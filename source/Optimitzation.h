@@ -1,12 +1,12 @@
 /*
- * DarkMatter.h
+ * Optimitzation.h
  *
  *  Created on: 03/07/2017
  *      Author: david
  */
 
-#ifndef DARKMATTER_H_
-#define DARKMATTER_H_
+#ifndef OPTIMITZATION_H_
+#define OPTIMITZATION_H_
 
 
 class Optimitzation {
@@ -17,15 +17,9 @@ public:
 
 protected:
 
-void CreateFunctions();
-
-
 private:
 
 
 };
 
-
-
-
-#endif /* DARKMATTER_H_ */
+#endif /* 	OPTIMITZATION_H_ */

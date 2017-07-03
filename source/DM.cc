@@ -1,34 +1,33 @@
 /*
- * DarkMatter.cc
+ * DM.cc
  *
  *  Created on: 03/07/2017
  *      Author: david
  */
 
-#include "Optimitzation.h"
+#include "DM.h"
 #include <TGraph.h>
 #include <TMath.h>
 
 using namespace std;
 
-Optimitzation::Optimitzation()
+DM::DM()
 {
 	    cout << endl;
 		cout << endl;
-		cout << "Constructor Optimitzation..." << endl;
+		cout << "Constructor DM..." << endl;
 		cout << endl;
 		cout << endl;
 
 }
 
-Optimitzation::~Optimitzation()
+DM::~DM()
 {
 
 		cout << endl;
 		cout << endl;
-		cout << "Destructor Optimitzation..." << endl;
+		cout << "Destructor DM..." << endl;
 		cout << endl;
 		cout << endl;
 
 }
-

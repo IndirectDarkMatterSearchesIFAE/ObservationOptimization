@@ -1,32 +1,32 @@
 /*
- * DarkMatter.cc
+ * Instrument.cc
  *
  *  Created on: 03/07/2017
  *      Author: david
  */
 
-#include "Optimitzation.h"
+#include "Instrument.h"
 #include <TGraph.h>
 #include <TMath.h>
 
 using namespace std;
 
-Optimitzation::Optimitzation()
+Instrument::Instrument()
 {
 	    cout << endl;
 		cout << endl;
-		cout << "Constructor Optimitzation..." << endl;
+		cout << "Constructor Instrument..." << endl;
 		cout << endl;
 		cout << endl;
 
 }
 
-Optimitzation::~Optimitzation()
+Instrument::~Instrument()
 {
 
 		cout << endl;
 		cout << endl;
-		cout << "Destructor Optimitzation..." << endl;
+		cout << "Destructor Instrument..." << endl;
 		cout << endl;
 		cout << endl;
 
