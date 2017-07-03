@@ -2,7 +2,7 @@
 
 Code to optimize DM observations with Imaging Atmospheric Cherenkov Telescopes (IACT).
 
-David
+David1
 
 ## Dependencies
 
