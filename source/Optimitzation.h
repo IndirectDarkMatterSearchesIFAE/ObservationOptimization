@@ -10,15 +10,14 @@
 
 
 class Optimitzation {
-
+public:
 	Optimitzation();
 	virtual ~Optimitzation();
-
-public:
 
 
 protected:
 
+void CreateFunctions();
 
 
 private:
