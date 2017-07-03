@@ -9,6 +9,23 @@
 #define DARKMATTER_H_
 
 
+class Optimitzation {
+
+	Optimitzation();
+	virtual ~Optimitzation();
+
+public:
+
+
+protected:
+
+
+
+private:
+
+
+};
+
 
 
 
