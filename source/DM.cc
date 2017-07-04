@@ -18,16 +18,13 @@ DM::DM()
 		cout << "Constructor DM..." << endl;
 		cout << endl;
 		cout << endl;
-
 }
 
 DM::~DM()
 {
-
 		cout << endl;
 		cout << endl;
 		cout << "Destructor DM..." << endl;
 		cout << endl;
 		cout << endl;
-
 }
