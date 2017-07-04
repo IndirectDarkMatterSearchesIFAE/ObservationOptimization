@@ -20,5 +20,6 @@ void RunExample1()
 	Optimitzation* prova2 = new Optimitzation();
 
 	cout<<"ADEU"<<endl;
+	cout<<"HOLA DE NOU"<<endl;
 
 }
