@@ -37,7 +37,7 @@ void SetJFactor();
 
 Double_t dJFactor(Double_t* x, Double_t* par);
 Double_t dQFactor(Double_t* x, Double_t* par);
-Double_t dLOS(Double_t x, Double_t* par);
+Double_t dLOS(Double_t* x, Double_t* par);
 
 
 

@@ -87,17 +87,10 @@ Double_t DM::dQFactor(Double_t* x, Double_t* par)
  return (gJFactor->Eval(x[0])/x[0])/(gJFactor->Eval(0.1)/0.1);
 }
 
-Double_t DM::dLOS(Double_t x, Double_t* par)
+Double_t DM::dLOS(Double_t* x, Double_t* par)
 {
-//	return fJFactor->Derivative(x)/(2*TMath::Pi*TMath::Sin(x));
-	return fJFactor->Derivative(x);
-
+	return fJFactor->Derivative(x[0])/(2*TMath::Pi()*TMath::Sin(x[0]));
 }
 
 
-
-
-
-
-//Provaré a fer el LOS amb una TF1 directament
 

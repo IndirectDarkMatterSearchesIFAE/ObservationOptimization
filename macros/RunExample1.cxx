@@ -90,8 +90,8 @@ void ShowLOS()
 	functionLOS->SetLineStyle(1);
 	TCanvas* canvas2 = new TCanvas("canvas2","",600,550);
 	TH1I* dummy2 = new TH1I("dummy2","UMa2",1,0.01,2.0);
-	dummy2->SetMaximum(10.);
-	dummy2->SetMinimum(0.);
+	dummy2->SetMaximum(3.e22);
+	dummy2->SetMinimum(1.e15);
 	dummy2->SetStats(0);
 	dummy2->SetXTitle(" #theta ");
 	dummy2->SetYTitle(" LOS [GeV^2/cm^5 #theta]");
@@ -99,7 +99,7 @@ void ShowLOS()
 	dummy2->GetYaxis()->SetTitleOffset(1.5);
 	dummy2->DrawCopy();
 	gPad->SetLogx();
-//	gPad->SetLogy();
+	gPad->SetLogy();
 	gPad->SetGridy();
 	gPad->SetGridx();
 	functionLOS->Draw("same");
@@ -115,9 +115,45 @@ void ShowLOS()
 	gPad->Update();
 }
 
+void ShowEfficiency()
+{
+//	De moment es epsilon 1D
+
+	Instrument* Efficiency = new Instrument();
+	TF1* functionEfficiency = Efficiency->GetEfficiency();
+
+	functionEfficiency->SetLineColor(2);
+	functionEfficiency->SetLineStyle(1);
+	TCanvas* canvas2 = new TCanvas("canvas2","",600,550);
+	TH1I* dummy2 = new TH1I("dummy2","UMa2",1,0.01,2.);
+	dummy2->SetMaximum(1.5);
+	dummy2->SetMinimum(0.);
+	dummy2->SetStats(0);
+	dummy2->SetXTitle(" #theta ");
+	dummy2->SetYTitle(" LOS [GeV^2/cm^5 #theta]");
+	dummy2->GetXaxis()->SetTitleOffset(1.3);
+	dummy2->GetYaxis()->SetTitleOffset(1.5);
+	dummy2->DrawCopy();
+	gPad->SetLogx();
+//	gPad->SetLogy();
+	gPad->SetGridy();
+	gPad->SetGridx();
+	functionEfficiency->Draw("same");
+
+	TLegend* leg2=new TLegend(.18,.75,.38,.90);
+	leg2->AddEntry(functionEfficiency, "LOS", "l");
+	leg2->SetFillColor(0);
+	leg2->SetLineColor(1);
+	leg2->SetBorderSize(1);
+	leg2->SetTextSize(0.037);
+	leg2->Draw();
+	gPad->Modified();
+	gPad->Update();
+}
 void RunExample1()
 {
-	ShowJFactor();
-	ShowQFactor();
-	ShowLOS();
+//	ShowJFactor();
+//	ShowQFactor();
+//	ShowLOS();
+	ShowEfficiency();
 }
