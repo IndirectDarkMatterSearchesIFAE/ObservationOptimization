@@ -8,15 +8,33 @@
 #ifndef DM_H_
 #define DM_H_
 
+#include <TF1.h>
+
 class DM {
 public:
 	DM();
 	virtual ~DM();
 
+
+TF1* GetJFactor()
+{
+	return fJFactor;
+}
+
+TF1* GetQFactor()
+{
+	return fQFactor;
+}
+
 protected:
 
-	void CreateFunctionsDM();
-	void SetJFactor();
+void CreateFunctionsDM();
+void SetJFactor();
+
+Double_t dJFactor(Double_t* x, Double_t* par);
+Double_t dQFactor(Double_t* x, Double_t* par);
+
+
 
 private:
 
@@ -28,10 +46,24 @@ TString sCandidate;
 TString sSource;
 
 ///////////////////////////////////////////////////////
+//Double_t
+///////////////////////////////////////////////////////
+
+Double_t dTheta;
+
+
+///////////////////////////////////////////////////////
 //TGraph
 ///////////////////////////////////////////////////////
 
 TGraph* gJFactor;
+
+///////////////////////////////////////////////////////
+//TF1
+///////////////////////////////////////////////////////
+TF1* fJFactor;
+TF1* fQFactor;
+
 
 };
 
