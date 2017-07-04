@@ -26,6 +26,10 @@ TF1* GetQFactor()
 	return fQFactor;
 }
 
+TF1* GetLOS()
+{
+	return fLOS;
+}
 protected:
 
 void CreateFunctionsDM();
@@ -33,6 +37,7 @@ void SetJFactor();
 
 Double_t dJFactor(Double_t* x, Double_t* par);
 Double_t dQFactor(Double_t* x, Double_t* par);
+Double_t dLOS(Double_t x, Double_t* par);
 
 
 
@@ -63,6 +68,7 @@ TGraph* gJFactor;
 ///////////////////////////////////////////////////////
 TF1* fJFactor;
 TF1* fQFactor;
+TF1* fLOS;
 
 
 };

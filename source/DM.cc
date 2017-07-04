@@ -38,8 +38,9 @@ void DM::CreateFunctionsDM()
 {
 SetJFactor();
 
-fJFactor = new TF1("fJFactor",this,&DM::dJFactor,0.,dTheta,1,"DM","JFactor");
-fQFactor = new TF1("fQFactor", this, &DM::dQFactor, 0., dTheta, 1, "DM", "QFactor");
+fJFactor = new TF1("fJFactor",this,&DM::dJFactor,0.,dTheta,0,"DM","dJFactor");
+fQFactor = new TF1("fQFactor", this, &DM::dQFactor, 0., dTheta, 0, "DM", "dQFactor");
+fLOS = new TF1("fLOS", this, &DM::dLOS, 0., dTheta, 0, "DM", "dLOS");
 
 }
 
@@ -84,6 +85,13 @@ Double_t DM::dJFactor(Double_t* x, Double_t* par)
 Double_t DM::dQFactor(Double_t* x, Double_t* par)
 {
  return (gJFactor->Eval(x[0])/x[0])/(gJFactor->Eval(0.1)/0.1);
+}
+
+Double_t DM::dLOS(Double_t x, Double_t* par)
+{
+//	return fJFactor->Derivative(x)/(2*TMath::Pi*TMath::Sin(x));
+	return fJFactor->Derivative(x);
+
 }
 
 

@@ -81,9 +81,43 @@ void ShowQFactor()
 	gPad->Update();
 }
 
+void ShowLOS()
+{
+	DM* LOS = new DM();
+	TF1* functionLOS= LOS->GetLOS();
+
+	functionLOS->SetLineColor(2);
+	functionLOS->SetLineStyle(1);
+	TCanvas* canvas2 = new TCanvas("canvas2","",600,550);
+	TH1I* dummy2 = new TH1I("dummy2","UMa2",1,0.01,2.0);
+	dummy2->SetMaximum(10.);
+	dummy2->SetMinimum(0.);
+	dummy2->SetStats(0);
+	dummy2->SetXTitle(" #theta ");
+	dummy2->SetYTitle(" LOS [GeV^2/cm^5 #theta]");
+	dummy2->GetXaxis()->SetTitleOffset(1.3);
+	dummy2->GetYaxis()->SetTitleOffset(1.5);
+	dummy2->DrawCopy();
+	gPad->SetLogx();
+//	gPad->SetLogy();
+	gPad->SetGridy();
+	gPad->SetGridx();
+	functionLOS->Draw("same");
+
+	TLegend* leg2=new TLegend(.18,.75,.38,.90);
+	leg2->AddEntry(functionLOS, "LOS", "l");
+	leg2->SetFillColor(0);
+	leg2->SetLineColor(1);
+	leg2->SetBorderSize(1);
+	leg2->SetTextSize(0.037);
+	leg2->Draw();
+	gPad->Modified();
+	gPad->Update();
+}
 
 void RunExample1()
 {
 	ShowJFactor();
 	ShowQFactor();
+	ShowLOS();
 }
