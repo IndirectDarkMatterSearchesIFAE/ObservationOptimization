@@ -5,7 +5,8 @@
  *      Author: david
  */
 
-#include "Instrument.h"
+//#include "Instrument.h" This works home
+#include <Instrument.h>
 #include <TGraph.h>
 #include <TMath.h>
 
@@ -34,23 +35,26 @@ Instrument::~Instrument()
 
 void Instrument::CreateFunctionsInstrument()
 {
-SetEfficiency();
+SetEpsilon();
 
-fEfficiency = new TF1("fEfficiency", this, &Instrument::dEfficiency, 0., dDccMax,0, "Instrument", "dEfficiency");
+fEpsilon = new TF1("fEpsilon", this, &Instrument::dEpsilon, 0., dDccMax, 0, "Instrument", "dEpsilon");
+fEfficiency = new TF1("fEfficiency", this, &Instrument::dEfficiency, 0., dDccMax, 0, "Instrument", "dEfficiency");
 
 }
 
-void Instrument::SetEfficiency()
+void Instrument::SetEpsilon()
 {
 
 	sInstrumentName="CrabNebula,Post-upgrade";
+	dWobble=0.;
 
-	TString myPath="/home/david/Escriptori/IFAE/DarkMatter/Eficiència/"+sInstrumentName+".txt";
+	TString myPath="/home/david/Documents/DarkMatter/Eficiència/"+sInstrumentName+".txt";
+//	TString myPath="/home/david/Escriptori/IFAE/DarkMatter/Eficiència/"+sInstrumentName+".txt";    This works home
 	Double_t X,Y,Y0;
 	Int_t contador = 0;
 
 
-	gEfficiency = new TGraph();
+	gEpsilon = new TGraph();
 
 	ifstream file (myPath);
 	while(!file.eof())
@@ -61,17 +65,23 @@ void Instrument::SetEfficiency()
 			Y0=Y;
 			}
 
-			gEfficiency->SetPoint(contador,X,(Y/Y0));
+			gEpsilon->SetPoint(contador,X,(Y/Y0));
 
 			contador++;
 		}
 	file.close();
-	dDccMax=X;	// dDistMaxCentreCam
+	dDccMax=X;
+}
+
+Double_t Instrument::dEpsilon(Double_t* x, Double_t* par)
+{
+	return gEpsilon->Eval(x[0]);
 }
 
 Double_t Instrument::dEfficiency(Double_t* x, Double_t* par)
 {
-	return gEfficiency->Eval(x[0]);
+	Double_t dccR = TMath::Power(TMath::Power(dWobble,2)+TMath::Power(x[0],2)+2*dWobble*x[0]*TMath::Cos(x[1]),0.50);
+	return dccR;
 }
 
 

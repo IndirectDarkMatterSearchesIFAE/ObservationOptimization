@@ -14,6 +14,11 @@ public:
 	Instrument();
 	virtual ~Instrument();
 
+TF1* GetEpsilon()
+{
+	return fEpsilon;
+}
+
 TF1* GetEfficiency()
 {
 	return fEfficiency;
@@ -22,9 +27,10 @@ TF1* GetEfficiency()
 protected:
 
 	void CreateFunctionsInstrument();
-	void SetEfficiency();
+	void SetEpsilon();
 
 Double_t dEfficiency(Double_t* x, Double_t* par);
+Double_t dEpsilon(Double_t* x, Double_t* par);
 
 
 private:
@@ -40,17 +46,19 @@ TString sInstrumentName;
 ///////////////////////////////////////////////////////
 
 Double_t dDccMax;
+Double_t dWobble;
 
 ///////////////////////////////////////////////////////
 //TGraph
 ///////////////////////////////////////////////////////
 
-TGraph* gEfficiency;
+TGraph* gEpsilon;
 
 ///////////////////////////////////////////////////////
 //TF1
 ///////////////////////////////////////////////////////
 
+TF1* fEpsilon;
 TF1* fEfficiency;
 
 };
