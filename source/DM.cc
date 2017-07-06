@@ -45,37 +45,112 @@ fQFactor = new TF1("fQFactor", this, &DM::dQFactor, 0., dTheta, 0, "DM", "dQFact
 
 void DM::SetJFactor()
 {
-	//Define a candidate and a source
+	//Define a candidate, a source and a form
 
-	sCandidate = "UMa2all";
+	sCandidate = "uma2";
 	sSource = "Bonnivard";
+	sForm = "Decay";
 
-//this works home
-	const TString myPath = "/home/david/Escriptori/IFAE/DarkMatter/Eficiència/"+sSource+"/"+sCandidate+".txt";
-
-//this works IFAE
-//	const TString myPath = "/home/david/Documents/DarkMatter/Eficiència/"+sSource+"/"+sCandidate+".txt";
-
-	Double_t dJ, dJ_m1, dJ_p1, dJ_m2, dJ_p2;
 	Int_t contador = 0;
 
 	gJFactor = new TGraph();
 
-	if (sSource == "Bonnivard")
-	{
+	if (sForm == "Decay"){
 
-	ifstream file (myPath);
-	while(!file.eof())
+		if (sSource == "Bonnivard")
 		{
-			file >> dTheta >> dJ >> dJ_m1 >> dJ_p1 >> dJ_m2 >> dJ_p2;
 
-			gJFactor->SetPoint(contador,dTheta,(dJ*(TMath::Power(SolarMass2GeV,1)/TMath::Power(kpc2cm,2))));
+			const TString myPath = "/home/david/Documents/DarkMatter/"+sSource+"/"+sCandidate+"_Dalphaint_cls_READ.output";
 
-			contador ++;
+			Double_t dJ, dJ_m1, dJ_p1, dJ_m2, dJ_p2;
+
+			ifstream file (myPath);
+			while(!file.eof())
+				{
+					file >> dTheta >> dJ >> dJ_m1 >> dJ_p1 >> dJ_m2 >> dJ_p2;
+
+					gJFactor->SetPoint(contador,dTheta,(dJ*(TMath::Power(SolarMass2GeV,1)/TMath::Power(kpc2cm,2))));
+
+					contador ++;
+				}
+
+			file.close();
+
 		}
 
-	file.close();
+		else if (sSource == "Geringer")
+		{
 
+			const TString myPath = "/home/david/Documents/DarkMatter/"+sSource+"/GeringerSamethTable_"+sCandidate+".txt";
+
+			TString name;
+			Double_t LogJann2m, LogJann1m, LogJann, LogJann1p, LogJann2p;
+			Double_t LogJdec2m, LogJdec1m, LogJdec, LogJdec1p, LogJdec2p;
+			Double_t a,b,c,d,e,f,g,h,i,j;
+
+			ifstream file (myPath);
+			while(!file.eof())
+			{
+				file	>> name >> dTheta
+						>> LogJann2m >> LogJann1m >> LogJann >> LogJann1p >> LogJann2p
+						>> LogJdec2m >> LogJdec1m >> LogJdec >> LogJdec1p >> LogJdec2p
+						>> a >> b >> c >> d >> e >> f >> g >> h >> i >> j;
+
+				gJFactor->SetPoint(contador, dTheta, TMath::Power(10., LogJdec));
+
+				contador ++;
+			}
+			file.close();
+		}
+	}
+
+	else if(sForm =="Annihilation")
+	{
+		if (sSource == "Bonnivard")
+		{
+
+			const TString myPath = "/home/david/Documents/DarkMatter/"+sSource+"/"+sCandidate+"_Jalphaint_cls_READ.output";
+
+			Double_t dJ, dJ_m1, dJ_p1, dJ_m2, dJ_p2;
+
+			ifstream file (myPath);
+			while(!file.eof())
+				{
+					file >> dTheta >> dJ >> dJ_m1 >> dJ_p1 >> dJ_m2 >> dJ_p2;
+
+					gJFactor->SetPoint(contador,dTheta,(dJ*(TMath::Power(SolarMass2GeV,2)/TMath::Power(kpc2cm,5))));
+
+					contador ++;
+				}
+
+			file.close();
+
+		}
+
+		else if (sSource == "Geringer")
+		{
+
+			const TString myPath = "/home/david/Documents/DarkMatter/"+sSource+"/GeringerSamethTable_"+sCandidate+".txt";
+
+			TString name;
+			Double_t LogJann2m, LogJann1m, LogJann, LogJann1p, LogJann2p;
+			Double_t LogJdec2m, LogJdec1m, LogJdec, LogJdec1p, LogJdec2p;
+			Double_t a,b,c,d,e,f,g,h,i,j;
+
+			ifstream file (myPath);
+			while(!file.eof())
+			{
+				file	>> name >> dTheta
+						>> LogJann2m >> LogJann1m >> LogJann >> LogJann1p >> LogJann2p
+						>> LogJdec2m >> LogJdec1m >> LogJdec >> LogJdec1p >> LogJdec2p
+						>> a >> b >> c >> d >> e >> f >> g >> h >> i >> j;
+
+				gJFactor->SetPoint(contador, dTheta, TMath::Power(10., LogJann));
+
+				contador ++;
+			}
+			file.close();
+		}
 	}
 }
 

@@ -43,6 +43,7 @@ private:
 
 TString sCandidate;
 TString sSource;
+TString sForm;
 
 ///////////////////////////////////////////////////////
 //Double_t
