@@ -40,9 +40,6 @@ SetJFactor();
 
 fJFactor = new TF1("fJFactor",this,&DM::dJFactor,0.,dTheta,0,"DM","dJFactor");
 fQFactor = new TF1("fQFactor", this, &DM::dQFactor, 0., dTheta, 0, "DM", "dQFactor");
-fLOS = new TF1("fLOS", this, &DM::dLOS, 0., dTheta, 0, "DM", "dLOS");
-fLOSPerSin = new TF1("fLOSPerSin", this, &DM::dLOSPerSin, 0., dTheta, 0, "DM", "dLOSPerSin");
-fJFactorFromLOS = new TF1("fJFactorFromLOS", this, &DM::dJFactorFromLOS, 0., dTheta, 0, "DM", "dJFactorFromLOS");
 
 }
 
@@ -53,8 +50,11 @@ void DM::SetJFactor()
 	sCandidate = "UMa2all";
 	sSource = "Bonnivard";
 
-//	const TString myPath = "/home/david/Escriptori/IFAE/DarkMatter/Eficiència/"+sSource+"/"+sCandidate+".txt";
-	const TString myPath = "/home/david/Documents/DarkMatter/Eficiència/"+sSource+"/"+sCandidate+".txt";
+//this works home
+	const TString myPath = "/home/david/Escriptori/IFAE/DarkMatter/Eficiència/"+sSource+"/"+sCandidate+".txt";
+
+//this works IFAE
+//	const TString myPath = "/home/david/Documents/DarkMatter/Eficiència/"+sSource+"/"+sCandidate+".txt";
 
 	Double_t dJ, dJ_m1, dJ_p1, dJ_m2, dJ_p2;
 	Int_t contador = 0;
@@ -88,26 +88,6 @@ Double_t DM::dJFactor(Double_t* x, Double_t* par)
 Double_t DM::dQFactor(Double_t* x, Double_t* par)
 {
  return (gJFactor->Eval(x[0])/x[0])/(gJFactor->Eval(0.1)/0.1);
-}
-
-Double_t DM::dLOS(Double_t* x, Double_t* par)
-{
-	return fJFactor->Derivative(x[0])/(2*TMath::Pi()*TMath::Sin(x[0]));
-}
-
-Double_t DM::dLOSPerSin(Double_t* x, Double_t* par)
-{
-
-	Double_t thetaRad = x[0]*(TMath::Pi()/180);
-
-	return fLOS->Eval(x[0])*TMath::Sin(thetaRad);
-}
-
-
-Double_t DM::dJFactorFromLOS(Double_t* x, Double_t* par)
-{
-	return 2*TMath::Pi()*fLOSPerSin->Integral(0., x[0]);
-
 }
 
 

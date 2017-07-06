@@ -6,7 +6,7 @@
  */
 
 //#include "Instrument.h" This works home
-#include <Instrument.h>
+#include "Instrument.h"
 #include <TGraph.h>
 #include <TMath.h>
 

@@ -1,15 +1,19 @@
-//#include "../source/DM.cc"
-//#include "../source/Instrument.cc"
-//#include "../source/Optimitzation.cc" this works home
+//this works home
+#include "../source/DM.cc"
+#include "../source/Instrument.cc"
+#include "../source/Optimitzation.cc"
 
-#include <../source/DM.cc>
-#include <../source/Instrument.cc>
-#include <../source/Optimitzation.cc>
+//this works at IFAE
+//#include <../source/DM.cc>
+//#include <../source/Instrument.cc>
+//#include <../source/Optimitzation.cc>
 
 
-//#include </home/david/Work/Software/root_v6.06.08/include/TStyle.h> this works home
+//this works home
+#include </home/david/Work/Software/root_v6.06.08/include/TStyle.h>
 
-#include </home/david/Work/Software/scripts/style.h>
+//this works at IFAE
+//#include </home/david/Work/Software/scripts/style.h>
 
 #include <TLegend.h>
 #include <TCanvas.h>
@@ -87,40 +91,6 @@ void ShowQFactor()
 	gPad->Update();
 }
 
-void ShowLOS()
-{
-	DM* LOS = new DM();
-	TF1* functionLOS= LOS->GetLOS();
-
-	functionLOS->SetLineColor(2);
-	functionLOS->SetLineStyle(1);
-	TCanvas* canvas2 = new TCanvas("canvas2","",600,550);
-	TH1I* dummy2 = new TH1I("dummy2","UMa2",1,0.01,2.0);
-	dummy2->SetMaximum(3.e22);
-	dummy2->SetMinimum(1.e15);
-	dummy2->SetStats(0);
-	dummy2->SetXTitle(" #theta ");
-	dummy2->SetYTitle(" LOS [GeV^2/cm^5 #theta]");
-	dummy2->GetXaxis()->SetTitleOffset(1.3);
-	dummy2->GetYaxis()->SetTitleOffset(1.5);
-	dummy2->DrawCopy();
-	gPad->SetLogx();
-	gPad->SetLogy();
-	gPad->SetGridy();
-	gPad->SetGridx();
-	functionLOS->Draw("same");
-
-	TLegend* leg2=new TLegend(.18,.75,.38,.90);
-	leg2->AddEntry(functionLOS, "LOS", "l");
-	leg2->SetFillColor(0);
-	leg2->SetLineColor(1);
-	leg2->SetBorderSize(1);
-	leg2->SetTextSize(0.037);
-	leg2->Draw();
-	gPad->Modified();
-	gPad->Update();
-}
-
 void ShowEpsilon()
 {
 	Instrument* Epsilon = new Instrument();
@@ -190,48 +160,10 @@ void ShowEfficiency()
 //	gPad->Update();
 }
 
-void ShowJFactorfromLOS()
-{
-
-	DM* JFactorFromLOS = new DM();
-	TF1* functionJFactorFromLOS = JFactorFromLOS->GetJFactorFromLOS();
-
-	functionJFactorFromLOS->SetLineColor(2);
-	functionJFactorFromLOS->SetLineStyle(1);
-	TCanvas* canvas5 = new TCanvas("canvas5","",600,550);
-	TH1I* dummy5 = new TH1I("dummy5","UMa2",1,0.01,2.);
-	dummy5->SetMaximum(3.e22);
-	dummy5->SetMinimum(1.e15);
-	dummy5->SetStats(0);
-	dummy5->SetXTitle(" #theta ");
-	dummy5->SetYTitle(" JFactor");
-	dummy5->GetXaxis()->SetTitleOffset(1.3);
-	dummy5->GetYaxis()->SetTitleOffset(1.5);
-	dummy5->DrawCopy();
-	gPad->SetLogx();
-	gPad->SetLogy();
-	gPad->SetGridy();
-	gPad->SetGridx();
-	functionJFactorFromLOS->Draw("same");
-
-	TLegend* leg5=new TLegend(.18,.75,.38,.90);
-	leg5->AddEntry(functionJFactorFromLOS, "J Factor From LOS", "l");
-	leg5->SetFillColor(0);
-	leg5->SetLineColor(1);
-	leg5->SetBorderSize(1);
-	leg5->SetTextSize(0.037);
-	leg5->Draw();
-	gPad->Modified();
-	gPad->Update();
-
-}
-
 void RunExample1()
 {
-	ShowJFactor();
+//	ShowJFactor();
 //	ShowQFactor();
-//	ShowLOS();
 //	ShowEpsilon();
 //	ShowEfficiency();
-//	ShowJFactorfromLOS();
 }
