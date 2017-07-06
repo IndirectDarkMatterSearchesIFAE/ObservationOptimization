@@ -14,7 +14,7 @@ using namespace std;
 static const Double_t SolarMass2GeV = 1.1154e57;  			// [GeV/SolarM]
 static const Double_t kpc2cm        = 3.08568e21; 			// [cm/kpc]
 
-DM::DM()
+DM::DM(Candidate, Source, Form);
 {
 	    cout << endl;
 		cout << endl;
@@ -36,6 +36,7 @@ DM::~DM()
 
 void DM::CreateFunctionsDM()
 {
+
 SetJFactor();
 
 fJFactor = new TF1("fJFactor",this,&DM::dJFactor,0.,dTheta,0,"DM","dJFactor");
@@ -45,22 +46,16 @@ fQFactor = new TF1("fQFactor", this, &DM::dQFactor, 0., dTheta, 0, "DM", "dQFact
 
 void DM::SetJFactor()
 {
-	//Define a candidate, a source and a form
-
-	sCandidate = "uma2";
-	sSource = "Bonnivard";
-	sForm = "Decay";
-
 	Int_t contador = 0;
 
 	gJFactor = new TGraph();
 
-	if (sForm == "Decay"){
+	if (GetForm() == "Decay"){
 
-		if (sSource == "Bonnivard")
+		if (GetSource() == "Bonnivard")
 		{
 
-			const TString myPath = "/home/david/Documents/DarkMatter/"+sSource+"/"+sCandidate+"_Dalphaint_cls_READ.output";
+			const TString myPath = "/home/david/Documents/DarkMatter/"+GetSource()+"/"+GetCandidate()+"_Dalphaint_cls_READ.output";
 
 			Double_t dJ, dJ_m1, dJ_p1, dJ_m2, dJ_p2;
 
@@ -78,10 +73,10 @@ void DM::SetJFactor()
 
 		}
 
-		else if (sSource == "Geringer")
+		else if (GetSource() == "Geringer")
 		{
 
-			const TString myPath = "/home/david/Documents/DarkMatter/"+sSource+"/GeringerSamethTable_"+sCandidate+".txt";
+			const TString myPath = "/home/david/Documents/DarkMatter/"+GetSource()+"/GeringerSamethTable_"+GetCandidate()+".txt";
 
 			TString name;
 			Double_t LogJann2m, LogJann1m, LogJann, LogJann1p, LogJann2p;
@@ -104,12 +99,12 @@ void DM::SetJFactor()
 		}
 	}
 
-	else if(sForm =="Annihilation")
+	else if(GetForm() =="Annihilation")
 	{
-		if (sSource == "Bonnivard")
+		if (GetSource() == "Bonnivard")
 		{
 
-			const TString myPath = "/home/david/Documents/DarkMatter/"+sSource+"/"+sCandidate+"_Jalphaint_cls_READ.output";
+			const TString myPath = "/home/david/Documents/DarkMatter/"+GetSource()+"/"+GetCandidate()+"_Jalphaint_cls_READ.output";
 
 			Double_t dJ, dJ_m1, dJ_p1, dJ_m2, dJ_p2;
 
@@ -127,10 +122,10 @@ void DM::SetJFactor()
 
 		}
 
-		else if (sSource == "Geringer")
+		else if (GetSource() == "Geringer")
 		{
 
-			const TString myPath = "/home/david/Documents/DarkMatter/"+sSource+"/GeringerSamethTable_"+sCandidate+".txt";
+			const TString myPath = "/home/david/Documents/DarkMatter/"+GetSource()+"/GeringerSamethTable_"+GetCandidate()+".txt";
 
 			TString name;
 			Double_t LogJann2m, LogJann1m, LogJann, LogJann1p, LogJann2p;
@@ -154,11 +149,18 @@ void DM::SetJFactor()
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////
+// x[0] = dTheta
+///////////////////////////////////////////////////////////////////////////
 
 Double_t DM::dJFactor(Double_t* x, Double_t* par)
 {
  return gJFactor->Eval(x[0]);
 }
+
+///////////////////////////////////////////////////////////////////////////
+// x[0] = dTheta
+///////////////////////////////////////////////////////////////////////////
 
 Double_t DM::dQFactor(Double_t* x, Double_t* par)
 {

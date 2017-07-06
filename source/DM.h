@@ -9,12 +9,13 @@
 #define DM_H_
 
 #include <TF1.h>
+using namespace std;
 
 class DM {
 public:
-	DM();
-	virtual ~DM();
 
+	DM(TString Candidate, TString Source, TString Form);
+		virtual ~DM();
 
 TF1* GetJFactor()
 {
@@ -25,6 +26,37 @@ TF1* GetQFactor()
 {
 	return fQFactor;
 }
+
+void SetCandidate(TString Candidate)
+{
+	 sCandidate=Candidate;
+}
+
+void SetSource(TString Source)
+{
+	sSource = Source;
+}
+
+void SetForm(TString Form)
+{
+	sForm = Form;
+}
+
+TString GetCandidate()
+{
+	return sCandidate;
+}
+
+TString GetSource()
+{
+	return sSource;
+}
+
+TString GetForm()
+{
+	return sForm;
+}
+
 
 protected:
 

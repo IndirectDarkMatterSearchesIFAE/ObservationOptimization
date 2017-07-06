@@ -24,18 +24,41 @@ using namespace std;
 
 void ShowJFactor()
 {
-	DM* 	JFactor = new DM();
+
+	TString Candidate ="uma2";
+	TString Source = "Bonnivard";
+	TString Form = "Decay";
+
+	DM* 	JFactor = new DM(Candidate, Source, Form);
+	JFactor->SetCandidate(Candidate);
+	JFactor->SetSource(Source);
+	JFactor->SetForm(Form);
 	TF1* functionJFactor = JFactor->GetJFactor();
+
+//	TString Candidate = JFactor->GetCandidate();
+//	TString Source = JFactor->GetSource();
+//	TString Form = JFactor->GetForm();
 
 	functionJFactor->SetLineColor(2);
 	functionJFactor->SetLineStyle(1);
 	TCanvas* canvas = new TCanvas("canvas","",600,550);
-	TH1I* dummy = new TH1I("dummy","UMa2",1,0.01,2.0);
+	TH1I* dummy = new TH1I("dummy", Source,1,0.01,2.0);
 	dummy->SetMaximum(3.e20);
 	dummy->SetMinimum(1.e15);
 	dummy->SetStats(0);
 	dummy->SetXTitle(" #theta ");
-	dummy->SetYTitle(" J Factor [GeV^2/cm^5]");
+	if (Form == "Annihilation")
+	{
+		cout<<"Annihilation"<<endl;
+		dummy->SetYTitle(" J Factor [GeV^2/cm^5]");
+
+	}
+	else if (Form == "Decay")
+	{
+		cout<<"Decay"<<endl;
+		dummy->SetYTitle(" J Factor [GeV/cm^2]");
+
+	}
 	dummy->GetXaxis()->SetTitleOffset(1.3);
 	dummy->GetYaxis()->SetTitleOffset(1.5);
 	dummy->DrawCopy();
@@ -45,8 +68,8 @@ void ShowJFactor()
 	gPad->SetGridx();
 	functionJFactor->Draw("same");
 
-	TLegend* leg=new TLegend(.18,.75,.38,.90);
-	leg->AddEntry(functionJFactor, "J Factor", "l");
+	TLegend* leg=new TLegend(.18,.75,.53,.85);
+	leg->AddEntry(functionJFactor, Candidate+"_"+Form , "l");
 	leg->SetFillColor(0);
 	leg->SetLineColor(1);
 	leg->SetBorderSize(1);
@@ -55,7 +78,7 @@ void ShowJFactor()
 	gPad->Modified();
 	gPad->Update();
 
-//	canvas->Print("/home/david/Documents/DarkMatter/Resultats/JFactor/BonDuma2.png");
+	canvas->Print("/home/david/Documents/DarkMatter/Resultats/JFactor/"+Source+"_"+Form+"_"+Candidate+".png");
 
 }
 
