@@ -26,16 +26,17 @@ void ShowJFactor()
 {
 
 	TString Candidate ="uma2";
-	TString Source = "Geringer";
+	TString Source = "Bonnivard";
 	TString Form = "Annihilation";
 
 	DM* 	JFactor = new DM(Candidate, Source, Form);
 	TF1* functionJFactor = JFactor->GetJFactor();
+	Double_t Theta = JFactor->GetTheta();
 
 	functionJFactor->SetLineColor(2);
 	functionJFactor->SetLineStyle(1);
 	TCanvas* canvas = new TCanvas("canvas","",600,550);
-	TH1I* dummy = new TH1I("dummy", Source,1,0.01,2.0);
+	TH1I* dummy = new TH1I("dummy", Source,1,0.01,Theta);
 	dummy->SetMaximum(3.e20);
 	dummy->SetMinimum(1.e15);
 	dummy->SetStats(0);
@@ -71,7 +72,7 @@ void ShowJFactor()
 	gPad->Modified();
 	gPad->Update();
 
-	canvas->Print("/home/david/Documents/DarkMatter/Resultats/JFactor/"+Source+"_"+Form+"_"+Candidate+".png");
+//	canvas->Print("/home/david/Documents/DarkMatter/Resultats/JFactor/"+Source+"_"+Form+"_"+Candidate+".png");
 
 }
 
@@ -84,11 +85,12 @@ void ShowQFactor()
 
 	DM* QFactor = new DM(Candidate, Source, Form);
 	TF1* functionQFactor= QFactor->GetQFactor();
+	Double_t Theta = QFactor->GetTheta();
 
 	functionQFactor->SetLineColor(2);
 	functionQFactor->SetLineStyle(1);
 	TCanvas* canvas1 = new TCanvas("canvas1","",600,550);
-	TH1I* dummy1 = new TH1I("dummy1",Source ,1,0.01,2.0);
+	TH1I* dummy1 = new TH1I("dummy1",Source ,1,0.01,Theta);
 	dummy1->SetMaximum(3.);
 	dummy1->SetMinimum(0.);
 	dummy1->SetStats(0);
@@ -127,29 +129,76 @@ void ShowQFactor()
 
 void ShowEpsilon()
 {
-	Instrument* Epsilon = new Instrument();
-	TF1* functionEpsilon = Epsilon->GetEpsilon();
 
-	functionEpsilon->SetLineColor(2);
-	functionEpsilon->SetLineStyle(1);
-	TCanvas* canvas3 = new TCanvas("canvas3","",600,550);
-	TH1I* dummy3 = new TH1I("dummy3","UMa2",1,0.01,2.);
-	dummy3->SetMaximum(1.5);
-	dummy3->SetMinimum(0.);
-	dummy3->SetStats(0);
-	dummy3->SetXTitle(" dcc ");
-	dummy3->SetYTitle(" Epsilon");
-	dummy3->GetXaxis()->SetTitleOffset(1.3);
-	dummy3->GetYaxis()->SetTitleOffset(1.5);
-	dummy3->DrawCopy();
-	gPad->SetLogx();
+	TString InstrumentName= "CrabNebula,Post-upgrade";
+	Double_t Wobble=0.;
+	TString sWobble = Form("%.1f",Wobble);
+
+	Instrument* Epsilon = new Instrument(InstrumentName, Wobble);
+	TF2* functionEpsilon = Epsilon->GetEpsilon();
+	Double_t Dcc = Epsilon->GetDcc();
+
+	TCanvas* canvas2 = new TCanvas("canvas2","",600,550);
+	TH2I* dummy2 = new TH2I("dummy2", "",1,0.,Dcc, 1, -TMath::Pi(), TMath::Pi());
+	dummy2->SetMaximum(1.5);
+	dummy2->SetMinimum(0.);
+	dummy2->SetStats(0);
+	dummy2->SetXTitle(" dcc ");
+	dummy2->SetYTitle(" Epsilon");
+	dummy2->GetXaxis()->SetTitleOffset(1.3);
+	dummy2->GetYaxis()->SetTitleOffset(1.5);
+	dummy2->DrawCopy();
+//	gPad->SetLogx();
 //	gPad->SetLogy();
 	gPad->SetGridy();
 	gPad->SetGridx();
-	functionEpsilon->Draw("same");
+	functionEpsilon->Draw("colz");
 
-	TLegend* leg3=new TLegend(.18,.75,.38,.90);
-	leg3->AddEntry(functionEpsilon, "Epsilon", "l");
+	TLegend* leg2=new TLegend(.18,.75,.66,.85);
+	leg2->AddEntry(functionEpsilon, InstrumentName , "l");
+	leg2->SetFillColor(0);
+	leg2->SetLineColor(1);
+	leg2->SetBorderSize(1);
+	leg2->SetTextSize(0.037);
+	leg2->Draw();
+	gPad->Modified();
+	gPad->Update();
+
+	canvas2->Print("/home/david/Documents/DarkMatter/Resultats/Epsilon/"+InstrumentName+"_Wobble:"+sWobble+".png");
+
+}
+
+void ShowEfficiency()
+{
+
+	TString InstrumentName= "CrabNebula,Post-upgrade";
+	Double_t Wobble=0.;
+	TString sWobble = Form("%.1f",Wobble);
+
+	Instrument* Efficiency = new Instrument(InstrumentName, Wobble);
+	TF1* functionEfficiency = Efficiency->GetEfficiency();
+	Double_t TethaMax = Efficiency->GetThetaMax();
+
+	functionEfficiency->SetLineColor(2);
+	functionEfficiency->SetLineStyle(1);
+	TCanvas* canvas3 = new TCanvas("canvas3","",600,550);
+	TH1I* dummy3 = new TH1I("dummy3","",1,0.,TethaMax);
+	dummy3->SetMaximum(1.5);
+	dummy3->SetMinimum(0.);
+	dummy3->SetStats(0);
+	dummy3->SetXTitle(" #theta ");
+	dummy3->SetYTitle(" Efficiency ");
+	dummy3->GetXaxis()->SetTitleOffset(1.3);
+	dummy3->GetYaxis()->SetTitleOffset(1.5);
+	dummy3->DrawCopy();
+//	gPad->SetLogx();
+//	gPad->SetLogy();
+	gPad->SetGridy();
+	gPad->SetGridx();
+	functionEfficiency->Draw("same");
+
+	TLegend* leg3=new TLegend(.18,.75,.66,.85);
+	leg3->AddEntry(functionEfficiency, InstrumentName, "l");
 	leg3->SetFillColor(0);
 	leg3->SetLineColor(1);
 	leg3->SetBorderSize(1);
@@ -157,47 +206,23 @@ void ShowEpsilon()
 	leg3->Draw();
 	gPad->Modified();
 	gPad->Update();
-}
 
-void ShowEfficiency()
-{
+	canvas3->Print("/home/david/Documents/DarkMatter/Resultats/Eficiència/"+InstrumentName+"_Wobble:"+sWobble+".png");
 
-//	Instrument* Efficiency = new Instrument();
-//	TF1* functionEfficiency = Efficiency->GetEfficiency();
-//
-//	functionEfficiency->SetLineColor(2);
-//	functionEfficiency->SetLineStyle(1);
-//	TCanvas* canvas2 = new TCanvas("canvas2","",600,550);
-//	TH1I* dummy2 = new TH1I("dummy2","UMa2",1,0.01,2.);
-//	dummy2->SetMaximum(1.5);
-//	dummy2->SetMinimum(0.);
-//	dummy2->SetStats(0);
-//	dummy2->SetXTitle(" #theta ");
-//	dummy2->SetYTitle(" LOS [GeV^2/cm^5 #theta]");
-//	dummy2->GetXaxis()->SetTitleOffset(1.3);
-//	dummy2->GetYaxis()->SetTitleOffset(1.5);
-//	dummy2->DrawCopy();
-//	gPad->SetLogx();
-////	gPad->SetLogy();
-//	gPad->SetGridy();
-//	gPad->SetGridx();
-//	functionEfficiency->Draw("same");
-//
-//	TLegend* leg2=new TLegend(.18,.75,.38,.90);
-//	leg2->AddEntry(functionEfficiency, "LOS", "l");
-//	leg2->SetFillColor(0);
-//	leg2->SetLineColor(1);
-//	leg2->SetBorderSize(1);
-//	leg2->SetTextSize(0.037);
-//	leg2->Draw();
-//	gPad->Modified();
-//	gPad->Update();
 }
 
 void RunExample1()
 {
+
+///////////////////////////////////////////////////////////////
+//DM Class
+//////////////////////////////////////////////////////////////
 //	ShowJFactor();
-	ShowQFactor();
-//	ShowEpsilon();
-//	ShowEfficiency();
+//	ShowQFactor();
+
+///////////////////////////////////////////////////////////////
+//Instrument Class
+////////////////////////////////////////////////////////////////
+	ShowEpsilon();
+	ShowEfficiency();
 }

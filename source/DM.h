@@ -27,6 +27,11 @@ TF1* GetQFactor()
 	return fQFactor;
 }
 
+Double_t GetTheta()
+{
+	return dTheta;
+}
+
 protected:
 
 void CreateFunctionsDM();
