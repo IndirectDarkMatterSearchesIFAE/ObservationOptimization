@@ -27,37 +27,6 @@ TF1* GetQFactor()
 	return fQFactor;
 }
 
-void SetCandidate(TString Candidate)
-{
-	 sCandidate=Candidate;
-}
-
-void SetSource(TString Source)
-{
-	sSource = Source;
-}
-
-void SetForm(TString Form)
-{
-	sForm = Form;
-}
-
-TString GetCandidate()
-{
-	return sCandidate;
-}
-
-TString GetSource()
-{
-	return sSource;
-}
-
-TString GetForm()
-{
-	return sForm;
-}
-
-
 protected:
 
 void CreateFunctionsDM();

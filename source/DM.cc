@@ -14,7 +14,8 @@ using namespace std;
 static const Double_t SolarMass2GeV = 1.1154e57;  			// [GeV/SolarM]
 static const Double_t kpc2cm        = 3.08568e21; 			// [cm/kpc]
 
-DM::DM(Candidate, Source, Form);
+DM::DM(TString Candidate, TString Source, TString Form):
+		sCandidate(Candidate), sSource(Source), sForm(Form)
 {
 	    cout << endl;
 		cout << endl;
@@ -50,12 +51,12 @@ void DM::SetJFactor()
 
 	gJFactor = new TGraph();
 
-	if (GetForm() == "Decay"){
+	if (sForm == "Decay"){
 
-		if (GetSource() == "Bonnivard")
+		if (sSource == "Bonnivard")
 		{
 
-			const TString myPath = "/home/david/Documents/DarkMatter/"+GetSource()+"/"+GetCandidate()+"_Dalphaint_cls_READ.output";
+			const TString myPath = "/home/david/Documents/DarkMatter/"+sSource+"/"+sCandidate+"_Dalphaint_cls_READ.output";
 
 			Double_t dJ, dJ_m1, dJ_p1, dJ_m2, dJ_p2;
 
@@ -73,10 +74,10 @@ void DM::SetJFactor()
 
 		}
 
-		else if (GetSource() == "Geringer")
+		else if (sSource == "Geringer")
 		{
 
-			const TString myPath = "/home/david/Documents/DarkMatter/"+GetSource()+"/GeringerSamethTable_"+GetCandidate()+".txt";
+			const TString myPath = "/home/david/Documents/DarkMatter/"+sSource+"/GeringerSamethTable_"+sCandidate+".txt";
 
 			TString name;
 			Double_t LogJann2m, LogJann1m, LogJann, LogJann1p, LogJann2p;
@@ -99,12 +100,12 @@ void DM::SetJFactor()
 		}
 	}
 
-	else if(GetForm() =="Annihilation")
+	else if(sForm =="Annihilation")
 	{
-		if (GetSource() == "Bonnivard")
+		if (sSource == "Bonnivard")
 		{
 
-			const TString myPath = "/home/david/Documents/DarkMatter/"+GetSource()+"/"+GetCandidate()+"_Jalphaint_cls_READ.output";
+			const TString myPath = "/home/david/Documents/DarkMatter/"+sSource+"/"+sCandidate+"_Jalphaint_cls_READ.output";
 
 			Double_t dJ, dJ_m1, dJ_p1, dJ_m2, dJ_p2;
 
@@ -122,10 +123,10 @@ void DM::SetJFactor()
 
 		}
 
-		else if (GetSource() == "Geringer")
+		else if (sSource == "Geringer")
 		{
 
-			const TString myPath = "/home/david/Documents/DarkMatter/"+GetSource()+"/GeringerSamethTable_"+GetCandidate()+".txt";
+			const TString myPath = "/home/david/Documents/DarkMatter/"+sSource+"/GeringerSamethTable_"+sCandidate+".txt";
 
 			TString name;
 			Double_t LogJann2m, LogJann1m, LogJann, LogJann1p, LogJann2p;

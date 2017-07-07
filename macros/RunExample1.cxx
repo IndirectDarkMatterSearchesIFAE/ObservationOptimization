@@ -26,18 +26,11 @@ void ShowJFactor()
 {
 
 	TString Candidate ="uma2";
-	TString Source = "Bonnivard";
-	TString Form = "Decay";
+	TString Source = "Geringer";
+	TString Form = "Annihilation";
 
 	DM* 	JFactor = new DM(Candidate, Source, Form);
-	JFactor->SetCandidate(Candidate);
-	JFactor->SetSource(Source);
-	JFactor->SetForm(Form);
 	TF1* functionJFactor = JFactor->GetJFactor();
-
-//	TString Candidate = JFactor->GetCandidate();
-//	TString Source = JFactor->GetSource();
-//	TString Form = JFactor->GetForm();
 
 	functionJFactor->SetLineColor(2);
 	functionJFactor->SetLineStyle(1);
@@ -78,43 +71,43 @@ void ShowJFactor()
 	gPad->Modified();
 	gPad->Update();
 
-	canvas->Print("/home/david/Documents/DarkMatter/Resultats/JFactor/"+Source+"_"+Form+"_"+Candidate+".png");
+//	canvas->Print("/home/david/Documents/DarkMatter/Resultats/JFactor1/"+Source+"_"+Form+"_"+Candidate+".png");
 
 }
 
 void ShowQFactor()
 {
-
-	DM* QFactor = new DM();
-	TF1* functionQFactor= QFactor->GetQFactor();
-
-	functionQFactor->SetLineColor(2);
-	functionQFactor->SetLineStyle(1);
-	TCanvas* canvas1 = new TCanvas("canvas1","",600,550);
-	TH1I* dummy1 = new TH1I("dummy1","UMa2",1,0.01,2.0);
-	dummy1->SetMaximum(10.);
-	dummy1->SetMinimum(0.);
-	dummy1->SetStats(0);
-	dummy1->SetXTitle(" #theta ");
-	dummy1->SetYTitle(" Q Factor [GeV^2/cm^5 #theta]");
-	dummy1->GetXaxis()->SetTitleOffset(1.3);
-	dummy1->GetYaxis()->SetTitleOffset(1.5);
-	dummy1->DrawCopy();
-	gPad->SetLogx();
-//	gPad->SetLogy();
-	gPad->SetGridy();
-	gPad->SetGridx();
-	functionQFactor->Draw("same");
-
-	TLegend* leg=new TLegend(.18,.75,.38,.90);
-	leg->AddEntry(functionQFactor, "Q Factor", "l");
-	leg->SetFillColor(0);
-	leg->SetLineColor(1);
-	leg->SetBorderSize(1);
-	leg->SetTextSize(0.037);
-	leg->Draw();
-	gPad->Modified();
-	gPad->Update();
+//
+//	DM* QFactor = new DM();
+//	TF1* functionQFactor= QFactor->GetQFactor();
+//
+//	functionQFactor->SetLineColor(2);
+//	functionQFactor->SetLineStyle(1);
+//	TCanvas* canvas1 = new TCanvas("canvas1","",600,550);
+//	TH1I* dummy1 = new TH1I("dummy1","UMa2",1,0.01,2.0);
+//	dummy1->SetMaximum(10.);
+//	dummy1->SetMinimum(0.);
+//	dummy1->SetStats(0);
+//	dummy1->SetXTitle(" #theta ");
+//	dummy1->SetYTitle(" Q Factor [GeV^2/cm^5 #theta]");
+//	dummy1->GetXaxis()->SetTitleOffset(1.3);
+//	dummy1->GetYaxis()->SetTitleOffset(1.5);
+//	dummy1->DrawCopy();
+//	gPad->SetLogx();
+////	gPad->SetLogy();
+//	gPad->SetGridy();
+//	gPad->SetGridx();
+//	functionQFactor->Draw("same");
+//
+//	TLegend* leg=new TLegend(.18,.75,.38,.90);
+//	leg->AddEntry(functionQFactor, "Q Factor", "l");
+//	leg->SetFillColor(0);
+//	leg->SetLineColor(1);
+//	leg->SetBorderSize(1);
+//	leg->SetTextSize(0.037);
+//	leg->Draw();
+//	gPad->Modified();
+//	gPad->Update();
 }
 
 void ShowEpsilon()
