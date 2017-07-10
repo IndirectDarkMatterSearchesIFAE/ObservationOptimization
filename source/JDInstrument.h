@@ -16,7 +16,7 @@
 
 class JDInstrument {
 public:
-	JDInstrument(TString InstrumentName, Double_t Wobble);
+	JDInstrument(TString instrumentName, Double_t wobble);
 	virtual ~JDInstrument();
 
 TF2* GetEpsilon()

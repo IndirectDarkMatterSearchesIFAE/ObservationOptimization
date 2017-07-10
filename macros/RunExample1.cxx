@@ -1,5 +1,5 @@
 //this works home
-#include "../source/DM.cc"
+#include "../source/JDDarkMatter.cc"
 #include "../source/Instrument.cc"
 #include "../source/Optimitzation.cc"
 
@@ -10,10 +10,10 @@
 
 
 //this works home
-#include </home/david/Work/Software/root_v6.06.08/include/TStyle.h>
+//#include </home/david/Work/Software/root_v6.06.08/include/TStyle.h>
 
 //this works at IFAE
-//#include </home/david/Work/Software/scripts/style.h>
+#include </home/david/Work/Software/scripts/style.h>
 
 #include <TLegend.h>
 #include <TCanvas.h>
@@ -25,33 +25,29 @@ using namespace std;
 void ShowJFactor()
 {
 
-	TString Candidate ="uma2";
-	TString Source = "Bonnivard";
-	TString Form = "Annihilation";
+	TString author = "Bonnivard";
+	TString source ="uma2";
+	TString candidate = "Decay";
 
-	DM* 	JFactor = new DM(Candidate, Source, Form);
-	TF1* functionJFactor = JFactor->GetJFactor();
+	JDDarkMatter* 	JFactor = new JDDarkMatter(author, source, candidate);
+	TF1* functionJFactor = JFactor->GetTF1JFactorVsTheta();
 	Double_t Theta = JFactor->GetTheta();
 
 	functionJFactor->SetLineColor(2);
 	functionJFactor->SetLineStyle(1);
 	TCanvas* canvas = new TCanvas("canvas","",600,550);
-	TH1I* dummy = new TH1I("dummy", Source,1,0.01,Theta);
+	TH1I* dummy = new TH1I("dummy", author,1,0.01,Theta);
 	dummy->SetMaximum(3.e20);
 	dummy->SetMinimum(1.e15);
 	dummy->SetStats(0);
 	dummy->SetXTitle(" #theta ");
-	if (Form == "Annihilation")
+	if (candidate == "Annihilation")
 	{
-		cout<<"Annihilation"<<endl;
 		dummy->SetYTitle(" J Factor [GeV^2/cm^5]");
-
 	}
-	else if (Form == "Decay")
+	else if (candidate == "Decay")
 	{
-		cout<<"Decay"<<endl;
 		dummy->SetYTitle(" J Factor [GeV/cm^2]");
-
 	}
 	dummy->GetXaxis()->SetTitleOffset(1.3);
 	dummy->GetYaxis()->SetTitleOffset(1.5);
@@ -63,7 +59,7 @@ void ShowJFactor()
 	functionJFactor->Draw("same");
 
 	TLegend* leg=new TLegend(.18,.75,.53,.85);
-	leg->AddEntry(functionJFactor, Candidate+"_"+Form , "l");
+	leg->AddEntry(functionJFactor, source+"_"+candidate , "l");
 	leg->SetFillColor(0);
 	leg->SetLineColor(1);
 	leg->SetBorderSize(1);
@@ -72,35 +68,37 @@ void ShowJFactor()
 	gPad->Modified();
 	gPad->Update();
 
-//	canvas->Print("/home/david/Documents/DarkMatter/Resultats/JFactor/"+Source+"_"+Form+"_"+Candidate+".png");
+//	canvas->Print("/home/david/Documents/DarkMatter/Resultats/JFactor/"+author+"_"+candidate+"_"+source+".png");
 
 }
 
 void ShowQFactor()
 {
 
-	TString Candidate ="uma2";
-	TString Source = "Geringer";
-	TString Form = "Decay";
+	TString author = "Bonnivard";
+	TString source ="uma2";
+	TString candidate = "Annihilation";
+	Double_t normalizationPoint = 0.1;
 
-	DM* QFactor = new DM(Candidate, Source, Form);
-	TF1* functionQFactor= QFactor->GetQFactor();
+	JDDarkMatter* QFactor = new JDDarkMatter(author, source, candidate);
+//	QFactor->~JDDarkMatter();
+	TF1* functionQFactor= QFactor->GetTF1QFactorVsTheta(normalizationPoint);
 	Double_t Theta = QFactor->GetTheta();
 
 	functionQFactor->SetLineColor(2);
 	functionQFactor->SetLineStyle(1);
 	TCanvas* canvas1 = new TCanvas("canvas1","",600,550);
-	TH1I* dummy1 = new TH1I("dummy1",Source ,1,0.01,Theta);
+	TH1I* dummy1 = new TH1I("dummy1",author ,1,0.01,Theta);
 	dummy1->SetMaximum(3.);
 	dummy1->SetMinimum(0.);
 	dummy1->SetStats(0);
 	dummy1->SetXTitle(" #theta ");
-	if (Form == "Annihilation")
+	if (candidate == "Annihilation")
 		{
 			dummy1->SetYTitle(" Q Factor [GeV^2/cm^5 #theta]");
 
 		}
-		else if (Form == "Decay")
+		else if (candidate == "Decay")
 		{
 			dummy1->SetYTitle(" Q Factor [GeV/cm^2 #theta]");
 		}
@@ -114,7 +112,7 @@ void ShowQFactor()
 	functionQFactor->Draw("same");
 
 	TLegend* leg=new TLegend(.18,.75,.53,.85);
-	leg->AddEntry(functionQFactor,Candidate+"_"+Form , "l");
+	leg->AddEntry(functionQFactor,source+"_"+candidate , "l");
 	leg->SetFillColor(0);
 	leg->SetLineColor(1);
 	leg->SetBorderSize(1);
@@ -123,18 +121,18 @@ void ShowQFactor()
 	gPad->Modified();
 	gPad->Update();
 
-	canvas1->Print("/home/david/Documents/DarkMatter/Resultats/QFactor/"+Source+"_"+Form+"_"+Candidate+".png");
+//	canvas1->Print("/home/david/Documents/DarkMatter/Resultats/QFactor/"+author+"_"+candidate+"_"+source+".png");
 
 }
 
 void ShowEpsilon()
 {
 
-	TString InstrumentName= "CrabNebula,Post-upgrade";
-	Double_t Wobble=0.;
-	TString sWobble = Form("%.1f",Wobble);
+	TString instrumentName= "MagicIdealEfficiency";
+	Double_t wobble=0.;
+	TString sWobble = Form("%.1f",wobble);
 
-	Instrument* Epsilon = new Instrument(InstrumentName, Wobble);
+	JDInstrument* Epsilon = new JDInstrument(instrumentName, wobble);
 	TF2* functionEpsilon = Epsilon->GetEpsilon();
 	Double_t Dcc = Epsilon->GetDcc();
 
@@ -155,7 +153,7 @@ void ShowEpsilon()
 	functionEpsilon->Draw("colz");
 
 	TLegend* leg2=new TLegend(.18,.75,.66,.85);
-	leg2->AddEntry(functionEpsilon, InstrumentName , "l");
+	leg2->AddEntry(functionEpsilon, instrumentName , "l");
 	leg2->SetFillColor(0);
 	leg2->SetLineColor(1);
 	leg2->SetBorderSize(1);
@@ -164,21 +162,25 @@ void ShowEpsilon()
 	gPad->Modified();
 	gPad->Update();
 
-	canvas2->Print("/home/david/Documents/DarkMatter/Resultats/Epsilon/"+InstrumentName+"_Wobble:"+sWobble+".png");
+//	canvas2->Print("/home/david/Documents/DarkMatter/Resultats/Epsilon/"+instrumentName+"_Wobble:"+sWobble+".png");
 
 }
 
+//-------------------------------------
+//
 void ShowEfficiency()
 {
-
-	TString InstrumentName= "CrabNebula,Post-upgrade";
+	// We declare here the name of the ...
+	TString InstrumentName= "MagicIdealEfficiency";
 	Double_t Wobble=0.;
 	TString sWobble = Form("%.1f",Wobble);
 
-	Instrument* Efficiency = new Instrument(InstrumentName, Wobble);
+	// We declare here the name of the ...
+	JDInstrument* Efficiency = new JDInstrument(InstrumentName, Wobble);
 	TF1* functionEfficiency = Efficiency->GetEfficiency();
 	Double_t TethaMax = Efficiency->GetThetaMax();
 
+	// We declare here the name of the ...
 	functionEfficiency->SetLineColor(2);
 	functionEfficiency->SetLineStyle(1);
 	TCanvas* canvas3 = new TCanvas("canvas3","",600,550);
@@ -207,7 +209,9 @@ void ShowEfficiency()
 	gPad->Modified();
 	gPad->Update();
 
-	canvas3->Print("/home/david/Documents/DarkMatter/Resultats/Eficiència/"+InstrumentName+"_Wobble:"+sWobble+".png");
+//	canvas3->Print("/home/david/Documents/DarkMatter/Resultats/Eficiència/"+InstrumentName+"_Wobble:"+sWobble+".png");
+	//EXAMPLE ONLY
+	//canvas3->Print("../plots/"+InstrumentName+"_Wobble:"+sWobble+".png");
 
 }
 
@@ -215,14 +219,18 @@ void RunExample1()
 {
 
 ///////////////////////////////////////////////////////////////
-//DM Class
+//  DM Class
 //////////////////////////////////////////////////////////////
-//	ShowJFactor();
+	ShowJFactor();
 //	ShowQFactor();
 
 ///////////////////////////////////////////////////////////////
-//Instrument Class
+//  Instrument Class
 ////////////////////////////////////////////////////////////////
-	ShowEpsilon();
-	ShowEfficiency();
+//	ShowEpsilon();
+//	ShowEfficiency();
+
+///////////////////////////////////////////////////////////////
+//  Combined Class
+////////////////////////////////////////////////////////////////
 }

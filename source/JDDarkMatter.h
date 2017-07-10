@@ -11,31 +11,31 @@
 #include <TF1.h>
 using namespace std;
 
-//JDDarkMatter ¿?
-
 class JDDarkMatter {
 public:
 
-	JDDarkMatter(TString candidate, TString source, TString form);
+	JDDarkMatter(TString author, TString source, TString candidate);
 		virtual ~JDDarkMatter();
 
-// GetTF1JFactorVsTheta
-TF1* GetJFactor()
+TF1* GetTF1JFactorVsTheta()
 {
-	return fJFactor;
+	return fEvaluateJFactorVsTheta;
 }
 
 // x[0] == normalization point [deg]
 //TF1* GetQFactor(Double_t thetaNorm)
-TF1* GetQFactor()
+TF1* GetTF1QFactorVsTheta(Double_t thetaNorm)
 {
-	return fQFactor;
+	fEvaluateQFactorVsTheta->SetParameter(0, thetaNorm);
+	return fEvaluateQFactorVsTheta;
 }
 
 Double_t GetTheta()
 {
 	return dTheta;
 }
+
+
 
 //GetJFactorName
 //GetAuthorName
@@ -45,9 +45,13 @@ protected:
 
 void CreateFunctionsDM();
 void SetJFactor();
+void ReadJFactorBonnivard();
+void ReadJFactorGeringer();
+void SetLOS();
 
-Double_t dJFactor(Double_t* x, Double_t* par);
-Double_t dQFactor(Double_t* x, Double_t* par);
+
+Double_t TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par);
+Double_t EvaluateQFactorVsTheta(Double_t* x, Double_t* par);
 
 
 private:
@@ -56,35 +60,31 @@ private:
 //TString
 ///////////////////////////////////////////////////////
 
-TString sCandidate;
+TString sAuthor;
 TString sSource;
-TString sForm;
-
-///////////////////////////////////////////////////////
-//TString
-///////////////////////////////////////////////////////
-Bool_t isAnnihilation;
+TString sCandidate;
 
 ///////////////////////////////////////////////////////
 //Double_t
 ///////////////////////////////////////////////////////
 
 Double_t dTheta;
-
+Double_t dThetaNorm;
+Double_t contadorMax;
 
 ///////////////////////////////////////////////////////
 //TGraph
 ///////////////////////////////////////////////////////
 
 TGraph* gJFactor;
+TGraph* gLOS;
 
 ///////////////////////////////////////////////////////
 //TF1
 ///////////////////////////////////////////////////////
 
-TF1* fJFactor;
-TF1* fQFactor;
-
+TF1* fEvaluateJFactorVsTheta;
+TF1* fEvaluateQFactorVsTheta;
 
 };
 
