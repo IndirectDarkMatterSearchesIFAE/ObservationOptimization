@@ -82,6 +82,9 @@ void JDDarkMatter::CreateFunctionsDM()
 	fEvaluateJFactorVsTheta = new TF1("fEvaluateJFactorVsTheta",this,&JDDarkMatter::TGraphEvaluateJFactorVsTheta,0.,dTheta,0,"JDDarkMatter","TGraphEvaluateJFactorVsTheta");
 	fEvaluateQFactorVsTheta = new TF1("fEvaluateQFactorVsTheta", this, &JDDarkMatter::EvaluateQFactorVsTheta, 0., dTheta, 1, "JDDarkMatter", "EvaluateQFactorVsTheta");
 
+	fEvaluateLOSVsTheta = new TF2("fEvaluateLOSVsTheta", this, &JDDarkMatter::EvaluateLOSVsTheta, 0., dTheta, -TMath::Pi(), TMath::Pi(), 0, "JDDarkMatter", "EvaluateLOSVsTheta");
+	fEvaluateLOSPerSinusVsTheta = new TF2("fEvaluateLOSPerSinusVsTheta", this, &JDDarkMatter::EvaluateLOSPerSinusVsTheta, 0., dTheta, -TMath::Pi(), TMath::Pi(), 0, "JDDarkMatter", "EvaluateLOSPerSinusVsTheta");
+	fEvaluateJFactorFromLOSVsTheta= new TF1("fEvaluateJFactorFromLOSVsTheta", this, &JDDarkMatter::EvaluateJFactorFromLOSVsTheta, 0., dTheta, 0, "JDDarkMatter", "EvaluateJFactorFromLOSVsTheta");
 }
 
 //-----------------------------------------------
@@ -116,7 +119,6 @@ void JDDarkMatter::ReadJFactorBonnivard()
 {
 
 	Int_t contador = 0;
-	Double_t contadorMax;
 
 	gJFactor = new TGraph();
 
@@ -143,19 +145,23 @@ void JDDarkMatter::ReadJFactorBonnivard()
 			cout<<"Possibilities are: DECAY or ANNIHILATION"<<endl;
 		}
 
+		/////////////////////////
+		//WARNING!!! FA UNA VOLTA DE MÉS!!!
+		/////////////////////////
 		ifstream file (myPath);
 		while(!file.eof())
 			{
 				file >> dTheta >> dJ >> dJ_m1 >> dJ_p1 >> dJ_m2 >> dJ_p2;
 
-//				gJFactor->SetPoint(contador,dTheta,(dJ*(TMath::Power(SolarMass2GeV,exp)/TMath::Power(kpc2cm,exp1))));
-				gJFactor->SetPoint(contador,dTheta,dJ);
+				gJFactor->SetPoint(contador,dTheta,(dJ*(TMath::Power(SolarMass2GeV,exp)/TMath::Power(kpc2cm,exp1))));
 
 				contadorMax=contador;
-				cout<<contador<<endl;
-				cout<<dJ<<endl;
+
+//				cout<< gJFactor->GetY()[contador]<<endl;
 				contador ++;
 			}
+
+		cout<<contadorMax<<endl;
 
 		file.close();
 }
@@ -223,9 +229,11 @@ void JDDarkMatter::SetLOS()
 	Double_t* JX = (Double_t*)gJFactor->GetX();
 	Double_t* JY = (Double_t*)gJFactor->GetY();
 
+
+	cout<<"El valor del contador és:"<<contadorMax<<endl;
 	for (Int_t t=0;t<contadorMax-1;t++)
 		{
-			lineofsight->SetPoint(t,JX[t+1],(((JY[t+1]-JY[t])/(JX[t+1]-JX[t]))*(1/(2*TMath::Pi()*TMath::Sin(JX[t+1]*Deg2Rad)))));
+			gLOS->SetPoint(t,JX[t+1],(((JY[t+1]-JY[t])/(JX[t+1]-JX[t]))*(1/(2*TMath::Pi()*TMath::Sin(JX[t+1]*Deg2Rad)))));
 		}
 }
 
@@ -248,9 +256,31 @@ Double_t JDDarkMatter::EvaluateQFactorVsTheta(Double_t* x, Double_t* par)
 //----------------------------------------------------
 // Line of sight
 // x[0]
-//Double_t DM::dQFactor(Double_t* x, Double_t* par)
-//{
-// return (gJFactor->Eval(x[0])/x[0])/(gJFactor->Eval(0.1)/0.1);
-//}
+Double_t JDDarkMatter::EvaluateLOSVsTheta(Double_t* x, Double_t* par)
+{
+	Double_t dcg = TMath::Power(4*TMath::Power(0,2)+TMath::Power(x[0],2)-2*2*0*x[0]*TMath::Cos(x[1]),0.5);
+
+	return gLOS->Eval(dcg);
+}
+
+//----------------------------------------------------
+// Line of sight
+// x[0]
+Double_t JDDarkMatter::EvaluateLOSPerSinusVsTheta(Double_t* x, Double_t* par)
+{
+	Double_t dcg = TMath::Power(4*TMath::Power(0,2)+TMath::Power(x[0],2)-2*2*0*x[0]*TMath::Cos(x[1]),0.5);
+
+	Double_t thetaRad = x[0]*Deg2Rad;
+	return  gLOS->Eval(dcg)*TMath::Sin(thetaRad);
+
+}
+//----------------------------------------------------
+// Line of sight
+// x[0]
+
+Double_t JDDarkMatter::EvaluateJFactorFromLOSVsTheta(Double_t* x, Double_t* par)
+{
+	return fEvaluateLOSPerSinusVsTheta->Integral(0., x[0], -TMath::Pi(), TMath::Pi(),1e-6);
+}
 
 
