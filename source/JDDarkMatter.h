@@ -57,8 +57,6 @@ void CreateFunctionsDM();
 void SetJFactor();
 void ReadJFactorBonnivard();
 void ReadJFactorGeringer();
-void SetLOS();
-void SetJFactorFromLOS();
 
 
 
@@ -84,14 +82,12 @@ TString sCandidate;
 
 Double_t dTheta;
 Double_t dThetaNorm;
-Double_t contadorMax;
 
 ///////////////////////////////////////////////////////
 //TGraph
 ///////////////////////////////////////////////////////
 
 TGraph* gJFactor;
-TGraph* gLOS;
 
 ///////////////////////////////////////////////////////
 //TF1

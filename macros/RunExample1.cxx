@@ -9,7 +9,8 @@
 #include <TLegend.h>
 #include <TCanvas.h>
 #include <TF1.h>
-#include "../source/JDOptimitzation.cc"
+
+#include "../source/JDOptimization.cc"
 
 using namespace std;
 
@@ -22,46 +23,46 @@ void ShowJFactor()
 	TString candidate = "Decay";
 
 	JDDarkMatter* 	JFactor = new JDDarkMatter(author, source, candidate);
-//	TF1* functionJFactor = JFactor->GetTF1JFactorVsTheta();
-//	Double_t Theta = JFactor->GetTheta();
-//	cout<<"JFactor:"<<functionJFactor->Eval(0.5)<<endl;
-//
-//	functionJFactor->SetLineColor(2);
-//	functionJFactor->SetLineStyle(1);
-//	TCanvas* canvas = new TCanvas("canvas","",600,550);
-//	TH1I* dummy = new TH1I("dummy", author,1,0.01,Theta);
-//	dummy->SetMaximum(3.e20);
-//	dummy->SetMinimum(1.e15);
-//	dummy->SetStats(0);
-//	dummy->SetXTitle(" #theta ");
-//	if (candidate == "Annihilation")
-//	{
-//		dummy->SetYTitle(" J Factor [GeV^2/cm^5]");
-//	}
-//	else if (candidate == "Decay")
-//	{
-//		dummy->SetYTitle(" J Factor [GeV/cm^2]");
-//	}
-//	dummy->GetXaxis()->SetTitleOffset(1.3);
-//	dummy->GetYaxis()->SetTitleOffset(1.5);
-//	dummy->DrawCopy();
-//	gPad->SetLogx();
-//	gPad->SetLogy();
-//	gPad->SetGridy();
-//	gPad->SetGridx();
-//	functionJFactor->Draw("same");
-//
-//	TLegend* leg=new TLegend(.18,.75,.53,.85);
-//	leg->AddEntry(functionJFactor, source+"_"+candidate , "l");
-//	leg->SetFillColor(0);
-//	leg->SetLineColor(1);
-//	leg->SetBorderSize(1);
-//	leg->SetTextSize(0.037);
-//	leg->Draw();
-//	gPad->Modified();
-//	gPad->Update();
-//
-////	canvas->Print("/home/david/Documents/DarkMatter/Resultats/JFactor/"+author+"_"+candidate+"_"+source+".png");
+	TF1* functionJFactor = JFactor->GetTF1JFactorVsTheta();
+	Double_t Theta = JFactor->GetTheta();
+	cout<<"JFactor:"<<functionJFactor->Eval(0.5)<<endl;
+
+	functionJFactor->SetLineColor(2);
+	functionJFactor->SetLineStyle(1);
+	TCanvas* canvas = new TCanvas("canvas","",600,550);
+	TH1I* dummy = new TH1I("dummy", author,1,0.01,Theta);
+	dummy->SetMaximum(3.e20);
+	dummy->SetMinimum(1.e15);
+	dummy->SetStats(0);
+	dummy->SetXTitle(" #theta ");
+	if (candidate == "Annihilation")
+	{
+		dummy->SetYTitle(" J Factor [GeV^2/cm^5]");
+	}
+	else if (candidate == "Decay")
+	{
+		dummy->SetYTitle(" J Factor [GeV/cm^2]");
+	}
+	dummy->GetXaxis()->SetTitleOffset(1.3);
+	dummy->GetYaxis()->SetTitleOffset(1.5);
+	dummy->DrawCopy();
+	gPad->SetLogx();
+	gPad->SetLogy();
+	gPad->SetGridy();
+	gPad->SetGridx();
+	functionJFactor->Draw("same");
+
+	TLegend* leg=new TLegend(.18,.75,.53,.85);
+	leg->AddEntry(functionJFactor, source+"_"+candidate , "l");
+	leg->SetFillColor(0);
+	leg->SetLineColor(1);
+	leg->SetBorderSize(1);
+	leg->SetTextSize(0.037);
+	leg->Draw();
+	gPad->Modified();
+	gPad->Update();
+
+//	canvas->Print("/home/david/Documents/DarkMatter/Resultats/JFactor/"+author+"_"+candidate+"_"+source+".png");
 
 }
 
@@ -126,34 +127,34 @@ void ShowEpsilon()
 	TString sWobble = Form("%.1f",wobble);
 
 	JDInstrument* Epsilon = new JDInstrument(instrumentName, wobble);
-	TF2* functionEpsilon = Epsilon->GetEpsilon();
-	Double_t Dcc = Epsilon->GetDcc();
-
-	TCanvas* canvas2 = new TCanvas("canvas2","",600,550);
-	TH2I* dummy2 = new TH2I("dummy2", "",1,0.,Dcc, 1, -TMath::Pi(), TMath::Pi());
-	dummy2->SetMaximum(1.5);
-	dummy2->SetMinimum(0.);
-	dummy2->SetStats(0);
-	dummy2->SetXTitle(" dcc ");
-	dummy2->SetYTitle(" Epsilon");
-	dummy2->GetXaxis()->SetTitleOffset(1.3);
-	dummy2->GetYaxis()->SetTitleOffset(1.5);
-	dummy2->DrawCopy();
-//	gPad->SetLogx();
-//	gPad->SetLogy();
-	gPad->SetGridy();
-	gPad->SetGridx();
-	functionEpsilon->Draw("colz");
-
-	TLegend* leg2=new TLegend(.18,.75,.66,.85);
-	leg2->AddEntry(functionEpsilon, instrumentName , "l");
-	leg2->SetFillColor(0);
-	leg2->SetLineColor(1);
-	leg2->SetBorderSize(1);
-	leg2->SetTextSize(0.037);
-	leg2->Draw();
-	gPad->Modified();
-	gPad->Update();
+//	TF2* functionEpsilon = Epsilon->GetEpsilon();
+//	Double_t Dcc = Epsilon->GetDcc();
+//
+//	TCanvas* canvas2 = new TCanvas("canvas2","",600,550);
+//	TH2I* dummy2 = new TH2I("dummy2", "",1,0.,Dcc, 1, -TMath::Pi(), TMath::Pi());
+//	dummy2->SetMaximum(1.5);
+//	dummy2->SetMinimum(0.);
+//	dummy2->SetStats(0);
+//	dummy2->SetXTitle(" dcc ");
+//	dummy2->SetYTitle(" Epsilon");
+//	dummy2->GetXaxis()->SetTitleOffset(1.3);
+//	dummy2->GetYaxis()->SetTitleOffset(1.5);
+//	dummy2->DrawCopy();
+////	gPad->SetLogx();
+////	gPad->SetLogy();
+//	gPad->SetGridy();
+//	gPad->SetGridx();
+//	functionEpsilon->Draw("colz");
+//
+//	TLegend* leg2=new TLegend(.18,.75,.66,.85);
+//	leg2->AddEntry(functionEpsilon, instrumentName , "l");
+//	leg2->SetFillColor(0);
+//	leg2->SetLineColor(1);
+//	leg2->SetBorderSize(1);
+//	leg2->SetTextSize(0.037);
+//	leg2->Draw();
+//	gPad->Modified();
+//	gPad->Update();
 
 //	canvas2->Print("/home/david/Documents/DarkMatter/Resultats/Epsilon/"+instrumentName+"_Wobble:"+sWobble+".png");
 
@@ -268,13 +269,58 @@ void ShowJFactorFromLOS()
 	gPad->Modified();
 	gPad->Update();
 }
+
+void test()
+{
+	TString author = "Bonnivard";
+	TString source ="uma2";
+	TString candidate = "Decay";
+	TString instrumentName= "MagicIdealEfficiency";
+	Double_t wobble=0.;
+	JDOptimization* a = new JDOptimization(author, source, candidate, instrumentName,wobble);
+	TF1* b = a->GetEfficiency();
+	Double_t Theta = a->GetDcc();
+
+	TCanvas* canvas4 = new TCanvas("canvas4","",600,550);
+	TH1I* dummy4 = new TH1I("dummy4", author,1,0.01,Theta);
+	dummy4->SetMaximum(2.);
+	dummy4->SetMinimum(0.);
+	dummy4->SetStats(0);
+	dummy4->SetXTitle(" #theta ");
+	if (candidate == "Annihilation")
+	{
+		dummy4->SetYTitle(" J Factor [GeV^2/cm^5]");
+	}
+	else if (candidate == "Decay")
+	{
+		dummy4->SetYTitle(" J Factor [GeV/cm^2]");
+	}
+	dummy4->GetXaxis()->SetTitleOffset(1.3);
+	dummy4->GetYaxis()->SetTitleOffset(1.5);
+	dummy4->DrawCopy();
+//	gPad->SetLogx();
+//	gPad->SetLogy();
+	gPad->SetGridy();
+	gPad->SetGridx();
+	b->Draw("same");
+
+	TLegend* leg4=new TLegend(.18,.75,.53,.85);
+	leg4->AddEntry(b, source+"_"+candidate , "l");
+	leg4->SetFillColor(0);
+	leg4->SetLineColor(1);
+	leg4->SetBorderSize(1);
+	leg4->SetTextSize(0.037);
+	leg4->Draw();
+	gPad->Modified();
+	gPad->Update();
+}
 void RunExample1()
 {
 
 ///////////////////////////////////////////////////////////////
 //  DM Class
 //////////////////////////////////////////////////////////////
-	ShowJFactor();
+//	ShowJFactor();
 //	ShowQFactor();
 //	ShowLOS();
 //	ShowJFactorFromLOS();
@@ -288,4 +334,5 @@ void RunExample1()
 ///////////////////////////////////////////////////////////////
 //  Combined Class
 ////////////////////////////////////////////////////////////////
+	test();
 }

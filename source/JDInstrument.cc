@@ -5,15 +5,23 @@
  *      Author: david
  */
 
-//#include "JDInstrument.h" This works home
 #include "JDInstrument.h"
 #include <TGraph.h>
 #include <TMath.h>
 
 using namespace std;
 
+//-----------------------------------------------
+//
+//	This is the constructor.
+//
+//	Possible variables are:
+// 	sInstrumentName 	= (TString) name of the telescope
+//	dWobble			 	= (Double_t) wobble distance
 JDInstrument::JDInstrument(TString instrumentName, Double_t wobble):
-		sInstrumentName(instrumentName), dWobble(wobble)
+		sInstrumentName(instrumentName), dWobble(wobble),
+		gEpsilon(NULL),fEvaluateEfficiencyVsTheta(NULL),
+		fEvaluateEpsilonVsTheta(NULL),fEvaluateEpsilonPerThetaVsTheta(NULL)
 {
 	    cout << endl;
 		cout << endl;
@@ -24,8 +32,16 @@ JDInstrument::JDInstrument(TString instrumentName, Double_t wobble):
 	CreateFunctionsInstrument();
 }
 
+//-----------------------------------------------
+//This is the destructor
+//It deletes the functions in order not to be reused
 JDInstrument::~JDInstrument()
 {
+
+	if (gEpsilon)									delete gEpsilon;
+	if (fEvaluateEfficiencyVsTheta)					delete fEvaluateEfficiencyVsTheta;
+	if (fEvaluateEpsilonVsTheta)					delete fEvaluateEpsilonVsTheta;
+	if (fEvaluateEpsilonPerThetaVsTheta)			delete fEvaluateEpsilonPerThetaVsTheta;
 
 		cout << endl;
 		cout << endl;
@@ -34,6 +50,10 @@ JDInstrument::~JDInstrument()
 		cout << endl;
 }
 
+//-----------------------------------------------
+//This function calls the important functions of this class
+//
+//dThetaMax (Double_t) is used in Efficiency and EpsilonPerTheta so as to stop the function as soon as the evaluation gets out of the camera
 void JDInstrument::CreateFunctionsInstrument()
 {
 SetEpsilon();
@@ -47,21 +67,20 @@ fEvaluateEpsilonPerThetaVsTheta = new TF2("fEvaluateEpsilonPerThetaVsTheta", thi
 
 }
 
+//-----------------------------------------------
+//This function fulfills a TGraph with the information  of the epsilon of the telescope normalized at the centre of the camera. We define epsilon as the % of the quality of the camera with respect to its centre.
+//dDcc (Double_t) is the distance to the centre of the camera
 void JDInstrument::SetEpsilon()
 {
-
 	TString myPath= "/home/david/Documents/DarkMatter/Epsilon/"+sInstrumentName+".txt";
 	Double_t Y,Y0;
 	Int_t contador = 0;
 
-
 	gEpsilon = new TGraph();
 
 	ifstream file (myPath);
-	while(!file.eof())
+	while(file 	>> dDcc >> Y)
 		{
-			file 	>> dDcc >> Y;
-
 			if (contador==0){
 			Y0=Y;
 			}
@@ -71,9 +90,13 @@ void JDInstrument::SetEpsilon()
 			contador++;
 		}
 	file.close();
-
 }
 
+//-----------------------------------------------
+//	dccR distance to the centre of the camera in radial components
+//	x[0] = theta
+//  x[1] = phi
+//  par[0] = wobble
 Double_t JDInstrument::EvaluateEpsilonVsTheta(Double_t* x, Double_t* par)
 {
 	Double_t dccR = TMath::Power(TMath::Power(dWobble,2)+TMath::Power(x[0],2)+2*dWobble*x[0]*TMath::Cos(x[1]),0.50);
@@ -89,16 +112,19 @@ Double_t JDInstrument::EvaluateEpsilonVsTheta(Double_t* x, Double_t* par)
 	}
 }
 
+//-----------------------------------------------
+//	x[0] = theta
+//  x[1] = phi
 Double_t JDInstrument::EvaluateEpsilonPerThetaVsTheta(Double_t* x, Double_t* par)
 {
 	return fEvaluateEpsilonVsTheta->Eval(x[0], x[1])*x[0];
 }
 
+//-----------------------------------------------
+//	x[0] = theta
 Double_t JDInstrument::EvaluateEfficiencyVsTheta(Double_t* x, Double_t* par)
 {
-
 	return fEvaluateEpsilonPerThetaVsTheta->Integral(0., x[0], -TMath::Pi(), TMath::Pi(), 1.e-6)/(TMath::Pi()*TMath::Power(x[0],2));
-
 }
 
 

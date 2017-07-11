@@ -36,7 +36,6 @@ static const Double_t kpc2cm        = 3.08568e21; 			// [cm/kpc]
 JDDarkMatter::JDDarkMatter(TString author, TString source, TString candidate):
 		sAuthor(author), sSource(source), sCandidate(candidate),
 		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateQFactorVsTheta(NULL)
-//afegir totes les variables variable(NULL)
 {
 	    cout << endl;
 		cout << endl;
@@ -50,10 +49,9 @@ JDDarkMatter::JDDarkMatter(TString author, TString source, TString candidate):
 //-----------------------------------------------
 //
 //	This is the destructor.
+//It deletes the functions in order not to be reused
 JDDarkMatter::~JDDarkMatter()
 {
-	// delete everything
-
 	if (gJFactor)								delete gJFactor;
 	if (fEvaluateJFactorVsTheta)				delete fEvaluateJFactorVsTheta;
 	if (fEvaluateQFactorVsTheta)				delete fEvaluateQFactorVsTheta;
@@ -74,7 +72,6 @@ JDDarkMatter::~JDDarkMatter()
 //	fEvaluateQFactorVsTheta -> TF1 that evaluates the QFactor vs Theta; QFactor [~GeV,~cm deg] theta [deg]
 void JDDarkMatter::CreateFunctionsDM()
 {
-
 	SetJFactor(); // [Units]
 
 	fEvaluateJFactorVsTheta = new TF1("fEvaluateJFactorVsTheta",this,&JDDarkMatter::TGraphEvaluateJFactorVsTheta,0.,dTheta,0,"JDDarkMatter","TGraphEvaluateJFactorVsTheta");
@@ -83,9 +80,6 @@ void JDDarkMatter::CreateFunctionsDM()
 	fEvaluateLOSVsTheta = new TF1("fEvaluateLOSVsTheta", this, &JDDarkMatter::EvaluateLOSVsTheta, 0., dTheta, 0, "JDDarkMatter", "EvaluateLOSVsTheta");
 	fEvaluateLOSPerSinusVsTheta = new TF1("fEvaluateLOSPerSinusVsTheta", this, &JDDarkMatter::EvaluateLOSPerSinusVsTheta, 0., dTheta, 0, "JDDarkMatter", "EvaluateLOSPerSinusVsTheta");
 	fEvaluateJFactorFromLOSVsTheta= new TF1("fEvaluateJFactorFromLOSVsTheta", this, &JDDarkMatter::EvaluateJFactorFromLOSVsTheta, 0., dTheta, 0, "JDDarkMatter", "EvaluateJFactorFromLOSVsTheta");
-
-	SetLOS();
-	SetJFactorFromLOS();
 }
 
 //-----------------------------------------------
@@ -110,9 +104,7 @@ void JDDarkMatter::SetJFactor()
 	}
 }
 
-//Bool_t / Int_t
-// return 0 if succed
-// return -1 else
+
 //-----------------------------------------------
 //	This function reads the JFactor data of Bonnivard
 //	It fulfills a TGraph with this data
@@ -130,8 +122,6 @@ void JDDarkMatter::ReadJFactorBonnivard()
 		if (sCandidate == "Decay")
 		{
 			myPath = "/home/david/Documents/DarkMatter/"+sAuthor+"/"+sSource+"_Dalphaint_cls_READ.output";
-//			myPath = "/home/david/Documents/DarkMatter/"+sAuthor+"/"+sSource+".txt";
-
 			exp = 1.;
 			exp1 = 2.;
 		}
@@ -149,18 +139,12 @@ void JDDarkMatter::ReadJFactorBonnivard()
 			cout<<"Possibilities are: DECAY or ANNIHILATION"<<endl;
 		}
 
-		/////////////////////////
-		//WARNING!!! FA UNA VOLTA DE MÉS!!!
-		/////////////////////////
 		ifstream file (myPath);
 		while(file >> dTheta >> dJ >> dJ_m1 >> dJ_p1 >> dJ_m2 >> dJ_p2)
 			{
 			gJFactor->SetPoint(contador,dTheta,(dJ*(TMath::Power(SolarMass2GeV,exp)/TMath::Power(kpc2cm,exp1))));
 
-				contadorMax=contador;
-
-				cout<< contador <<"    "<<gJFactor->GetX()[contador]<<"    "<<gJFactor->GetY()[contador]<<endl;
-				contador ++;
+			contador ++;
 			}
 
 		file.close();
@@ -218,40 +202,6 @@ void JDDarkMatter::ReadJFactorGeringer()
 	}
 }
 
-void JDDarkMatter::SetLOS()
-{
-	gLOS = new TGraph();
-
-	Double_t* JX = (Double_t*)gJFactor->GetX();
-	Double_t* JY = (Double_t*)gJFactor->GetY();
-
-	cout<<"LOS"<<endl;
-
-	for (Int_t t=0;t<=contadorMax-1;t++)
-		{
-		cout<< t <<"    "<<JX[t+1]<<"    "<<fEvaluateLOSVsTheta->Eval(JX[t+1])<<endl;
-
-//			gLOS->SetPoint(t,JX[t+1],(((JY[t+1]-JY[t])/(JX[t+1]-JX[t]))*(1/(2*TMath::Pi()*TMath::Sin(JX[t+1]*Deg2Rad)))));
-//			cout<< t <<"    "<<gLOS->GetX()[t]<<"    "<<gLOS->GetY()[t]<<endl;
-
-		}
-}
-
-void JDDarkMatter::SetJFactorFromLOS()
-{
-
-	Double_t* JX = (Double_t*)gJFactor->GetX();
-
-	cout<<"JFactorFromLOS"<<endl;
-
-	for (Int_t t=0;t<=contadorMax;t++)
-		{
-			cout<< t <<"    "<<JX[t]<<"    "<<fEvaluateJFactorFromLOSVsTheta->Eval(JX[t])<<endl;
-
-		}
-}
-
-
 //-----------------------------------------------
 // x[0] 	= dTheta
 Double_t JDDarkMatter::TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par)
@@ -273,8 +223,6 @@ Double_t JDDarkMatter::EvaluateQFactorVsTheta(Double_t* x, Double_t* par)
 Double_t JDDarkMatter::EvaluateLOSVsTheta(Double_t* x, Double_t* par)
 {
 	return fEvaluateJFactorVsTheta->Derivative(x[0])/(2*TMath::Pi()*TMath::Sin(x[0]*Deg2Rad));
-
-//	return gLOS->Eval(x[0]);
 }
 
 //----------------------------------------------------
