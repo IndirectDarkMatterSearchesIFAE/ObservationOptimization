@@ -1,12 +1,12 @@
 /*
- * Instrument.cc
+ * JDInstrument.cc
  *
  *  Created on: 03/07/2017
  *      Author: david
  */
 
-//#include "Instrument.h" This works home
-#include "Instrument.h"
+//#include "JDInstrument.h" This works home
+#include "JDInstrument.h"
 #include <TGraph.h>
 #include <TMath.h>
 

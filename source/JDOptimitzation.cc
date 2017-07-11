@@ -5,28 +5,29 @@
  *      Author: david
  */
 
-#include "Optimitzation.h"
+#include "JDOptimitzation.h"
+
 #include <TGraph.h>
 #include <TMath.h>
 
 using namespace std;
 
-Optimitzation::Optimitzation()
+JDOptimitzation::JDOptimitzation()
 {
 	    cout << endl;
 		cout << endl;
-		cout << "Constructor Optimitzation..." << endl;
+		cout << "Constructor JDOptimitzation..." << endl;
 		cout << endl;
 		cout << endl;
 
 }
 
-Optimitzation::~Optimitzation()
+JDOptimitzation::~JDOptimitzation()
 {
 
 		cout << endl;
 		cout << endl;
-		cout << "Destructor Optimitzation..." << endl;
+		cout << "Destructor JDOptimitzation..." << endl;
 		cout << endl;
 		cout << endl;
 

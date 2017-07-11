@@ -30,7 +30,7 @@ TF1* GetTF1QFactorVsTheta(Double_t thetaNorm)
 	return fEvaluateQFactorVsTheta;
 }
 
-TF2* GetTF2LOSVsTheta()
+TF1* GetTF1LOSVsTheta()
 {
 	return fEvaluateLOSVsTheta;
 }
@@ -58,6 +58,8 @@ void SetJFactor();
 void ReadJFactorBonnivard();
 void ReadJFactorGeringer();
 void SetLOS();
+void SetJFactorFromLOS();
+
 
 
 Double_t TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par);
@@ -97,8 +99,8 @@ TGraph* gLOS;
 
 TF1* fEvaluateJFactorVsTheta;
 TF1* fEvaluateQFactorVsTheta;
-TF2* fEvaluateLOSVsTheta;
-TF2* fEvaluateLOSPerSinusVsTheta;
+TF1* fEvaluateLOSVsTheta;
+TF1* fEvaluateLOSPerSinusVsTheta;
 TF1* fEvaluateJFactorFromLOSVsTheta;
 
 };

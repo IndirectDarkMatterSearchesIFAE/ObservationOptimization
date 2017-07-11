@@ -1,23 +1,15 @@
 //this works home
 #include "../source/JDDarkMatter.cc"
-#include "../source/Instrument.cc"
-#include "../source/Optimitzation.cc"
+#include "../source/JDInstrument.cc"
+#include </home/david/Work/Software/root_v6.06.08/include/TStyle.h>
 
 //this works at IFAE
-//#include <../source/DM.cc>
-//#include <../source/Instrument.cc>
-//#include <../source/Optimitzation.cc>
-
-
-//this works home
-//#include </home/david/Work/Software/root_v6.06.08/include/TStyle.h>
-
-//this works at IFAE
-#include </home/david/Work/Software/scripts/style.h>
+//#include </home/david/Work/Software/scripts/style.h>
 
 #include <TLegend.h>
 #include <TCanvas.h>
 #include <TF1.h>
+#include "../source/JDOptimitzation.cc"
 
 using namespace std;
 
@@ -26,7 +18,7 @@ void ShowJFactor()
 {
 
 	TString author = "Bonnivard";
-	TString source ="uma2";
+	TString source ="test";
 	TString candidate = "Decay";
 
 	JDDarkMatter* 	JFactor = new JDDarkMatter(author, source, candidate);
@@ -223,58 +215,58 @@ void ShowLOS()
 	TString candidate = "Decay";
 
 	JDDarkMatter* 	LOS = new JDDarkMatter(author, source, candidate);
-	TF2* functionLOS = LOS->GetTF2LOSVsTheta();
+	TF1* functionLOS = LOS->GetTF1LOSVsTheta();
 	Double_t Theta = LOS->GetTheta();
 	cout<<functionLOS->Eval(0.5)<<endl;
-	functionLOS->Draw("colz");
+	functionLOS->Draw();
 }
 
 void ShowJFactorFromLOS()
 {
 	TString author = "Bonnivard";
-	TString source ="uma2";
+	TString source ="test";
 	TString candidate = "Decay";
 
 	JDDarkMatter* 	JFactorFromLOS = new JDDarkMatter(author, source, candidate);
-	TF1* functionJFactorFromLOS = JFactorFromLOS->GetTF1JFactorFromLOSVsTheta();
-	Double_t Theta = JFactorFromLOS->GetTheta();
-
-	cout<<"JFactorFromLOS:"<<functionJFactorFromLOS->Eval(0.5)<<endl;
-
-	functionJFactorFromLOS->SetLineColor(2);
-	functionJFactorFromLOS->SetLineStyle(1);
-	TCanvas* canvas4 = new TCanvas("canvas4","",600,550);
-	TH1I* dummy4 = new TH1I("dummy4", author,1,0.01,Theta);
-	dummy4->SetMaximum(3.e20);
-	dummy4->SetMinimum(1.e15);
-	dummy4->SetStats(0);
-	dummy4->SetXTitle(" #theta ");
-	if (candidate == "Annihilation")
-	{
-		dummy4->SetYTitle(" J Factor [GeV^2/cm^5]");
-	}
-	else if (candidate == "Decay")
-	{
-		dummy4->SetYTitle(" J Factor [GeV/cm^2]");
-	}
-	dummy4->GetXaxis()->SetTitleOffset(1.3);
-	dummy4->GetYaxis()->SetTitleOffset(1.5);
-	dummy4->DrawCopy();
-	gPad->SetLogx();
-	gPad->SetLogy();
-	gPad->SetGridy();
-	gPad->SetGridx();
-	functionJFactorFromLOS->Draw("same");
-
-	TLegend* leg4=new TLegend(.18,.75,.53,.85);
-	leg4->AddEntry(functionJFactorFromLOS, source+"_"+candidate , "l");
-	leg4->SetFillColor(0);
-	leg4->SetLineColor(1);
-	leg4->SetBorderSize(1);
-	leg4->SetTextSize(0.037);
-	leg4->Draw();
-	gPad->Modified();
-	gPad->Update();
+//	TF1* functionJFactorFromLOS = JFactorFromLOS->GetTF1JFactorFromLOSVsTheta();
+//	Double_t Theta = JFactorFromLOS->GetTheta();
+//
+//	cout<<"JFactorFromLOS:"<<functionJFactorFromLOS->Eval(0.5)<<endl;
+//
+//	functionJFactorFromLOS->SetLineColor(2);
+//	functionJFactorFromLOS->SetLineStyle(1);
+//	TCanvas* canvas4 = new TCanvas("canvas4","",600,550);
+//	TH1I* dummy4 = new TH1I("dummy4", author,1,0.01,Theta);
+//	dummy4->SetMaximum(3.e20);
+//	dummy4->SetMinimum(1.e15);
+//	dummy4->SetStats(0);
+//	dummy4->SetXTitle(" #theta ");
+//	if (candidate == "Annihilation")
+//	{
+//		dummy4->SetYTitle(" J Factor [GeV^2/cm^5]");
+//	}
+//	else if (candidate == "Decay")
+//	{
+//		dummy4->SetYTitle(" J Factor [GeV/cm^2]");
+//	}
+//	dummy4->GetXaxis()->SetTitleOffset(1.3);
+//	dummy4->GetYaxis()->SetTitleOffset(1.5);
+//	dummy4->DrawCopy();
+//	gPad->SetLogx();
+//	gPad->SetLogy();
+//	gPad->SetGridy();
+//	gPad->SetGridx();
+//	functionJFactorFromLOS->Draw("same");
+//
+//	TLegend* leg4=new TLegend(.18,.75,.53,.85);
+//	leg4->AddEntry(functionJFactorFromLOS, source+"_"+candidate , "l");
+//	leg4->SetFillColor(0);
+//	leg4->SetLineColor(1);
+//	leg4->SetBorderSize(1);
+//	leg4->SetTextSize(0.037);
+//	leg4->Draw();
+//	gPad->Modified();
+//	gPad->Update();
 }
 void RunExample1()
 {
@@ -285,7 +277,7 @@ void RunExample1()
 	ShowJFactor();
 //	ShowQFactor();
 //	ShowLOS();
-	ShowJFactorFromLOS();
+//	ShowJFactorFromLOS();
 
 ///////////////////////////////////////////////////////////////
 //  Instrument Class
