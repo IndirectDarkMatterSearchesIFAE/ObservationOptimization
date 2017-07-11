@@ -129,8 +129,8 @@ void JDDarkMatter::ReadJFactorBonnivard()
 
 		if (sCandidate == "Decay")
 		{
-//			myPath = "/home/david/Documents/DarkMatter/"+sAuthor+"/"+sSource+"_Dalphaint_cls_READ.output";
-			myPath = "/home/david/Documents/DarkMatter/"+sAuthor+"/"+sSource+".txt";
+			myPath = "/home/david/Documents/DarkMatter/"+sAuthor+"/"+sSource+"_Dalphaint_cls_READ.output";
+//			myPath = "/home/david/Documents/DarkMatter/"+sAuthor+"/"+sSource+".txt";
 
 			exp = 1.;
 			exp1 = 2.;
@@ -149,19 +149,13 @@ void JDDarkMatter::ReadJFactorBonnivard()
 			cout<<"Possibilities are: DECAY or ANNIHILATION"<<endl;
 		}
 
-		cout<<"JFactor"<<endl;
-
 		/////////////////////////
 		//WARNING!!! FA UNA VOLTA DE MÉS!!!
 		/////////////////////////
 		ifstream file (myPath);
-		while(!file.eof())
+		while(file >> dTheta >> dJ >> dJ_m1 >> dJ_p1 >> dJ_m2 >> dJ_p2)
 			{
-//				file >> dTheta >> dJ >> dJ_m1 >> dJ_p1 >> dJ_m2 >> dJ_p2;
-			file >> dTheta >> dJ;
-
-//				gJFactor->SetPoint(contador,dTheta,(dJ*(TMath::Power(SolarMass2GeV,exp)/TMath::Power(kpc2cm,exp1))));
-			gJFactor->SetPoint(contador,dTheta,dJ);
+			gJFactor->SetPoint(contador,dTheta,(dJ*(TMath::Power(SolarMass2GeV,exp)/TMath::Power(kpc2cm,exp1))));
 
 				contadorMax=contador;
 
@@ -191,13 +185,11 @@ void JDDarkMatter::ReadJFactorGeringer()
 	if (sCandidate == "Decay")
 	{
 		ifstream file (myPath);
-		while(!file.eof())
+		while(file	>> name >> dTheta
+				>> LogJann2m >> LogJann1m >> LogJann >> LogJann1p >> LogJann2p
+				>> LogJdec2m >> LogJdec1m >> LogJdec >> LogJdec1p >> LogJdec2p
+				>> a >> b >> c >> d >> e >> f >> g >> h >> i >> j)
 			{
-				file	>> name >> dTheta
-						>> LogJann2m >> LogJann1m >> LogJann >> LogJann1p >> LogJann2p
-						>> LogJdec2m >> LogJdec1m >> LogJdec >> LogJdec1p >> LogJdec2p
-						>> a >> b >> c >> d >> e >> f >> g >> h >> i >> j;
-
 				gJFactor->SetPoint(contador, dTheta, TMath::Power(10., LogJdec));
 
 				contador ++;
@@ -208,13 +200,11 @@ void JDDarkMatter::ReadJFactorGeringer()
 	else if (sCandidate == "Annihilation")
 	{
 		ifstream file (myPath);
-		while(!file.eof())
+		while(file	>> name >> dTheta
+				>> LogJann2m >> LogJann1m >> LogJann >> LogJann1p >> LogJann2p
+				>> LogJdec2m >> LogJdec1m >> LogJdec >> LogJdec1p >> LogJdec2p
+				>> a >> b >> c >> d >> e >> f >> g >> h >> i >> j)
 			{
-				file	>> name >> dTheta
-						>> LogJann2m >> LogJann1m >> LogJann >> LogJann1p >> LogJann2p
-						>> LogJdec2m >> LogJdec1m >> LogJdec >> LogJdec1p >> LogJdec2p
-						>> a >> b >> c >> d >> e >> f >> g >> h >> i >> j;
-
 				gJFactor->SetPoint(contador, dTheta, TMath::Power(10., LogJann));
 
 				contador ++;
@@ -300,7 +290,7 @@ Double_t JDDarkMatter::EvaluateLOSPerSinusVsTheta(Double_t* x, Double_t* par)
 
 Double_t JDDarkMatter::EvaluateJFactorFromLOSVsTheta(Double_t* x, Double_t* par)
 {
-	return 2*TMath::Pi()*(fEvaluateLOSPerSinusVsTheta->Integral(0., x[0], 1.e-6));
+	return 2*TMath::Pi()*(fEvaluateLOSPerSinusVsTheta->Integral(0., x[0], 1.e-4));
 }
 
 

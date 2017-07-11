@@ -18,50 +18,50 @@ void ShowJFactor()
 {
 
 	TString author = "Bonnivard";
-	TString source ="test";
+	TString source ="uma2";
 	TString candidate = "Decay";
 
 	JDDarkMatter* 	JFactor = new JDDarkMatter(author, source, candidate);
-	TF1* functionJFactor = JFactor->GetTF1JFactorVsTheta();
-	Double_t Theta = JFactor->GetTheta();
-	cout<<"JFactor:"<<functionJFactor->Eval(0.5)<<endl;
-
-	functionJFactor->SetLineColor(2);
-	functionJFactor->SetLineStyle(1);
-	TCanvas* canvas = new TCanvas("canvas","",600,550);
-	TH1I* dummy = new TH1I("dummy", author,1,0.01,Theta);
-	dummy->SetMaximum(3.e20);
-	dummy->SetMinimum(1.e15);
-	dummy->SetStats(0);
-	dummy->SetXTitle(" #theta ");
-	if (candidate == "Annihilation")
-	{
-		dummy->SetYTitle(" J Factor [GeV^2/cm^5]");
-	}
-	else if (candidate == "Decay")
-	{
-		dummy->SetYTitle(" J Factor [GeV/cm^2]");
-	}
-	dummy->GetXaxis()->SetTitleOffset(1.3);
-	dummy->GetYaxis()->SetTitleOffset(1.5);
-	dummy->DrawCopy();
-	gPad->SetLogx();
-	gPad->SetLogy();
-	gPad->SetGridy();
-	gPad->SetGridx();
-	functionJFactor->Draw("same");
-
-	TLegend* leg=new TLegend(.18,.75,.53,.85);
-	leg->AddEntry(functionJFactor, source+"_"+candidate , "l");
-	leg->SetFillColor(0);
-	leg->SetLineColor(1);
-	leg->SetBorderSize(1);
-	leg->SetTextSize(0.037);
-	leg->Draw();
-	gPad->Modified();
-	gPad->Update();
-
-//	canvas->Print("/home/david/Documents/DarkMatter/Resultats/JFactor/"+author+"_"+candidate+"_"+source+".png");
+//	TF1* functionJFactor = JFactor->GetTF1JFactorVsTheta();
+//	Double_t Theta = JFactor->GetTheta();
+//	cout<<"JFactor:"<<functionJFactor->Eval(0.5)<<endl;
+//
+//	functionJFactor->SetLineColor(2);
+//	functionJFactor->SetLineStyle(1);
+//	TCanvas* canvas = new TCanvas("canvas","",600,550);
+//	TH1I* dummy = new TH1I("dummy", author,1,0.01,Theta);
+//	dummy->SetMaximum(3.e20);
+//	dummy->SetMinimum(1.e15);
+//	dummy->SetStats(0);
+//	dummy->SetXTitle(" #theta ");
+//	if (candidate == "Annihilation")
+//	{
+//		dummy->SetYTitle(" J Factor [GeV^2/cm^5]");
+//	}
+//	else if (candidate == "Decay")
+//	{
+//		dummy->SetYTitle(" J Factor [GeV/cm^2]");
+//	}
+//	dummy->GetXaxis()->SetTitleOffset(1.3);
+//	dummy->GetYaxis()->SetTitleOffset(1.5);
+//	dummy->DrawCopy();
+//	gPad->SetLogx();
+//	gPad->SetLogy();
+//	gPad->SetGridy();
+//	gPad->SetGridx();
+//	functionJFactor->Draw("same");
+//
+//	TLegend* leg=new TLegend(.18,.75,.53,.85);
+//	leg->AddEntry(functionJFactor, source+"_"+candidate , "l");
+//	leg->SetFillColor(0);
+//	leg->SetLineColor(1);
+//	leg->SetBorderSize(1);
+//	leg->SetTextSize(0.037);
+//	leg->Draw();
+//	gPad->Modified();
+//	gPad->Update();
+//
+////	canvas->Print("/home/david/Documents/DarkMatter/Resultats/JFactor/"+author+"_"+candidate+"_"+source+".png");
 
 }
 
@@ -224,49 +224,49 @@ void ShowLOS()
 void ShowJFactorFromLOS()
 {
 	TString author = "Bonnivard";
-	TString source ="test";
+	TString source ="uma2";
 	TString candidate = "Decay";
 
 	JDDarkMatter* 	JFactorFromLOS = new JDDarkMatter(author, source, candidate);
-//	TF1* functionJFactorFromLOS = JFactorFromLOS->GetTF1JFactorFromLOSVsTheta();
-//	Double_t Theta = JFactorFromLOS->GetTheta();
-//
-//	cout<<"JFactorFromLOS:"<<functionJFactorFromLOS->Eval(0.5)<<endl;
-//
-//	functionJFactorFromLOS->SetLineColor(2);
-//	functionJFactorFromLOS->SetLineStyle(1);
-//	TCanvas* canvas4 = new TCanvas("canvas4","",600,550);
-//	TH1I* dummy4 = new TH1I("dummy4", author,1,0.01,Theta);
-//	dummy4->SetMaximum(3.e20);
-//	dummy4->SetMinimum(1.e15);
-//	dummy4->SetStats(0);
-//	dummy4->SetXTitle(" #theta ");
-//	if (candidate == "Annihilation")
-//	{
-//		dummy4->SetYTitle(" J Factor [GeV^2/cm^5]");
-//	}
-//	else if (candidate == "Decay")
-//	{
-//		dummy4->SetYTitle(" J Factor [GeV/cm^2]");
-//	}
-//	dummy4->GetXaxis()->SetTitleOffset(1.3);
-//	dummy4->GetYaxis()->SetTitleOffset(1.5);
-//	dummy4->DrawCopy();
-//	gPad->SetLogx();
-//	gPad->SetLogy();
-//	gPad->SetGridy();
-//	gPad->SetGridx();
-//	functionJFactorFromLOS->Draw("same");
-//
-//	TLegend* leg4=new TLegend(.18,.75,.53,.85);
-//	leg4->AddEntry(functionJFactorFromLOS, source+"_"+candidate , "l");
-//	leg4->SetFillColor(0);
-//	leg4->SetLineColor(1);
-//	leg4->SetBorderSize(1);
-//	leg4->SetTextSize(0.037);
-//	leg4->Draw();
-//	gPad->Modified();
-//	gPad->Update();
+	TF1* functionJFactorFromLOS = JFactorFromLOS->GetTF1JFactorFromLOSVsTheta();
+	Double_t Theta = JFactorFromLOS->GetTheta();
+
+	cout<<"JFactorFromLOS:"<<functionJFactorFromLOS->Eval(0.5)<<endl;
+
+	functionJFactorFromLOS->SetLineColor(2);
+	functionJFactorFromLOS->SetLineStyle(1);
+	TCanvas* canvas4 = new TCanvas("canvas4","",600,550);
+	TH1I* dummy4 = new TH1I("dummy4", author,1,0.01,Theta);
+	dummy4->SetMaximum(3.e20);
+	dummy4->SetMinimum(1.e15);
+	dummy4->SetStats(0);
+	dummy4->SetXTitle(" #theta ");
+	if (candidate == "Annihilation")
+	{
+		dummy4->SetYTitle(" J Factor [GeV^2/cm^5]");
+	}
+	else if (candidate == "Decay")
+	{
+		dummy4->SetYTitle(" J Factor [GeV/cm^2]");
+	}
+	dummy4->GetXaxis()->SetTitleOffset(1.3);
+	dummy4->GetYaxis()->SetTitleOffset(1.5);
+	dummy4->DrawCopy();
+	gPad->SetLogx();
+	gPad->SetLogy();
+	gPad->SetGridy();
+	gPad->SetGridx();
+	functionJFactorFromLOS->Draw("same");
+
+	TLegend* leg4=new TLegend(.18,.75,.53,.85);
+	leg4->AddEntry(functionJFactorFromLOS, source+"_"+candidate , "l");
+	leg4->SetFillColor(0);
+	leg4->SetLineColor(1);
+	leg4->SetBorderSize(1);
+	leg4->SetTextSize(0.037);
+	leg4->Draw();
+	gPad->Modified();
+	gPad->Update();
 }
 void RunExample1()
 {
