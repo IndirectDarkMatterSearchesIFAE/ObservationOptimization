@@ -206,7 +206,8 @@ void JDDarkMatter::ReadJFactorGeringer()
 // x[0] 	= dTheta
 Double_t JDDarkMatter::TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par)
 {
- return gJFactor->Eval(x[0]);
+	return gJFactor->Eval(x[0]);
+
 }
 
 //----------------------------------------------------

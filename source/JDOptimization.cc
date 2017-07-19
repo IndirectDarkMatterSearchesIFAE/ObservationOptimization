@@ -6,6 +6,7 @@
  */
 
 #include "JDOptimization.h"
+#include "JDDarkMatter.h"
 
 #include <TGraph.h>
 #include <TMath.h>
@@ -37,7 +38,20 @@ JDOptimization::~JDOptimization()
 
 void JDOptimization::CreateFunctions()
 {
+		cout<<GetAuthor()<<endl;
+		cout<<GetSource()<<endl;
+		cout<<GetCandidate()<<endl;
+		cout<<GetWobble()<<endl;
+		cout<<GetInstrumentName()<<endl;
 
-	cout<<GetDcc()<<endl;
+		//Vull fer el JFactor Effective, que és multiplicar el JFactor amb l'efectivitat
+
+		fJFactorEffectiveVsTheta = new TF1("fJFactorEffectiveVsTheta", this, &JDOptimization::JFactorEffectiveVsTheta, 0., GetThetaMax(), 0, "JDOptimization", "JFactorEffectiveVsTheta");
 
 }
+
+Double_t JDOptimization::JFactorEffectiveVsTheta(Double_t* x, Double_t* par)
+{
+	return (GetTF1JFactorVsTheta()->Eval(x[0]))*(GetTF1EfficiencyVsTheta()->Eval(x[0]));
+}
+

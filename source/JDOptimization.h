@@ -17,13 +17,20 @@ public:
 	JDOptimization(TString author, TString source, TString candidate, TString instrumentName, Double_t wobble);
 	virtual ~JDOptimization();
 
+	TF1* GetJFactorEffectiveVsTheta()
+	{
+		return fJFactorEffectiveVsTheta;
+	}
 
 protected:
 
 	void CreateFunctions();
 
+	Double_t JFactorEffectiveVsTheta(Double_t* x, Double_t* par);
+
 private:
 
+	TF1* fJFactorEffectiveVsTheta;
 
 };
 

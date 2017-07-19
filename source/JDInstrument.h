@@ -19,12 +19,12 @@ public:
 	JDInstrument(TString instrumentName, Double_t wobble);
 	virtual ~JDInstrument();
 
-TF2* GetEpsilon()
+TF2* GetTF2EpsilonVsThetaAndPhi()
 {
-	return fEvaluateEpsilonVsTheta;
+	return fEvaluateEpsilonVsThetaAndPhi;
 }
 
-TF1* GetEfficiency()
+TF1* GetTF1EfficiencyVsTheta()
 {
 	return fEvaluateEfficiencyVsTheta;
 }
@@ -39,13 +39,23 @@ Double_t GetThetaMax()
 	return dThetaMax;
 }
 
+Double_t GetWobble()
+{
+	return dWobble;
+}
+
+TString GetInstrumentName()
+{
+	return sInstrumentName;
+}
+
 protected:
 
 	void CreateFunctionsInstrument();
 	void SetEpsilon();
 
-Double_t EvaluateEpsilonVsTheta(Double_t* x, Double_t* par);
-Double_t EvaluateEpsilonPerThetaVsTheta(Double_t* x, Double_t* par);
+Double_t EvaluateEpsilonVsThetaAndPhi(Double_t* x, Double_t* par);
+Double_t EvaluateEpsilonPerThetaVsThetaAndPhi(Double_t* x, Double_t* par);
 Double_t EvaluateEfficiencyVsTheta(Double_t* x, Double_t* par);
 
 
@@ -82,8 +92,8 @@ TF1* fEvaluateEfficiencyVsTheta;
 //TF2
 ///////////////////////////////////////////////////////
 
-TF2* fEvaluateEpsilonVsTheta;
-TF2* fEvaluateEpsilonPerThetaVsTheta;
+TF2* fEvaluateEpsilonVsThetaAndPhi;
+TF2* fEvaluateEpsilonPerThetaVsThetaAndPhi;
 };
 
 

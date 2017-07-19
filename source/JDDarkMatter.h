@@ -45,6 +45,20 @@ Double_t GetTheta()
 	return dTheta;
 }
 
+TString GetAuthor()
+{
+	return sAuthor;
+}
+TString GetSource()
+{
+	return sSource;
+}
+
+TString GetCandidate()
+{
+	return sCandidate;
+}
+
 
 
 //GetJFactorName

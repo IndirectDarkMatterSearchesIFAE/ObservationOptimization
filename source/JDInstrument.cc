@@ -21,7 +21,7 @@ using namespace std;
 JDInstrument::JDInstrument(TString instrumentName, Double_t wobble):
 		sInstrumentName(instrumentName), dWobble(wobble),
 		gEpsilon(NULL),fEvaluateEfficiencyVsTheta(NULL),
-		fEvaluateEpsilonVsTheta(NULL),fEvaluateEpsilonPerThetaVsTheta(NULL)
+		fEvaluateEpsilonVsThetaAndPhi(NULL),fEvaluateEpsilonPerThetaVsThetaAndPhi(NULL)
 {
 	    cout << endl;
 		cout << endl;
@@ -38,10 +38,10 @@ JDInstrument::JDInstrument(TString instrumentName, Double_t wobble):
 JDInstrument::~JDInstrument()
 {
 
-	if (gEpsilon)									delete gEpsilon;
-	if (fEvaluateEfficiencyVsTheta)					delete fEvaluateEfficiencyVsTheta;
-	if (fEvaluateEpsilonVsTheta)					delete fEvaluateEpsilonVsTheta;
-	if (fEvaluateEpsilonPerThetaVsTheta)			delete fEvaluateEpsilonPerThetaVsTheta;
+	if (gEpsilon)										delete gEpsilon;
+	if (fEvaluateEfficiencyVsTheta)						delete fEvaluateEfficiencyVsTheta;
+	if (fEvaluateEpsilonVsThetaAndPhi)					delete fEvaluateEpsilonVsThetaAndPhi;
+	if (fEvaluateEpsilonPerThetaVsThetaAndPhi)			delete fEvaluateEpsilonPerThetaVsThetaAndPhi;
 
 		cout << endl;
 		cout << endl;
@@ -62,8 +62,8 @@ dThetaMax= dDcc-dWobble;
 
 fEvaluateEfficiencyVsTheta = new TF1("fEvaluateEfficiencyVsTheta", this, &JDInstrument::EvaluateEfficiencyVsTheta, 0., dThetaMax, 0, "JDInstrument", "EvaluateEfficiencyVsTheta");
 
-fEvaluateEpsilonVsTheta = new TF2("fEvaluateEpsilonVsTheta", this, &JDInstrument::EvaluateEpsilonVsTheta, 0., dDcc, -TMath::Pi(), TMath::Pi(), 0, "JDInstrument", "EvaluateEpsilonVsTheta");
-fEvaluateEpsilonPerThetaVsTheta = new TF2("fEvaluateEpsilonPerThetaVsTheta", this, &JDInstrument::EvaluateEpsilonPerThetaVsTheta, 0., dThetaMax, -TMath::Pi(), TMath::Pi(), 0, "JDInstrument", "EvaluateEpsilonPerThetaVsTheta");
+fEvaluateEpsilonVsThetaAndPhi = new TF2("fEvaluateEpsilonVsThetaAndPhi", this, &JDInstrument::EvaluateEpsilonVsThetaAndPhi, 0., dDcc, -TMath::Pi(), TMath::Pi(), 0, "JDInstrument", "EvaluateEpsilonVsThetaAndPhi");
+fEvaluateEpsilonPerThetaVsThetaAndPhi = new TF2("fEvaluateEpsilonPerThetaVsThetaAndPhi", this, &JDInstrument::EvaluateEpsilonPerThetaVsThetaAndPhi, 0., dThetaMax, -TMath::Pi(), TMath::Pi(), 0, "JDInstrument", "EvaluateEpsilonPerThetaVsThetaAndPhi");
 
 }
 
@@ -97,7 +97,7 @@ void JDInstrument::SetEpsilon()
 //	x[0] = theta
 //  x[1] = phi
 //  par[0] = wobble
-Double_t JDInstrument::EvaluateEpsilonVsTheta(Double_t* x, Double_t* par)
+Double_t JDInstrument::EvaluateEpsilonVsThetaAndPhi(Double_t* x, Double_t* par)
 {
 	Double_t dccR = TMath::Power(TMath::Power(dWobble,2)+TMath::Power(x[0],2)+2*dWobble*x[0]*TMath::Cos(x[1]),0.50);
 
@@ -115,16 +115,16 @@ Double_t JDInstrument::EvaluateEpsilonVsTheta(Double_t* x, Double_t* par)
 //-----------------------------------------------
 //	x[0] = theta
 //  x[1] = phi
-Double_t JDInstrument::EvaluateEpsilonPerThetaVsTheta(Double_t* x, Double_t* par)
+Double_t JDInstrument::EvaluateEpsilonPerThetaVsThetaAndPhi(Double_t* x, Double_t* par)
 {
-	return fEvaluateEpsilonVsTheta->Eval(x[0], x[1])*x[0];
+	return fEvaluateEpsilonVsThetaAndPhi->Eval(x[0], x[1])*x[0];
 }
 
 //-----------------------------------------------
 //	x[0] = theta
 Double_t JDInstrument::EvaluateEfficiencyVsTheta(Double_t* x, Double_t* par)
 {
-	return fEvaluateEpsilonPerThetaVsTheta->Integral(0., x[0], -TMath::Pi(), TMath::Pi(), 1.e-6)/(TMath::Pi()*TMath::Power(x[0],2));
+	return fEvaluateEpsilonPerThetaVsThetaAndPhi->Integral(0., x[0], -TMath::Pi(), TMath::Pi(), 1.e-6)/(TMath::Pi()*TMath::Power(x[0],2));
 }
 
 
