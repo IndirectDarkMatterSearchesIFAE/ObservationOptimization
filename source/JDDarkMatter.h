@@ -14,20 +14,17 @@ using namespace std;
 class JDDarkMatter {
 public:
 
-	JDDarkMatter(TString author, TString source, TString candidate);
+	JDDarkMatter(TString author, TString source, TString candidate, TString mySourcePath);
 		virtual ~JDDarkMatter();
+
+
+///////////////////////////////////////////////////////
+//TF1
+///////////////////////////////////////////////////////
 
 TF1* GetTF1JFactorVsTheta()
 {
 	return fEvaluateJFactorVsTheta;
-}
-
-// x[0] == normalization point [deg]
-//TF1* GetQFactor(Double_t thetaNorm)
-TF1* GetTF1QFactorVsTheta(Double_t thetaNorm)
-{
-	fEvaluateQFactorVsTheta->SetParameter(0, thetaNorm);
-	return fEvaluateQFactorVsTheta;
 }
 
 TF1* GetTF1LOSVsTheta()
@@ -35,20 +32,24 @@ TF1* GetTF1LOSVsTheta()
 	return fEvaluateLOSVsTheta;
 }
 
-TF1* GetTF1JFactorFromLOSVsTheta()
-{
-	return fEvaluateJFactorFromLOSVsTheta;
-}
+///////////////////////////////////////////////////////
+//Double_t
+///////////////////////////////////////////////////////
 
 Double_t GetTheta()
 {
 	return dTheta;
 }
 
+///////////////////////////////////////////////////////
+//TString
+///////////////////////////////////////////////////////
+
 TString GetAuthor()
 {
 	return sAuthor;
 }
+
 TString GetSource()
 {
 	return sSource;
@@ -58,12 +59,6 @@ TString GetCandidate()
 {
 	return sCandidate;
 }
-
-
-
-//GetJFactorName
-//GetAuthorName
-//GetIsAnnihilation
 
 protected:
 
@@ -75,10 +70,7 @@ void ReadJFactorGeringer();
 
 
 Double_t TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par);
-Double_t EvaluateQFactorVsTheta(Double_t* x, Double_t* par);
 Double_t EvaluateLOSVsTheta(Double_t* x, Double_t* par);
-Double_t EvaluateLOSPerSinusVsTheta(Double_t* x, Double_t* par);
-Double_t EvaluateJFactorFromLOSVsTheta(Double_t* x, Double_t* par);
 
 private:
 
@@ -89,13 +81,13 @@ private:
 TString sAuthor;
 TString sSource;
 TString sCandidate;
+TString sMySourcePath;
 
 ///////////////////////////////////////////////////////
 //Double_t
 ///////////////////////////////////////////////////////
 
 Double_t dTheta;
-Double_t dThetaNorm;
 
 ///////////////////////////////////////////////////////
 //TGraph
@@ -108,10 +100,7 @@ TGraph* gJFactor;
 ///////////////////////////////////////////////////////
 
 TF1* fEvaluateJFactorVsTheta;
-TF1* fEvaluateQFactorVsTheta;
 TF1* fEvaluateLOSVsTheta;
-TF1* fEvaluateLOSPerSinusVsTheta;
-TF1* fEvaluateJFactorFromLOSVsTheta;
 
 };
 

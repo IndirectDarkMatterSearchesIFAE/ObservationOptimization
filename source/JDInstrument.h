@@ -16,7 +16,7 @@
 
 class JDInstrument {
 public:
-	JDInstrument(TString instrumentName, Double_t wobble);
+	JDInstrument(TString instrumentName, Double_t wobble, TString myInstrumentPath);
 	virtual ~JDInstrument();
 
 TF2* GetTF2EpsilonVsThetaAndPhi()
@@ -67,6 +67,7 @@ private:
 ///////////////////////////////////////////////////////
 
 TString sInstrumentName;
+TString sMyInstrumentPath;
 
 ///////////////////////////////////////////////////////
 //Double_t
