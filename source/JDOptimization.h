@@ -23,22 +23,22 @@ public:
 		return fEvaluateQFactorVsTheta;
 	}
 
-	TF1* GetTF1JFactorFromLOS_On()
+	TF1* GetTF1JFactorFromLOS_OnVsTheta()
 	{
 		return fEvaluateJFactorFromLOS_OnVsTheta;
 	}
 
-	TF1* GetTF1JFactorFromLOS_Off()
+	TF1* GetTF1JFactorFromLOS_OffVsTheta()
 	{
 		return fEvaluateJFactorFromLOS_OffVsTheta;
 	}
 
-	TF1* GetTF1JFactorFromLOS_Total()
+	TF1* GetTF1JFactorFromLOS_TotalVsTheta()
 	{
 		return fEvaluateJFactorFromLOS_TotalVsTheta;
 	}
 
-	TF1* GetTF1QFactorFromLOS_Total(Double_t thetaNorm)
+	TF1* GetTF1QFactorFromLOS_TotalVsTheta(Double_t thetaNorm)
 	{
 		fEvaluateQFactorFromLOS_TotalVsTheta->SetParameter(0, thetaNorm);
 		return fEvaluateQFactorFromLOS_TotalVsTheta;
@@ -47,6 +47,12 @@ public:
 	TF1* GetTF1JFactorEffectiveVsTheta()
 	{
 		return fEvaluateJFactorEffectiveVsTheta;
+	}
+
+	TF1* GetTF1QFactorEffectiveVsTheta(Double_t thetaNorm)
+	{
+		fEvaluateQFactorEffectiveVsTheta->SetParameter(0, thetaNorm);
+		return fEvaluateQFactorEffectiveVsTheta;
 	}
 
 protected:
@@ -62,6 +68,7 @@ protected:
 	Double_t EvaluateQFactorFromLOS_TotalVsTheta (Double_t* x, Double_t* par);
 
 	Double_t EvaluateJFactorEffectiveVsTheta(Double_t* x, Double_t* par);
+	Double_t EvaluateQFactorEffectiveVsTheta(Double_t* x, Double_t* par);
 
 private:
 
@@ -71,6 +78,7 @@ private:
 	TF1* fEvaluateJFactorFromLOS_TotalVsTheta;
 	TF1* fEvaluateQFactorFromLOS_TotalVsTheta;
 	TF1* fEvaluateJFactorEffectiveVsTheta;
+	TF1* fEvaluateQFactorEffectiveVsTheta;
 
 	TF2* fEvaluateLOSPerSinusThetaVsDcg;
 
