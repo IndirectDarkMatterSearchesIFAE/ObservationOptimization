@@ -2,7 +2,11 @@
  * DM.h
  *
  *  Created on: 03/07/2017
- *      Author: david
+ *  Authors: David Navarro Gironés 	<<david.navarrogir@e-campus.uab.cat>>
+ *  		 Joaquim Palacio 		<<jpalacio@ifae.es>>
+ *
+ *  		 ADD A GENERAL DESCRIPTION ON THE CLASS, THE MAIN FUNCTIONS, THE VARIABLES
+ *  		 AND MENTION THE "runExample#.C" THAT SHOWS HOW TO USE IT
  */
 
 #ifndef JDDarkMatter_H_
@@ -93,6 +97,8 @@ Double_t dTheta;
 //TGraph
 ///////////////////////////////////////////////////////
 
+// (QUIM) you can specify here how this JFactor is going to be filled,
+// make explicit that the same TGraph is used for Bon/Ger & Ann/Dec
 TGraph* gJFactor;
 
 ///////////////////////////////////////////////////////

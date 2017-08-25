@@ -3,7 +3,8 @@
 #include "../source/JDInstrument.cc"
 #include "../source/JDOptimization.cc"
 
-#include </home/david/Work/Software/root_v6.06.08/include/TStyle.h>
+//#include </home/david/Work/Software/root_v6.06.08/include/TStyle.h>
+#include <TStyle.h>
 
 //this works at IFAE
 //#include </home/david/Work/Software/scripts/style.h>
@@ -17,24 +18,29 @@ using namespace std;
 
 //-------------------------------------
 //  This function shows the JFactor of the author, source and candidate we want.
-//
-void ShowJFactor()
+//	(QUIM) a definition of JFactor should be referenced (probably from Bertone?, miguel-angel?)
+//	(QUIM) Declare author, source, candidate
+void ShowJFactor() // (QUIM) Show-> Draw?
 {
 
-	TString author = "Bonnivard";
-	TString source = "uma2";
-	TString candidate = "Annihilation";
-	TString mySourcePath;
+	TString author = "Bonnivard"; 		// (QUIM) Possible authors are "Bonnivard" and "Geringer"
+	TString source = "uma2";			// (QUIM) List of possible sources?
+	TString candidate = "Annihilation";	// (QUIM) Possible candidates are "Annihilation" and "Decay"
+
+	TString mySourcePath;				// (QUIM) This variable should not be shown in here, should be
+										// a private variable of the class (the user should not care)
 
 	if (author == "Bonnivard")
 	{
 		if (candidate == "Decay")
 		{
+			// (QUIM) els paths haurien de ser relatius al codi que et descarregues
 			mySourcePath = "/home/david/Documents/DarkMatter/"+author+"/"+source+"_Dalphaint_cls_READ.output";
 		}
 
 		else if (candidate == "Annihilation")
 		{
+			// (QUIM) els paths haurien de ser relatius al codi que l'usuari es descarregua
 			mySourcePath = "/home/david/Documents/DarkMatter/"+author+"/"+source+"_Jalphaint_cls_READ.output";
 		}
 
@@ -46,6 +52,7 @@ void ShowJFactor()
 
 	else if (author == "Geringer")
 	{
+		// (QUIM) els paths haurien de ser relatius al codi que l'usuari es descarrega
 		mySourcePath = "/home/david/Documents/DarkMatter/"+author+"/GeringerSamethTable_"+source+".txt";
 	}
 
@@ -54,8 +61,17 @@ void ShowJFactor()
 		cout<<"ERROR: Author is not valid"<<endl;
 	}
 
+	// (QUIM) some informatino could be given to explain what is each line doing, for example
+	// "creating a class element that will read the values of J vs theta for a given author/source/candidate
 	JDDarkMatter* 	JFactor = new JDDarkMatter(author, source, candidate, mySourcePath);
+	// (QUIM) mySourcePath -> should be a private variable, and not be in the constructor
+
+
+	// (QUIM) example: "this returns a TF1 with the values of J vs theta"
 	TF1* functionJFactor = JFactor->GetTF1JFactorVsTheta();
+
+	// (QUIM) example: "this returns a double ..., only for plotting purpose" [em sembla que el nom de theta no es el millor]
+	// (QUIM) variables locals millor sempre en minuscula: Theta -> theta
 	Double_t Theta = JFactor->GetTheta();
 
 	functionJFactor->SetLineColor(2);
@@ -66,6 +82,10 @@ void ShowJFactor()
 	dummy->SetMinimum(1.e15);
 	dummy->SetStats(0);
 	dummy->SetXTitle(" #theta ");
+	// (QUIM) aquests if else tant facils millor així (més compactes):
+	// 	hi hauria d'haver un "GetCandidate()"
+	// if(GetCandidate() == "Annihilation") 	dummy->SetYTitle(" J Factor [GeV^2/cm^5]");
+	// else if (candidate == "Decay") 	dummy->SetYTitle(" J Factor [GeV/cm^2]");
 	if (candidate == "Annihilation")
 	{
 		dummy->SetYTitle(" J Factor [GeV^2/cm^5]");
@@ -98,7 +118,8 @@ void ShowJFactor()
 
 //-------------------------------------
 //  This function shows the LOS of the author, source and candidate we want.
-//
+//	(QUIM) a definition of los should be given in relation to JFactor, probably written in here and specifying the units
+//	(QUIM) most of the comments of ShowJFactor apply in here
 void ShowLOS()
 {
 	TString author = "Bonnivard";
@@ -106,6 +127,8 @@ void ShowLOS()
 	TString candidate = "Annihilation";
 	TString mySourcePath;
 
+	// (QUIM) this piece of code is repeated, in ShowJFactor. As I was saying before, the user does not care at all...
+	//------------------------------------------------------------------------------
 	if (author == "Bonnivard")
 	{
 		if (candidate == "Decay")
@@ -133,6 +156,7 @@ void ShowLOS()
 	{
 		cout<<"ERROR: Author is not valid"<<endl;
 	}
+	//------------------------------------------------------------------------------
 
 	JDDarkMatter* 	LOS = new JDDarkMatter(author, source, candidate, mySourcePath);
 	TF1* functionLOS = LOS->GetTF1LOSVsTheta();
@@ -145,7 +169,7 @@ void ShowLOS()
 	dummy1->SetMaximum(3.e22);
 	dummy1->SetMinimum(1.e17);
 	dummy1->SetStats(0);
-	dummy1->SetXTitle(" #theta ");
+	dummy1->SetXTitle(" #theta "); //(QUIM) specify UNITS!!!
 	if (candidate == "Annihilation")
 		{
 		dummy1->SetYTitle(" LOS ");
@@ -179,16 +203,23 @@ void ShowLOS()
 }
 
 //-------------------------------------
-// This function shows the epsilon of the telescope, which expresses in a scale from 0 to 1 how good are the measures that it takes depending on the point of the camera
+// (QUIM): Rephrase... We need to define epsilon with an equation, and then explain how we obtain
+// 	epsilon for each instrument
+// (QUIM): Define instrumentName, wobble, myInstrumentPath
+//
+// This function shows the epsilon of the telescope, which expresses in a scale
+// from 0 to 1 how good are the measures that it takes depending on the point of the camera
 //
 void ShowEpsilon()
 {
 
-	TString instrumentName= "MagicPointLikeEfficiency";
-	Double_t wobble=1.;
+	TString instrumentName= "MagicPointLikeEfficiency";	//(QUIM) The user name should be MAGICPointLike, Efficiency doesn't have a meaning for users
+	Double_t wobble=1.;	// (QUIM) UNITS!
 	TString sWobble = Form("%.1f",wobble);
+	// (QUIM) Aixó hauria de ser un path relatiu a gitHup
 	TString myInstrumentPath = "/home/david/Documents/DarkMatter/Epsilon/"+instrumentName+".txt";
 
+	// (QUIM) "E"psilon majuscula...
 	JDInstrument* Epsilon = new JDInstrument(instrumentName, wobble, myInstrumentPath);
 	TF2* functionEpsilon = Epsilon->GetTF2EpsilonVsThetaAndPhi();
 	Double_t Dcc = Epsilon->GetDcc();
@@ -314,6 +345,9 @@ void ShowQFactor()
 	}
 
 	JDOptimization* QFactor = new JDOptimization(author, source, candidate, mySourcePath, instrumentName, wobble, myInstrumentPath);
+	// (QUIM) cambiar "normalizationPoint" -> "normalizationFactor"; així podem comparar differents QFactors.
+	// normalizationFactor hauria de ser una variable de la classe JDOptimization, amb valor per defecte 1. Hi hauria d'aver un
+	// Setter (per canviar-li el valor si es vol) i un Getter
 	TF1* functionQFactor= QFactor->GetTF1QFactorVsTheta(normalizationPoint);
 	Double_t TethaMax = QFactor->GetThetaMax();
 
@@ -883,14 +917,14 @@ void RunExample1()
 ///////////////////////////////////////////////////////////////
 //  Dark Matter Class
 //////////////////////////////////////////////////////////////
-	ShowJFactor();
-	ShowLOS();
+	ShowJFactor();  		// (QUIM)-> checked!
+	ShowLOS();				// (QUIM)-> checked!
 
 ///////////////////////////////////////////////////////////////
 //  Instrument Class
 ////////////////////////////////////////////////////////////////
-	ShowEpsilon();
-	ShowEfficiency();
+	ShowEpsilon();			// (QUIM)-> checked!
+	ShowEfficiency();		// (QUIM)-> checked!
 
 ///////////////////////////////////////////////////////////////
 //  Combined Class
