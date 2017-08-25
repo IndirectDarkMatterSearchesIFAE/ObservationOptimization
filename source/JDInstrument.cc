@@ -2,7 +2,11 @@
  * JDInstrument.cc
  *
  *  Created on: 03/07/2017
- *      Author: david
+ *  Authors: David Navarro Gironés 	<<david.navarrogir@e-campus.uab.cat>>
+ *  		 Joaquim Palacio 		<<jpalacio@ifae.es>>
+ *
+ *  		 ADD A GENERAL DESCRIPTION ON THE CLASS, THE MAIN FUNCTIONS, THE VARIABLES
+ *  		 AND MENTION THE "runExample#.C" THAT SHOWS HOW TO USE IT
  */
 
 #include "JDInstrument.h"
@@ -17,7 +21,7 @@ using namespace std;
 //
 //	Possible variables are:
 // 	sInstrumentName 	= (TString) name of the telescope
-//	dWobble			 	= (Double_t) wobble distance
+//	dWobble			 	= (Double_t) wobble distance (QUIM) UNITS!!!
 //	sMyInstrumentPath	= (TString) name of the instrument path
 JDInstrument::JDInstrument(TString instrumentName, Double_t wobble, TString myInstrumentPath):
 		sInstrumentName(instrumentName), dWobble(wobble), sMyInstrumentPath(myInstrumentPath),
@@ -64,6 +68,7 @@ void JDInstrument::CreateFunctionsInstrument()
 {
 SetEpsilon();
 
+// (QUIM) dDcc no te un valor definit...[segueix a **1]
 dThetaMax= dDcc-dWobble;
 
 fEvaluateEfficiencyVsTheta = new TF1("fEvaluateEfficiencyVsTheta", this, &JDInstrument::EvaluateEfficiencyVsTheta, 0., dThetaMax, 0, "JDInstrument", "EvaluateEfficiencyVsTheta");
@@ -74,8 +79,18 @@ fEvaluateEpsilonPerThetaVsThetaAndPhi = new TF2("fEvaluateEpsilonPerThetaVsTheta
 }
 
 //-----------------------------------------------
-// This function fulfills a TGraph with the information  of the epsilon of the telescope normalized at the centre of the camera. We define epsilon as the % of the quality of the camera with respect to its centre.
+// This function fills a TGraph with the information of the epsilon
+// of the telescope normalized at the centre of the camera.
+// We define epsilon as the % of the quality of the camera with respect
+// to its centre.
+//
 // dDcc (Double_t) is the distance to the centre of the camera
+//
+// (QUIM) Epsilon és un concepte que nosaltre inventem (hauriem de parlar sempre
+// d'acceptancia, i epsilon es la lletra que utilitzem per definir la acceptancia)
+// Quan parlem d'acceptancies, parlarem de la de MAGIC, CTA i ideal (i potser més endavant
+// d'altres. Per tant, dintre de SetEpsilon, hi hauria d'haver diferents casos, que
+// segons l'instrument, hi hagués una acceptancia different.
 void JDInstrument::SetEpsilon()
 {
 	Double_t Y,Y0;
@@ -84,6 +99,11 @@ void JDInstrument::SetEpsilon()
 	gEpsilon = new TGraph();
 
 	ifstream file (sMyInstrumentPath);
+	// (QUIM) [**1] va canviant de valor dintre del while fins a la última iteració...
+	// segurament aquí vols definir una variable local "distanceCameraCenter" que es destrueixi
+	// després de SetEpsilon
+
+	// (QUIM) This is the MAGIC case.
 	while(file 	>> dDcc >> Y)
 		{
 			if (contador==0){
@@ -100,20 +120,25 @@ void JDInstrument::SetEpsilon()
 //-----------------------------------------------
 //	It evaluates the Epsilon of the camera vs theta and phi
 //
-//	dccR distance to the centre of the camera in radial components
+//	dccR distance to the centre of the camera in radial components (QUIM) UNITS!!!
 //	x[0] = theta [deg]
 //  x[1] = phi [rad]
 //  par[0] = wobble [deg]
 Double_t JDInstrument::EvaluateEpsilonVsThetaAndPhi(Double_t* x, Double_t* par)
 {
-	Double_t dccR = TMath::Power(TMath::Power(dWobble,2)+TMath::Power(x[0],2)+2*dWobble*x[0]*TMath::Cos(x[1]),0.50);
+	//(QUIM) - La formula es xx+yy-2xy·cos(); el motiu per posar un signe més es perque en realitat es phi'=180-phi?
+	//		(see triangle slide-2)
+	//		 - Power(a,0.50) =? Sqrt()
+	//Double_t dccR = TMath::Power(TMath::Power(dWobble,2)+TMath::Power(x[0],2)+2*dWobble*x[0]*TMath::Cos(x[1]),0.50);
+	Double_t dccR = TMath::Power(TMath::Power(par[0],2)+TMath::Power(x[0],2)+2*par[0]*x[0]*TMath::Cos(x[1]),0.50);
+
 
 	if (dccR<=dDcc)
 	{
 		return gEpsilon->Eval(dccR);
 	}
 
-	else
+	else	// (QUIM) this is just to make integrals over the camera to converge right?
 	{
 		return 1.e-20;
 	}
@@ -121,6 +146,7 @@ Double_t JDInstrument::EvaluateEpsilonVsThetaAndPhi(Double_t* x, Double_t* par)
 
 //-----------------------------------------------
 //	It evaluates the Epsilon of the camera multiplied by theta vs theta and phi
+//	(QUIM) - Why are you multiplying by theta? Area = int dphy int r·dr ; where theta is r.
 //
 //	x[0] = theta [deg]
 //  x[1] = phi [rad]
@@ -131,6 +157,7 @@ Double_t JDInstrument::EvaluateEpsilonPerThetaVsThetaAndPhi(Double_t* x, Double_
 
 //-----------------------------------------------
 //	It evaluates the Efficiency of the camera vs theta
+//	(QUIM) what is efficiency, see slide 3
 //
 //	x[0] = theta [deg]
 Double_t JDInstrument::EvaluateEfficiencyVsTheta(Double_t* x, Double_t* par)

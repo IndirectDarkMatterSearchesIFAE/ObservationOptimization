@@ -2,10 +2,15 @@
  * DarkMatter.cc
  *
  *  Created on: 03/07/2017
- *      Author: david
+ *  Authors: David Navarro Gironés 	<<david.navarrogir@e-campus.uab.cat>>
+ *  		 Joaquim Palacio 		<<jpalacio@ifae.es>>
+ *
+ *  		 ADD A GENERAL DESCRIPTION ON THE CLASS, THE MAIN FUNCTIONS, THE VARIABLES
+ *  		 AND MENTION THE "runExample#.C" THAT SHOWS HOW TO USE IT
  */
 
 #include "JDOptimization.h"
+//(QUIM) Perque necessites incluir JDDarkMatter.h i no JDInstrument.h
 #include "JDDarkMatter.h"
 
 #include <TGraph.h>
@@ -85,6 +90,13 @@ JDOptimization::~JDOptimization()
 //	fEvaluateLOSPerSinusThetaVsDcg
 void JDOptimization::CreateFunctions()
 {
+	// (QUIM) Hauriem de definir uns criteris tipo: Q = N_gamma/Sqrt(N_bkg),
+	//	[where acceptance_gamma=acceptance_bkg, tinc un plot que demostra aixó, recorda-m'ho]
+	//	IDEAL: 					Q1 = J/theta
+	//	LEAKAGE EFFECT: 		Q2 = int_LOS_On/Sqrt(theta*theta + int_LOS_Off)
+	//  ACCEPTANCE EFFECT: 		Q3 = J_eff/theta_eff
+	// 	LEAKAGE + ACCEPTANCE:	Q4 = int_LOS_On_eff/Sqrt(theta_eff*theta_eff + int_LOS_Off_eff)
+
 	//	First case
 		fEvaluateQFactorVsTheta = new TF1("fEvaluateQFactorVsTheta", this, &JDOptimization::EvaluateQFactorVsTheta, 0., GetThetaMax(), 1, "JDOptimization", "EvaluateQFactorVsTheta");
 
@@ -109,6 +121,8 @@ void JDOptimization::CreateFunctions()
 Double_t JDOptimization::EvaluateQFactorVsTheta(Double_t* x, Double_t* par)
 {
 	 return (GetTF1JFactorVsTheta()->Eval(x[0])/x[0])/(GetTF1JFactorVsTheta()->Eval(par[0])/par[0]);
+	 // (QUIM) NormalizationFactor
+	 //return (GetTF1JFactorVsTheta()->Eval(x[0])/x[0])/normalizationFactor;
 }
 
 //----------------------------------------------------
