@@ -364,7 +364,7 @@ void DrawNormLOSFromTGraph()
 	JFactor->SetCandidate("Annihilation");
 	JFactor->SetAuthor("Saturni-Doro");
 	JFactor->SetSourceName("TrigII");
-	Double_t normTheta=0.1; // [deg]
+	Double_t normTheta=0.05; // [deg]
 	TF1* functionLOS = JFactor->GetTF1NormLOSVsTheta(normTheta);
 	Double_t Theta = JFactor->GetThetaMax();
 	functionLOS->SetLineColor(2);
@@ -387,6 +387,15 @@ void DrawNormLOSFromTGraph()
 	gPad->SetGridx();
 	functionLOS->Draw("same");
 
+	// This for the Donut MC
+	Double_t thetaMin=0.05; 					// [deg]
+	Double_t thetaMax=JFactor->GetThetaMax();	// [deg]
+	for(Int_t i=0; i<100; i++)
+	{
+		Double_t theta = thetaMin + (thetaMax-thetaMin)/100.*i;
+		cout << theta << " " << functionLOS->Eval(theta) << endl;
+	}
+
 
 	TLegend* leg1=new TLegend(.18,.15,.88,.25);
 	leg1->AddEntry(functionLOS, JFactor->GetSourceName()+" "+JFactor->GetCandidate()+" ("+JFactor->GetAuthor()+")", "l");
@@ -398,7 +407,8 @@ void DrawNormLOSFromTGraph()
 	gPad->Modified();
 	gPad->Update();
 
-//	canvas1->Print("/home/david/Documents/DarkMatter/Resultats/LOS/"+author+"_"+candidate+"_"+source+".png");
+	canvas1->Print("~/Desktop/normalizedLOS.pdf");
+	canvas1->Print("~/Desktop/normalizedLOS.root");
 
 }
 
