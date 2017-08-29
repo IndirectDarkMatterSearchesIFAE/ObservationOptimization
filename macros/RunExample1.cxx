@@ -20,46 +20,15 @@ using namespace std;
 //  This function shows the JFactor of the author, source and candidate we want.
 //	(QUIM) a definition of JFactor should be referenced (probably from Bertone?, miguel-angel?)
 //	(QUIM) Declare author, source, candidate
-void ShowJFactor() // (QUIM) Show-> Draw?
+void DrawJFactor() // (QUIM) Show-> Draw?
 {
 
 	TString author = "Bonnivard"; 		// (QUIM) Possible authors are "Bonnivard" and "Geringer"
 	TString source = "uma2";			// (QUIM) List of possible sources?
 	TString candidate = "Annihilation";	// (QUIM) Possible candidates are "Annihilation" and "Decay"
 
-	TString mySourcePath;				// (QUIM) This variable should not be shown in here, should be
+	TString mySourcePath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization";				// (QUIM) This variable should not be shown in here, should be
 										// a private variable of the class (the user should not care)
-
-	if (author == "Bonnivard")
-	{
-		if (candidate == "Decay")
-		{
-			// (QUIM) els paths haurien de ser relatius al codi que et descarregues
-			mySourcePath = "/home/david/Documents/DarkMatter/"+author+"/"+source+"_Dalphaint_cls_READ.output";
-		}
-
-		else if (candidate == "Annihilation")
-		{
-			// (QUIM) els paths haurien de ser relatius al codi que l'usuari es descarregua
-			mySourcePath = "/home/david/Documents/DarkMatter/"+author+"/"+source+"_Jalphaint_cls_READ.output";
-		}
-
-		else
-		{
-			cout<<"ERROR: Candidate is not valid"<<endl;
-		}
-	}
-
-	else if (author == "Geringer")
-	{
-		// (QUIM) els paths haurien de ser relatius al codi que l'usuari es descarrega
-		mySourcePath = "/home/david/Documents/DarkMatter/"+author+"/GeringerSamethTable_"+source+".txt";
-	}
-
-	else
-	{
-		cout<<"ERROR: Author is not valid"<<endl;
-	}
 
 	// (QUIM) some informatino could be given to explain what is each line doing, for example
 	// "creating a class element that will read the values of J vs theta for a given author/source/candidate
@@ -72,12 +41,12 @@ void ShowJFactor() // (QUIM) Show-> Draw?
 
 	// (QUIM) example: "this returns a double ..., only for plotting purpose" [em sembla que el nom de theta no es el millor]
 	// (QUIM) variables locals millor sempre en minuscula: Theta -> theta
-	Double_t Theta = JFactor->GetTheta();
+	Double_t thetaMax = JFactor->GetTheta();
 
 	functionJFactor->SetLineColor(2);
 	functionJFactor->SetLineStyle(1);
 	TCanvas* canvas = new TCanvas("canvas","",600,550);
-	TH1I* dummy = new TH1I("dummy", author,1,0.01,Theta);
+	TH1I* dummy = new TH1I("dummy", author,1,0.01,thetaMax);
 	dummy->SetMaximum(3.e20);
 	dummy->SetMinimum(1.e15);
 	dummy->SetStats(0);
