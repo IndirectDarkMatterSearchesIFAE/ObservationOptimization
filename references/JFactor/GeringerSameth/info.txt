@@ -1,0 +1,59 @@
+   *************************************** 
+   ***   Aperture Angle Optimization   *** 
+   *************************************** 
+
+
+ComaBerenices:
+     Angle = 0.239875
+     QFactor(Angle) = 1.21304
+     Log10[JFactor(0.1)] = 18.4863
+     Log10[JFactor(Angle)] = 18.9508
+     Log10[JFactor_p1Sigma(Angle)] = 19.3052
+
+     EffectiveJFactor(Angle) = 22.4247
+     EffectiveJFactorRelativeError(Angle) 2.26152
+
+
+Draco:
+     Angle = 0.423068
+     QFactor(Angle) = 1.36225
+     Log10[JFactor(0.1)] = 18.0134
+     Log10[JFactor(Angle)] = 18.7724
+     Log10[JFactor_p1Sigma(Angle)] = 18.8847
+
+     EffectiveJFactor(Angle) = 24.5386
+     EffectiveJFactorRelativeError(Angle) 1.29509
+
+
+Segue1:
+     Angle = 0.121415
+     QFactor(Angle) = 1.00185
+     Log10[JFactor(0.1)] = 18.9352
+     Log10[JFactor(Angle)] = 19.0208
+     Log10[JFactor_1Sigma(Angle)] = 19.3515
+
+     EffectiveJFactor(Angle) = 18.9703
+     EffectiveJFactorRelativeError(Angle) 2.14141
+
+
+UrsaMajorII:
+     Angle = 0.337163
+     QFactor(Angle) = 1.24483
+     Log10[JFactor(0.1)] = 18.6807
+     Log10[JFactor(Angle)] = 19.2996
+     Log10[JFactor_1Sigma(Angle)] = 19.7196
+
+     EffectiveJFactor(Angle) = 23.2543
+     EffectiveJFactorRelativeError(Angle) 2.63027
+
+
+UrsaMinor:
+     Angle = 0.0437227
+     QFactor(Angle) = 1.14966
+     Log10[JFactor(0.1)] = 18.7699
+     Log10[JFactor(Angle)] = 18.4711
+     Log10[JFactor_1Sigma(Angle)] = 18.9704
+
+     EffectiveJFactor(Angle) = 21.579
+     EffectiveJFactorRelativeError(Angle) 3.15718
+
