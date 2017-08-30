@@ -1,4 +1,13 @@
-//this works home
+/*
+ * JDDM.cc
+ *
+ *  Created on: 03/07/2017
+ *  Authors: David Navarro Gironés 	<<david.navarrogir@e-campus.uab.cat>>
+ *  		 Joaquim Palacio 		<<jpalacio@ifae.es>>
+ *
+ *  		 ADD A GENERAL DESCRIPTION ON THE CLASS, THE MAIN FUNCTIONS, THE VARIABLES
+ *  		 AND MENTION THE "runExample#.C" THAT SHOWS HOW TO USE IT
+ */
 
 #include <Rtypes.h>
 #include <TAttFill.h>
@@ -29,6 +38,20 @@
 //#include </home/david/Work/Software/scripts/style.h>
 
 using namespace std;
+
+//-------------------------------------
+//  new (QUIM)
+void PrintListOfPossibilities()
+{
+	JDDarkMatter* 	JFactor = new JDDarkMatter();
+	JFactor->GetListOfAuthors();
+	JFactor->SetAuthor("Bonnivard");
+	JFactor->GetListOfSources();
+	JFactor->GetListOfCandidates();
+	JFactor->GetUnits();
+	JFactor->GetListOfConstructors();
+
+}
 
 //-------------------------------------
 //  This function shows the JFactor of the author, source and candidate we want.
@@ -414,12 +437,14 @@ void DrawNormLOSFromTGraph()
 
 void exampleJDDarkMatter()
 {
+//	PrintListOfPossibilities();
+
 //	DrawJFactorFromReferences();
 //	DrawLOSFromReferences();
 //	DrawNormalizedLOSFromReferences();
 
 //	DrawJFactorFromTGraph();
 //	DrawLOSFromTGraph();
-	DrawNormLOSFromTGraph();
+//	DrawNormLOSFromTGraph();
 
 }
