@@ -26,13 +26,29 @@ static const Double_t kpc2cm        = 3.08568e21; 			// [cm/kpc]
 //-----------------------------------------------
 //
 //	This is the constructor is new (QUIM)
+JDDarkMatter::JDDarkMatter():
+		sAuthor(""), sSource(""), sCandidate(""), sMySourcePath (""),
+		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL)
+{
+	cout << endl;
+	cout << endl;
+	cout << "   Constructor DM..." << endl;
+	cout << endl;
+	cout << endl;
+
+	CreateFunctionsDM();
+}
+
+//-----------------------------------------------
+//
+//	This is the constructor is new (QUIM)
 JDDarkMatter::JDDarkMatter(TGraph* jfactor):
 		sAuthor(""), sSource(""), sCandidate(""), sMySourcePath (""),
 		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL)
 {
 	cout << endl;
 	cout << endl;
-	cout << "Constructor DM..." << endl;
+	cout << "   Constructor DM..." << endl;
 	cout << endl;
 	cout << endl;
 
@@ -44,6 +60,7 @@ JDDarkMatter::JDDarkMatter(TGraph* jfactor):
 		cout << "   ***                             ***" << endl;
 		cout << "   ***********************************" << endl;
 		return;
+
 	}
 	CreateFunctionsDM();
 }
@@ -67,7 +84,7 @@ JDDarkMatter::JDDarkMatter(TString author, TString source, TString candidate, TS
 {
 	cout << endl;
 	cout << endl;
-	cout << "Constructor DM..." << endl;
+	cout << "   Constructor DM..." << endl;
 	cout << endl;
 	cout << endl;
 
@@ -81,10 +98,6 @@ JDDarkMatter::JDDarkMatter(TString author, TString source, TString candidate, TS
 		return;
 	}
 	CreateFunctionsDM();
-
-	// (QUIM) couts are only shown if there are errors.
-	// maybe some information could be given to the user, examples:
-	// "Bonnivard JFactor for decay read correctly!!"
 }
 
 //-----------------------------------------------
@@ -101,7 +114,7 @@ JDDarkMatter::~JDDarkMatter()
 
 		cout << endl;
 		cout << endl;
-		cout << "Destructor DM..." << endl;
+		cout << "   Destructor DM..." << endl;
 		cout << endl;
 		cout << endl;
 }
@@ -113,7 +126,7 @@ JDDarkMatter::~JDDarkMatter()
 //	TF1 fEvaluateLOSVsTheta: 		evaluates the LOS vs Theta; LOS [~GeV, ~cm] theta [deg]
 void JDDarkMatter::CreateFunctionsDM()
 {
-//	SetJFactorFromTGraph();
+	SetIsJFactor(1);
 
 	fEvaluateJFactorVsTheta = new TF1("fEvaluateJFactorVsTheta",this,&JDDarkMatter::TGraphEvaluateJFactorVsTheta,0.,GetThetaMax(),0,"JDDarkMatter","TGraphEvaluateJFactorVsTheta");
 	// (QUIM) intenta que TF1 y Double_t es diguin igual (example TF1* fNomDeLaFuncio -> Double_T dNomDeLaFuncio)
@@ -126,10 +139,13 @@ void JDDarkMatter::CreateFunctionsDM()
 //	New (QUIM)
 Bool_t JDDarkMatter::SetJFactorFromTGraph(TGraph* jfactor)
 {
+	SetIsJFactor(1);
+
 	gJFactor =jfactor;
 
 	SetNumPointsJFactorGraph((Int_t)gJFactor->GetN());
 	if(GetNumPointsJFactorGraph()<=0) return -1;
+
 
 	Int_t numPoint = GetNumPointsJFactorGraph();
 	SetJFactorMin(gJFactor->GetY()[0]);
@@ -345,34 +361,103 @@ void JDDarkMatter::GetListOfCandidates()
 	cout << " " << endl;
 
 }
+
 void JDDarkMatter::GetListOfSources()
 {
 	if(GetAuthor()=="Bonnivard")
 	{
 		cout << " " << endl;
 		cout << "    List of available sources for Bonnivard is:" << endl;
-		cout << "    	- ..." << endl;
-		cout << "    	- (To Be Filled) " << endl;
+		cout << "    	- boo1" << endl;
+		cout << "    	- car" << endl;
+		cout << "    	- coma" << endl;
+		cout << "    	- cvn1" << endl;
+		cout << "    	- cvn2" << endl;
+		cout << "    	- for" << endl;
+		cout << "    	- her" << endl;
+		cout << "    	- leo1" << endl;
+		cout << "    	- leo2" << endl;
+		cout << "    	- leo4" << endl;
+		cout << "    	- leo5" << endl;
+		cout << "    	- leot" << endl;
+		cout << "    	- scl" << endl;
+		cout << "    	- seg1" << endl;
+		cout << "    	- seg2" << endl;
+		cout << "    	- sex" << endl;
+		cout << "    	- uma1" << endl;
+		cout << "    	- uma2" << endl;
+		cout << "    	- umi" << endl;
+		cout << "    	- wil1" << endl;
 		cout << " " << endl;
 	}
 	else if(GetAuthor()=="Geringer")
 	{
 		cout << " " << endl;
 		cout << "    List of available sources for Geringer-Sameth is:" << endl;
-		cout << "    	- ..." << endl;
-		cout << "    	- (To Be Filled) " << endl;
+		cout << "    	- Bootes" << endl;
+		cout << "    	- Carina" << endl;
+		cout << "    	- Coma Berenice" << endl;
+		cout << "    	- Canes Venatici I" << endl;
+		cout << "    	- Canes Venatici II" << endl;
+		cout << "    	- Draco" << endl;
+		cout << "    	- Fornax" << endl;
+		cout << "    	- Hercules" << endl;
+		cout << "    	- Leo I" << endl;
+		cout << "    	- Leo II" << endl;
+		cout << "    	- Leo IV" << endl;
+		cout << "    	- Leo V" << endl;
+		cout << "    	- Leo T" << endl;
+		cout << "    	- Sculptor" << endl;
+		cout << "    	- Segue 1" << endl;
+		cout << "    	- Sextans" << endl;
+		cout << "    	- Ursa Major I" << endl;
+		cout << "    	- Ursa Major II" << endl;
+		cout << "    	- Ursa Minor" << endl;
 		cout << " " << endl;
 	}
 	else
 	{
 		cout << " " << endl;
 		cout << "    Author not defined, no sources available." << endl;
-		cout << "    You can define your own JFactors using the constructor:" << endl;
-		cout << " 	 	- JDDarkMatter(TGraph* jfactor);" << endl;
-		cout << " " << endl;
+		GetListOfAuthors();
 	}
 }
+
 void JDDarkMatter::GetListOfAuthors()
 {
+	cout << " " << endl;
+	cout << "    List of available authors is:" << endl;
+	cout << "    	- Bonnivard" << endl;
+	cout << "    	- Geringer" << endl;
+	cout << " " << endl;
+}
 
+void JDDarkMatter::GetUnits()
+{
+	cout << " " << endl;
+	cout << "    All units are given in:" << endl;
+	cout << "    	- ~GeV" << endl;
+	cout << "    	- ~cm" << endl;
+	cout << "    	- ~deg" << endl;
+	cout << " " << endl;
+}
+
+void JDDarkMatter::GetListOfConstructors()
+{
+	cout << " " << endl;
+	cout << "    List of available constructors is:" << endl;
+	cout << "    	- 	JDDarkMatter()" << endl;
+	cout << "    	- 	JDDarkMatter(TGraph* jfactor)" << endl;
+	cout << "    	- 	JDDarkMatter(TString author, TString source, TString candidate, TString mySourcePath)" << endl;
+	cout << " " << endl;
+}
+
+void JDDarkMatter::GetWarning()
+{
+	cout << "  *****************************" << endl;
+	cout << "  ***" << endl;
+	cout << "  ***  WARNING:" << endl;
+	cout << "  ***" << endl;
+	cout << "  ***  	- 	JFactor not defined..." << endl;
+	cout << " " << endl;
 }

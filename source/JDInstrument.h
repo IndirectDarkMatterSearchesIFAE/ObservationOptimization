@@ -20,85 +20,143 @@
 
 class JDInstrument {
 public:
-	JDInstrument(TString instrumentName, Double_t wobble, TString myInstrumentPath);
+	JDInstrument();
+	JDInstrument(Double_t distanceCameraCenterMax, Double_t wobbleDist);
+	JDInstrument(TGraph* cameraAcceptance,Double_t wobbleDist);
+	JDInstrument(TString instrumentName, Double_t wobble, TString instrumentPath);
 	virtual ~JDInstrument();
 
-TF2* GetTF2EpsilonVsThetaAndPhi()
-{
-	return fEvaluateEpsilonVsThetaAndPhi;
-}
+	//Getters********
+	///////////////////////////////////////////////////////
+	//void
+	///////////////////////////////////////////////////////
+	void GetListOfInstruments();
+	void GetListOfConstructors();
+	void GetUnits();
+	void GetWarning();
 
-TF1* GetTF1EfficiencyVsTheta()
-{
-	return fEvaluateEfficiencyVsTheta;
-}
+	Bool_t GetIsIdeal()						{return bIsIdeal;}
+	Bool_t GetIsMAGIC()						{return bIsMagic;}
+	Bool_t GetIsCameraAcceptance()			{return bIsCameraAcceptance;}
 
-Double_t GetDcc()
-{
-	return dDcc;
-}
+	TString GetInstrumentName()			{return sInstrumentName;}
+	TString GetInstrumentPath()			{return sInstrumentPath;}
 
-Double_t GetThetaMax()
-{
-	return dThetaMax;
-}
+	Int_t GetNumPointsJFactorGraph()	{return iNumPointsCameraAcceptanceGraph;}
 
-Double_t GetWobble()
-{
-	return dWobble;
-}
+	Double_t GetDistCameraCenterMax()	{return dDistCenterCameraMax;}
+	Double_t GetThetaMax()				{return dThetaMax;}
+	Double_t GetWobbleDistance()		{return dWobbleDist;}
 
-TString GetInstrumentName()
-{
-	return sInstrumentName;
-}
+	TF1* GetTF1EpsilonVsTheta()
+	{
+		if(!GetIsCameraAcceptance()) GetWarning();
+		return fEvaluateEpsilonVsTheta;
+	}
+
+	TF1* GetTF1EfficiencyVsTheta()
+	{
+		if(!GetIsCameraAcceptance()) GetWarning();
+		return fEvaluateEfficiencyVsTheta;
+	}
+
+	TF2* GetTF2EpsilonVsThetaAndPhi()
+	{
+		if(!GetIsCameraAcceptance()) GetWarning();
+		fEvaluateEpsilonVsThetaAndPhi->SetParameter(0,GetWobbleDistance());
+		return fEvaluateEpsilonVsThetaAndPhi;
+	}
+
+	TF2* GetTF2EpsilonVsXAndY()
+	{
+		if(!GetIsCameraAcceptance()) GetWarning();
+		fEvaluateEpsilonVsXAndY->SetParameter(0,GetWobbleDistance());
+		return fEvaluateEpsilonVsXAndY;
+	}
+
+	//Setters********
+
+	void SetDistCenterCameraMax(Double_t distDistCenterCamMax)	{dDistCenterCameraMax=distDistCenterCamMax;}
+	void SetInstrumentName(TString instrumentName)				{sInstrumentName=instrumentName;}
+	void SetInstrumentPath(TString instrumentPath)				{sInstrumentPath=instrumentPath;}
 
 protected:
 
-	void CreateFunctionsInstrument();
-	void SetEpsilon();
+	//Setters********
+	Bool_t SetCameraAcceptanceIdeal(Double_t distanceCenterCameraMax);
+	Bool_t SetCameraAcceptanceFromInstrument(Bool_t verbose = 0);
+	Bool_t SetCameraAcceptanceFromTGraph(TGraph* cameraAcceptance, Bool_t verbose = 0);
 
-Double_t EvaluateEpsilonVsThetaAndPhi(Double_t* x, Double_t* par);
-Double_t EvaluateEpsilonPerThetaVsThetaAndPhi(Double_t* x, Double_t* par);
-Double_t EvaluateEfficiencyVsTheta(Double_t* x, Double_t* par);
+	void SetNumPointsCameraAcceptanceGraph(Int_t numPoints)			{iNumPointsCameraAcceptanceGraph=numPoints;}
+
+	void SetIsIdeal(Bool_t isIdeal)									{bIsIdeal=isIdeal;}
+	void SetIsMagic(Bool_t isMagic)									{bIsMagic=isMagic;}
+	void SetIsCameraAcceptance(Bool_t isCameraAcceptance)			{bIsCameraAcceptance=isCameraAcceptance;}
+	void SetWobbleDist(Double_t wobbleDist)							{dWobbleDist=wobbleDist;}
+
+
+	//OTHERS********
+	void CreateFunctionsInstrument();
+
+	Double_t EvaluateEpsilonVsTheta(Double_t* x, Double_t* par);
+	Double_t EvaluateEpsilonVsThetaAndPhi(Double_t* x, Double_t* par);
+	Double_t EvaluateEpsilonVsXAndY(Double_t* x, Double_t* par);
+	Double_t EvaluateEpsilonThetaVsThetaAndPhi(Double_t* x, Double_t* par);
+	Double_t EvaluateEfficiencyVsTheta(Double_t* x, Double_t* par);
 
 
 
 private:
 
-///////////////////////////////////////////////////////
-//TString
-///////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////
+	//TString
+	///////////////////////////////////////////////////////
 
-TString sInstrumentName;
-TString sMyInstrumentPath;
+	TString sInstrumentName;
+	TString sInstrumentPath;
 
-///////////////////////////////////////////////////////
-//Double_t
-///////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////
+	//TString
+	///////////////////////////////////////////////////////
 
-Double_t dDcc;
-Double_t dWobble;
-Double_t dThetaMax;
+	Int_t iNumPointsCameraAcceptanceGraph;
 
-///////////////////////////////////////////////////////
-//TGraph
-///////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////
+	//Double_t
+	///////////////////////////////////////////////////////
 
-TGraph* gEpsilon;
+	Double_t dDistCenterCameraMax;
+	Double_t dWobbleDist;
+	Double_t dThetaMax;
 
-///////////////////////////////////////////////////////
-//TF1
-///////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////
+	//TGraph
+	///////////////////////////////////////////////////////
 
-TF1* fEvaluateEfficiencyVsTheta;
+	TGraph* gCameraAcceptance;
 
-///////////////////////////////////////////////////////
-//TF2
-///////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////
+	//TF1
+	///////////////////////////////////////////////////////
 
-TF2* fEvaluateEpsilonVsThetaAndPhi;
-TF2* fEvaluateEpsilonPerThetaVsThetaAndPhi;
+	TF1* fEvaluateEpsilonVsTheta;
+	TF1* fEvaluateEfficiencyVsTheta;
+
+	///////////////////////////////////////////////////////
+	//TF2
+	///////////////////////////////////////////////////////
+
+	TF2* fEvaluateEpsilonVsThetaAndPhi;
+	TF2* fEvaluateEpsilonVsXAndY;
+	TF2* fEvaluateEpsilonThetaVsThetaAndPhi;
+
+	///////////////////////////////////////////////////////
+	//Bool_T
+	///////////////////////////////////////////////////////
+	Bool_t bIsIdeal=0;
+	Bool_t bIsMagic=0;
+	Bool_t bIsCameraAcceptance=0;
+
 };
 
 

@@ -19,21 +19,23 @@ using namespace std;
 class JDDarkMatter {
 public:
 
+	JDDarkMatter();
 	JDDarkMatter(TGraph* jfactor);
 	JDDarkMatter(TString author, TString source, TString candidate, TString mySourcePath);
 	virtual ~JDDarkMatter();
 
-	void SetNumPointsJFactorGraph(Int_t numPoints) 		{iNumPointsJFactorGraph=numPoints;}
+
+	//Setters********
+
 	void SetSourcePath(TString sourcePath) 				{sMySourcePath=sourcePath;}
 	void SetSourceName(TString sourceName) 				{sSource=sourceName;}
 	void SetCandidate(TString candidate) 				{sCandidate=candidate;}
 	void SetAuthor(TString author) 						{sAuthor=author;}
 	void SetThetaMax(Double_t thetaMax) 				{dThetaMax=thetaMax;}
-	void SetJFactorMax(Double_t jFactorMax) 			{dJFactorMax=jFactorMax;}
-	void SetJFactorMin(Double_t jFactorMin) 			{dJFactorMin=jFactorMin;}
-	void SetIsBonnivard(Bool_t isBonnivard) 			{bIsBonnivard=isBonnivard;}
-	void SetIsGeringer(Bool_t isGeringer) 				{bIsGeringer=isGeringer;}
 
+	Bool_t SetJFactorFromTGraph(TGraph* jfactor);
+
+	//Getters********
 
 	///////////////////////////////////////////////////////
 	//void
@@ -41,7 +43,9 @@ public:
 	void GetListOfCandidates();
 	void GetListOfSources();
 	void GetListOfAuthors();
-
+	void GetListOfConstructors();
+	void GetUnits();
+	void GetWarning();
 	///////////////////////////////////////////////////////
 	//Int
 	///////////////////////////////////////////////////////
@@ -51,10 +55,20 @@ public:
 	//TF1
 	///////////////////////////////////////////////////////
 
-	TF1* GetTF1JFactorVsTheta()		{return fEvaluateJFactorVsTheta;}
-	TF1* GetTF1LOSVsTheta() 		{return fEvaluateLOSVsTheta;}
+	TF1* GetTF1JFactorVsTheta()
+	{
+		if(!GetIsJFactor()) GetWarning();
+		return fEvaluateJFactorVsTheta;
+	}
+	TF1* GetTF1LOSVsTheta()
+	{
+		if(!GetIsJFactor()) GetWarning();
+		return fEvaluateLOSVsTheta;
+	}
+
 	TF1* GetTF1NormLOSVsTheta(Double_t normTheta)
 	{
+		if(!GetIsJFactor()) GetWarning();
 		fEvaluateNormLOSVsTheta->SetParameter(0,normTheta);
 		return fEvaluateNormLOSVsTheta;
 	}
@@ -83,16 +97,27 @@ public:
 
 	Bool_t GetIsBonnivard() 	{return bIsBonnivard;}
 	Bool_t GetIsGeringer() 		{return bIsGeringer;}
+	Bool_t GetIsJFactor()		{return bIsJFactor;}
+
 
 protected:
+
+	//Setters********
+	void SetIsBonnivard(Bool_t isBonnivard) 			{bIsBonnivard=isBonnivard;}
+	void SetIsGeringer(Bool_t isGeringer) 				{bIsGeringer=isGeringer;}
+	void SetIsJFactor(Bool_t isJFactor)					{bIsJFactor=isJFactor;}
+	void SetNumPointsJFactorGraph(Int_t numPoints) 		{iNumPointsJFactorGraph=numPoints;}
+
+	void SetJFactorMax(Double_t jFactorMax) 			{dJFactorMax=jFactorMax;}
+	void SetJFactorMin(Double_t jFactorMin) 			{dJFactorMin=jFactorMin;}
+
+	Bool_t SetJFactorFromReferences(Bool_t verbose=0);
+
+	//OTHERS********
 
 	void CreateFunctionsDM();
 	void ReadJFactorBonnivard(Bool_t verbose=0);
 	void ReadJFactorGeringer(Bool_t verbose=0);
-
-	Bool_t SetJFactorFromReferences(Bool_t verbose=0);
-	Bool_t SetJFactorFromTGraph(TGraph* jfactor);
-
 
 	Double_t TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par);
 	Double_t EvaluateLOSVsTheta(Double_t* x, Double_t* par);
@@ -145,6 +170,7 @@ private:
 
 	Bool_t bIsBonnivard=0;
 	Bool_t bIsGeringer=0;
+	Bool_t bIsJFactor=0;
 
 
 };
