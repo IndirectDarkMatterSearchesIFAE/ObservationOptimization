@@ -32,7 +32,7 @@ JDDarkMatter::JDDarkMatter():
 {
 	cout << endl;
 	cout << endl;
-	cout << "   Constructor DM..." << endl;
+	cout << "   Constructor JDDarkMatter..." << endl;
 	cout << endl;
 	cout << endl;
 
@@ -48,7 +48,7 @@ JDDarkMatter::JDDarkMatter(TGraph* jfactor):
 {
 	cout << endl;
 	cout << endl;
-	cout << "   Constructor DM..." << endl;
+	cout << "   Constructor JDDarkMatter..." << endl;
 	cout << endl;
 	cout << endl;
 
@@ -84,7 +84,7 @@ JDDarkMatter::JDDarkMatter(TString author, TString source, TString candidate, TS
 {
 	cout << endl;
 	cout << endl;
-	cout << "   Constructor DM..." << endl;
+	cout << "   Constructor JDDarkMatter..." << endl;
 	cout << endl;
 	cout << endl;
 
@@ -114,7 +114,7 @@ JDDarkMatter::~JDDarkMatter()
 
 		cout << endl;
 		cout << endl;
-		cout << "   Destructor DM..." << endl;
+		cout << "   Destructor JDDarkMatter..." << endl;
 		cout << endl;
 		cout << endl;
 }
@@ -129,9 +129,12 @@ void JDDarkMatter::CreateFunctionsDM()
 	SetIsJFactor(1);
 
 	fEvaluateJFactorVsTheta = new TF1("fEvaluateJFactorVsTheta",this,&JDDarkMatter::TGraphEvaluateJFactorVsTheta,0.,GetThetaMax(),0,"JDDarkMatter","TGraphEvaluateJFactorVsTheta");
-	// (QUIM) intenta que TF1 y Double_t es diguin igual (example TF1* fNomDeLaFuncio -> Double_T dNomDeLaFuncio)
-	fEvaluateLOSVsTheta = new TF1("fEvaluateLOSVsTheta", this, &JDDarkMatter::EvaluateLOSVsTheta, 0., GetThetaMax() , 0, "JDDarkMatter", "EvaluateLOSVsTheta");
+	fEvaluateLOSVsTheta = new TF1("fEvaluateLOSVsTheta", this, &JDDarkMatter::EvaluateLOSVsTheta,0.,GetThetaMax(),0, "JDDarkMatter", "EvaluateLOSVsTheta");
+	fIntegrateJFactorFromLOSVsTheta = new TF1("fIntegrateJFactorFromLOSVsTheta",this,&JDDarkMatter::IntegrateJFactorFromLOSVsTheta,0.,GetThetaMax(),0,"JDDarkMatter","IntegrateJFactorFromLOSVsTheta");
+	fEvaluateLOSThetaVsTheta = new TF1("fEvaluateLOSThetaVsTheta", this, &JDDarkMatter::EvaluateLOSThetaVsTheta, 0., GetThetaMax() , 0, "JDDarkMatter", "EvaluateLOSThetaVsTheta");
 	fEvaluateNormLOSVsTheta = new TF1("fEvaluateNormLOSVsTheta", this, &JDDarkMatter::EvaluateNormLOSVsTheta, 0., GetThetaMax() , 1, "JDDarkMatter", "EvaluateNormLOSVsTheta");
+
+	fEvaluateLOSThetaVsThetaPhi = new TF2("fEvaluateLOSThetaVsThetaPhi", this, &JDDarkMatter::EvaluateLOSThetaVsThetaPhi,0.,GetThetaMax(),-TMath::Pi(),TMath::Pi(),0, "JDDarkMatter", "EvaluateLOSThetaVsThetaPhi");
 
 }
 
@@ -334,15 +337,47 @@ Double_t JDDarkMatter::TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par)
 	return gJFactor->Eval(x[0]);
 }
 
+//-----------------------------------------------
+// new (QUIM)
+//
+// x[0] 	= dTheta [deg]
+Double_t JDDarkMatter::IntegrateJFactorFromLOSVsTheta(Double_t* x, Double_t* par)
+{
+	return fEvaluateLOSThetaVsThetaPhi->Integral(0.,x[0],0.,2*TMath::Pi(),1e-6);
+//	return fEvaluateLOSThetaVsThetaPhi->Integral(0.,x[0],0.,360.,1e-6);
+}
+
+//----------------------------------------------------
+// 	It evaluates the LOS vs Theta.
+//	The LOS is calculated from the derivative of the JFactor divided by 2*PI*Sin(theta)
+//
+// 	x[0]		= theta	[deg]
+Double_t JDDarkMatter::EvaluateLOSVsTheta(Double_t* x, Double_t* par)
+{
+	return fEvaluateJFactorVsTheta->Derivative(x[0])/(2*TMath::Pi()*TMath::Sin(x[0]*Deg2Rad));
+}
+
+////----------------------------------------------------
+//// 	It evaluates the LOS vs Theta.
+//// 	The LOS is calculated from the derivative of the JFactor divided by 2*PI*Sin(theta)
+////
+//// 	x[0]		= theta	[deg]
+//// 	x[1]		= phi	[rad]
+//Double_t JDDarkMatter::EvaluateLOSVsThetaPhi(Double_t* x, Double_t* par)
+//{
+//	return fEvaluateLOSVsTheta->Eval(x[0]);
+//}
+
+
 //----------------------------------------------------
 // It evaluates the LOS vs Theta. The LOS is calculated from the derivative of the JFactor divided by 2*PI*Sin(theta)
 //
-// x[0]		= dTheta
-Double_t JDDarkMatter::EvaluateLOSVsTheta(Double_t* x, Double_t* par)
-// (QUIM) Double_t JDDarkMatter::EvaluateLOSVsThetaDerivative(Double_t* x, Double_t* par)
+// x[0]		= theta	[deg]
+// x[1]		= phi	[rad]
+Double_t JDDarkMatter::EvaluateLOSThetaVsThetaPhi(Double_t* x, Double_t* par)
 {
-	return fEvaluateJFactorVsTheta->Derivative(x[0])/(2*TMath::Pi()*TMath::Sin(x[0]*Deg2Rad));
-	// (QUIM) Proof that Derivative() works fine [see comments in document]
+	Double_t X0rad =x[0]/180.*TMath::Pi();
+	return fEvaluateLOSVsTheta->Eval(x[0])*X0rad;
 }
 
 //----------------------------------------------------
