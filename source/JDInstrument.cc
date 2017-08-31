@@ -25,7 +25,7 @@ JDInstrument::JDInstrument():
 {
 	    cout << endl;
 		cout << endl;
-		cout << "   Constructor Instrument..." << endl;
+		cout << "   Constructor JDInstrument..." << endl;
 		cout << endl;
 		cout << endl;
 
@@ -43,7 +43,7 @@ JDInstrument::JDInstrument(Double_t distanceCameraCenterMax,Double_t wobbleDist)
 {
 	    cout << endl;
 		cout << endl;
-		cout << "   Constructor Instrument..." << endl;
+		cout << "   Constructor JDInstrument..." << endl;
 		cout << endl;
 		cout << endl;
 
@@ -70,7 +70,7 @@ JDInstrument::JDInstrument(TGraph* cameraAcceptance, Double_t wobbleDist):
 {
 	    cout << endl;
 		cout << endl;
-		cout << "   Constructor Instrument..." << endl;
+		cout << "   Constructor JDInstrument..." << endl;
 		cout << endl;
 		cout << endl;
 
@@ -101,7 +101,7 @@ JDInstrument::JDInstrument(TString instrumentName, Double_t wobble, TString inst
 {
 	    cout << endl;
 		cout << endl;
-		cout << "   Constructor Instrument..." << endl;
+		cout << "   Constructor JDInstrument..." << endl;
 		cout << endl;
 		cout << endl;
 
@@ -130,7 +130,7 @@ JDInstrument::~JDInstrument()
 
 		cout << endl;
 		cout << endl;
-		cout << "   Destructor Instrument..." << endl;
+		cout << "   Destructor JDInstrument..." << endl;
 		cout << endl;
 		cout << endl;
 }
@@ -269,7 +269,7 @@ Double_t JDInstrument::EvaluateEpsilonVsTheta(Double_t* x, Double_t* par)
 {
 
 	if (x[0]<=GetDistCameraCenterMax()) {	return gCameraAcceptance->Eval(x[0]);}
-	else							 {  return 1.e-20;}							// To make integrals converge
+	else							 	{  return 1.e-20;}							// To make integrals converge
 }
 
 //-----------------------------------------------

@@ -60,6 +60,13 @@ public:
 		if(!GetIsJFactor()) GetWarning();
 		return fEvaluateJFactorVsTheta;
 	}
+
+	TF1* GetTF1JFactorFromLOSVsTheta()
+	{
+		if(!GetIsJFactor()) GetWarning();
+		return fIntegrateJFactorFromLOSVsTheta;
+	}
+
 	TF1* GetTF1LOSVsTheta()
 	{
 		if(!GetIsJFactor()) GetWarning();
@@ -71,6 +78,16 @@ public:
 		if(!GetIsJFactor()) GetWarning();
 		fEvaluateNormLOSVsTheta->SetParameter(0,normTheta);
 		return fEvaluateNormLOSVsTheta;
+	}
+
+	///////////////////////////////////////////////////////
+	//TF2
+	///////////////////////////////////////////////////////
+
+	TF2* GetTF2LOSVsThetaPhi()
+	{
+		if(!GetIsJFactor()) GetWarning();
+		return fEvaluateLOSVsTheta;
 	}
 
 	///////////////////////////////////////////////////////
@@ -92,7 +109,7 @@ public:
 	TString GetSourceName() 	{return sSource;}
 
 	///////////////////////////////////////////////////////
-	//Boolt_T
+	//Bool_t
 	///////////////////////////////////////////////////////
 
 	Bool_t GetIsBonnivard() 	{return bIsBonnivard;}
@@ -120,8 +137,12 @@ protected:
 	void ReadJFactorGeringer(Bool_t verbose=0);
 
 	Double_t TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par);
+	Double_t IntegrateJFactorFromLOSVsTheta(Double_t* x, Double_t* par);
 	Double_t EvaluateLOSVsTheta(Double_t* x, Double_t* par);
+	Double_t EvaluateLOSThetaVsTheta(Double_t* x, Double_t* par);
 	Double_t EvaluateNormLOSVsTheta(Double_t* x, Double_t* par);
+
+	Double_t EvaluateLOSThetaVsThetaPhi(Double_t* x, Double_t* par);
 
 private:
 
@@ -162,7 +183,15 @@ private:
 
 	TF1* fEvaluateJFactorVsTheta;
 	TF1* fEvaluateLOSVsTheta;
+	TF1* fEvaluateLOSThetaVsTheta;
 	TF1* fEvaluateNormLOSVsTheta;
+	TF1* fIntegrateJFactorFromLOSVsTheta;
+
+	///////////////////////////////////////////////////////
+	//TF2
+	///////////////////////////////////////////////////////
+
+	TF2* fEvaluateLOSThetaVsThetaPhi;
 
 	///////////////////////////////////////////////////////
 	//Bool_t

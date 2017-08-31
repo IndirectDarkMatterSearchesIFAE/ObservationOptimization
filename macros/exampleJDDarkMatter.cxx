@@ -53,6 +53,8 @@ void PrintListOfPossibilities()
 
 }
 
+
+
 //-------------------------------------
 //  This function shows the JFactor of the author, source and candidate we want.
 //	(QUIM) Declare author, source, candidate
@@ -435,6 +437,59 @@ void DrawNormLOSFromTGraph()
 
 }
 
+//-------------------------------------
+//  This function shows the JFactor of the author, source and candidate we want.
+//	(QUIM) Declare author, source, candidate
+void DrawJFactorFromLOS()
+{
+
+	TString author = "Bonnivard";
+	TString source = "uma2";
+	TString candidate = "Annihilation";
+	TString mySourcePath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization";
+
+	JDDarkMatter* 	JFactor = new JDDarkMatter(author, source, candidate, mySourcePath);
+	TF1* functionJFactorFromLOS = JFactor->GetTF1JFactorFromLOSVsTheta();
+	TF1* functionJFactor = JFactor->GetTF1JFactorVsTheta();
+	functionJFactor->SetLineColor(2);
+	functionJFactor->SetLineStyle(1);
+	TCanvas* canvas = new TCanvas("canvas","",600,550);
+	TH1I* dummy = new TH1I("dummy", JFactor->GetAuthor(),1,0.01,JFactor->GetThetaMax());
+	dummy->SetMaximum(JFactor->GetJFactorMax()*100.);
+	dummy->SetMinimum(JFactor->GetJFactorMin()*0.1);
+	dummy->SetStats(0);
+	dummy->SetXTitle(" #theta ");
+	if (JFactor->GetCandidate() == "Annihilation")	{dummy->SetYTitle(" J Factor [GeV^{2}/cm^{5}]");}
+	else if (JFactor->GetCandidate() == "Decay")	{dummy->SetYTitle(" J Factor [GeV/cm^{2}]");	}
+	dummy->GetXaxis()->SetTitleOffset(1.3);
+	dummy->GetYaxis()->SetTitleOffset(1.5);
+	dummy->DrawCopy();
+	gPad->SetLogx();
+	gPad->SetLogy();
+	gPad->SetGridy();
+	gPad->SetGridx();
+	functionJFactorFromLOS->SetLineColor(1);
+	functionJFactorFromLOS->SetLineStyle(2);
+	functionJFactor->Draw("same");
+	functionJFactorFromLOS->Draw("same");
+
+	// This is for plotting purposes only
+	TString isBonnivard = (JFactor->GetIsBonnivard()? "arxiv:1504.02048" : "");
+	TString isGeringer = (JFactor->GetIsGeringer()? "arxiv:1408.0002" : "");
+
+	TLegend* leg=new TLegend(.18,.15,.88,.25);
+	leg->AddEntry(functionJFactor, JFactor->GetSourceName()+" "+JFactor->GetCandidate()+" - "+isBonnivard+isGeringer, "l");
+	leg->AddEntry(functionJFactorFromLOS, "(idem) from LOS", "l");
+	leg->SetFillColor(0);
+	leg->SetLineColor(1);
+	leg->SetBorderSize(1);
+	leg->SetTextSize(0.037);
+	leg->Draw();
+	gPad->Modified();
+	gPad->Update();
+
+}
+
 void exampleJDDarkMatter()
 {
 //	PrintListOfPossibilities();
@@ -446,5 +501,7 @@ void exampleJDDarkMatter()
 //	DrawJFactorFromTGraph();
 //	DrawLOSFromTGraph();
 //	DrawNormLOSFromTGraph();
+
+	DrawJFactorFromLOS();
 
 }
