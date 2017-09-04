@@ -441,6 +441,9 @@ void exampleJDInstrument()
 //	PlotCameraAcceptanceFromMAGIC();
 //	PlotEfficiencyFromMAGIC();
 
+//	PlotCameraAcceptanceFromCTA(); 	// (QUIM)
+//	PlotEfficiencyFromCTA();		// (QUIM)
+
 //	PlotCameraAcceptanceFromTGraph();
 //	PlotEfficiencyFromTGraph();
 

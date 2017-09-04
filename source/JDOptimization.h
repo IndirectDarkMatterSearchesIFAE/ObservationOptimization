@@ -19,29 +19,89 @@
 //class JDOptimization: public JDDarkMatter, public JDInstrument {
 class JDOptimization {
 public:
+	JDOptimization(TString txtFile, TString instrumentName, Double_t distCameraCenter, Double_t wobble);
 	JDOptimization(TString author, TString source, TString candidate, TString mySourcePath, TString instrumentName, Double_t distCameraCenter, Double_t wobble);
 	virtual ~JDOptimization();
 
-	TF1* GetTF1QFactorVsTheta(Double_t thetaNorm=1, Int_t type=0)
+	void GetListOfQFactors();
+
+
+	TF1* GetTF1EffectiveJFactorFromLOSVsTheta()
+	{
+		if(!GetIsJFactor()) GetWarning();
+		return fIntegrateEffectiveJFactorFromLOSVsTheta;
+	}
+
+
+	TF1* GetTF1QFactorVsTheta(Int_t type=0, Double_t thetaNorm=1)
 	{
 		if(type==0)	// J_on/theta
 		{
 			fEvaluateQ0FactorVsTheta->SetParameter(0, thetaNorm);
 			return fEvaluateQ0FactorVsTheta;
 		}
-		if(type==1)	// J_on/Sqrt{theta^2+J_off}
+		else if(type==1)	// J_on/Sqrt{theta^2+J_off}
 		{
 			fEvaluateQ1FactorVsTheta->SetParameter(0, thetaNorm);
 			return fEvaluateQ1FactorVsTheta;
 		}
 		else
 		{
-			// (QUIM) To be corrected
-			fEvaluateQ0FactorVsTheta->SetParameter(0, thetaNorm);
-			return fEvaluateQ0FactorVsTheta;
+			TF1* f1;
+			cout << endl;
+			cout << "   ***************************************************************" << endl;
+			cout << "   ***   WARNING: wrong Qfactor type!!!                        ***" << endl;
+			cout << "   ***************************************************************" << endl;
+			cout << endl;
+			GetListOfQFactors();
+			return f1;
 		}
 	}
 
+	TF1* GetTF1QFactor0VsTheta(Double_t thetaNorm=0.1)	// J_on/theta
+	{
+		fEvaluateQ0FactorVsTheta->SetParameter(0, thetaNorm);
+		return fEvaluateQ0FactorVsTheta;
+	}
+
+	TF1* GetTF1QFactor1VsTheta(Double_t thetaNorm=0.1)	// J_on/Sqrt{theta^2+J_off}
+	{
+		fEvaluateQ1FactorVsTheta->SetParameter(0, thetaNorm);
+		return fEvaluateQ1FactorVsTheta;
+	}
+
+//	TH2D* GetTH2DQFactorVsThetaWobble()
+//	void* GetOptimalThetaAndWobble(Double_t &theta, Double_t &wobble)
+
+
+	TF2* GetTF2QFactorVsThetaWobble(Int_t type=0, Double_t thetaNorm=1, Double_t wobbleNorm=0.4)
+	{
+		if(type==0)	// J_on/theta
+		{
+			fEvaluateQ0FactorVsThetaWobble->SetParameter(0, thetaNorm);
+			fEvaluateQ0FactorVsThetaWobble->SetParameter(1, wobbleNorm);
+			return fEvaluateQ0FactorVsThetaWobble;
+		}
+		if(type==1)	// J_on/theta
+		{
+			fEvaluateQ1FactorVsThetaWobble->SetParameter(0, thetaNorm);
+			fEvaluateQ1FactorVsThetaWobble->SetParameter(1, wobbleNorm);
+			return fEvaluateQ1FactorVsThetaWobble;
+		}
+		else
+		{
+			TF2* f2;
+			cout << endl;
+			cout << "   ***************************************************************" << endl;
+			cout << "   ***   WARNING: wrong Qfactor type!!!                        ***" << endl;
+			cout << "   ***************************************************************" << endl;
+			cout << endl;
+			GetListOfQFactors();
+			return f2;
+		}
+	}
+
+	/**************************************************/
 	TF1* GetTF1JFactorFromLOS_OnVsTheta()
 	{
 		return fEvaluateJFactorFromLOS_OnVsTheta;
@@ -73,23 +133,49 @@ public:
 		fEvaluateQFactorEffectiveVsTheta->SetParameter(0, thetaNorm);
 		return fEvaluateQFactorEffectiveVsTheta;
 	}
+	/**************************************************/
 
 	//***** JDDarkMatter Getters
-	Bool_t GetIsBonnivard()			{return jdDarkMatter->GetIsBonnivard();}
-	Bool_t GetIsGeringer()			{return jdDarkMatter->GetIsGeringer();}
-	Bool_t GetIsJFactor()			{return jdDarkMatter->GetIsJFactor();}
+	void GetWarning()						{return jdDarkMatter->GetWarning();}
 
-	TString GetSourceName()			{return jdDarkMatter->GetSourceName();}
-	TString GetCandidate()			{return jdDarkMatter->GetCandidate();}
+	Bool_t GetIsBonnivard()					{return jdDarkMatter->GetIsBonnivard();}
+	Bool_t GetIsGeringer()					{return jdDarkMatter->GetIsGeringer();}
+	Bool_t GetIsJFactor()					{return jdDarkMatter->GetIsJFactor();}
 
-	Double_t GetThetaMax()			{return jdDarkMatter->GetThetaMax();}
-	Double_t GetJFactorMax()		{return jdDarkMatter->GetJFactorMax();}
-	Double_t GetJFactorMin()		{return jdDarkMatter->GetJFactorMin();}
+	TString GetSourceName()					{return jdDarkMatter->GetSourceName();}
+	TString GetCandidate()					{return jdDarkMatter->GetCandidate();}
 
-	TF1* GetJFactorVsTheta()		{return jdDarkMatter->GetTF1JFactorVsTheta();}
+	Double_t GetThetaMax()					{return jdDarkMatter->GetThetaMax();}
+	Double_t GetJFactorMax()				{return jdDarkMatter->GetJFactorMax();}
+	Double_t GetJFactorMin()				{return jdDarkMatter->GetJFactorMin();}
 
-	//***** JDDarkMatter Getters
-	Bool_t GetIsIdeal()			{return jdInstrument->GetIsIdeal();}
+
+	TF1* GetTF1JFactorFromLOSVsTheta()
+	{
+		return jdDarkMatter->GetTF1JFactorFromLOSVsTheta();
+	}
+
+	TF1* GetTF1JFactorOffFromLOSVsTheta(){return jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*jdInstrument->GetWobbleDistance());}
+
+
+	TF1* GetJFactorVsTheta(Int_t type=0)
+	{
+		if(type==0)return jdDarkMatter->GetTF1JFactorVsTheta();
+		else return jdDarkMatter->GetTF1JFactorFromLOSVsTheta();
+	}
+
+	//***** JDDarkMatter Setters
+	void SetCandidate(TString candidate)		{jdDarkMatter->SetCandidate(candidate);}
+
+
+	//************************************************
+
+	//***** JDInstrument Getters
+	Bool_t GetIsIdeal()							{return jdInstrument->GetIsIdeal();}
+
+	Double_t GetDistCameraCenterMax()			{return jdInstrument->GetDistCameraCenterMax();}
+	Double_t GetWobbleDistance()				{return jdInstrument->GetWobbleDistance();}
+	//***** JDInstrument Setters
 
 
 
@@ -101,9 +187,13 @@ protected:
 
 	void CreateFunctions();
 
-	Double_t EvaluateQ0FactorVsTheta(Double_t* x, Double_t* par);	// J_on/theta
-	Double_t EvaluateQ1FactorVsTheta(Double_t* x, Double_t* par);	// J_on/Sqrt{theta^2+J_off}
+	Double_t EvaluateQ0FactorVsTheta(Double_t* x, Double_t* par);			// J_on/theta
+	Double_t EvaluateQ1FactorVsTheta(Double_t* x, Double_t* par);			// J_on/Sqrt{theta^2+J_off}
+	Double_t EvaluateQ2FactorVsTheta(Double_t* x, Double_t* par);			// J_eff/theta_eff
 
+	Double_t EvaluateQ0FactorVsThetaWobble(Double_t* x, Double_t* par);		// J_on/theta
+	Double_t EvaluateQ1FactorVsThetaWobble(Double_t* x, Double_t* par);		// J_on/Sqrt{theta^2+J_off}
+	Double_t EvaluateQ2FactorVsThetaWobble(Double_t* x, Double_t* par);		// J_eff/theta_eff
 
 	Double_t EvaluateLOSPerSinusThetaVsDcg(Double_t* x, Double_t* par);
 	Double_t EvaluateJFactorFromLOS_OnVsTheta(Double_t* x, Double_t* par);
@@ -118,6 +208,8 @@ private:
 
 	TF1* fEvaluateQ0FactorVsTheta;						// J_on/theta
 	TF1* fEvaluateQ1FactorVsTheta;						// J_on/Sqrt{theta^2+J_off}
+	TF1* fEvaluateQ2FactorVsTheta;						// J_eff/theta_eff
+
 	TF1* fEvaluateJFactorFromLOS_OnVsTheta;
 	TF1* fEvaluateJFactorFromLOS_OffVsTheta;
 	TF1* fEvaluateJFactorFromLOS_TotalVsTheta;
@@ -127,6 +219,12 @@ private:
 
 	TF2* fEvaluateLOSPerSinusThetaVsDcg;
 
+	TF2* fEvaluateQ0FactorVsThetaWobble;				// J_on/theta
+	TF2* fEvaluateQ1FactorVsThetaWobble;				// J_on/Sqrt{theta^2+J_off}
+	TF2* fEvaluateQ2FactorVsThetaWobble;				// J_eff/theta_eff
+
+
+	Double_t dDeg2Rad;
 };
 
 #endif /* 	JDOptimitzation_H_ */

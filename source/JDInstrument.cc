@@ -10,8 +10,25 @@
  */
 
 #include "JDInstrument.h"
+
 #include <TGraph.h>
 #include <TMath.h>
+#include <Rtypes.h>
+#include <TAttFill.h>
+#include <TAttLine.h>
+#include <TAttText.h>
+#include <TAxis.h>
+#include <TCanvas.h>
+#include <TF1.h>
+#include <TF2.h>
+#include <TGraph.h>
+#include <TH1.h>
+#include <TLegend.h>
+#include <TPave.h>
+#include <TString.h>
+#include <TVirtualPad.h>
+#include <iostream>
+#include <TStyle.h>
 
 using namespace std;
 
@@ -19,9 +36,9 @@ using namespace std;
 //
 //	new (QUIM) for que IDEAL case
 JDInstrument::JDInstrument():
-		sInstrumentName(""), dWobbleDist(""), sInstrumentPath(""),
 		gCameraAcceptance(NULL),fEvaluateEfficiencyVsTheta(NULL),
-		fEvaluateEpsilonVsThetaAndPhi(NULL),fEvaluateEpsilonThetaVsThetaAndPhi(NULL)
+		fEvaluateEpsilonVsThetaAndPhi(NULL),fEvaluateEpsilonThetaVsThetaAndPhi(NULL),
+		bIsIdeal(0), bIsMagic(0), bIsCameraAcceptance(0)
 {
 	    cout << endl;
 		cout << endl;
@@ -37,9 +54,10 @@ JDInstrument::JDInstrument():
 //
 //	new (QUIM) for que IDEAL case
 JDInstrument::JDInstrument(Double_t distanceCameraCenterMax,Double_t wobbleDist):
-		sInstrumentName(""), dWobbleDist(wobbleDist), sInstrumentPath(""),
+		dWobbleDist(wobbleDist),
 		gCameraAcceptance(NULL),fEvaluateEfficiencyVsTheta(NULL),
-		fEvaluateEpsilonVsThetaAndPhi(NULL),fEvaluateEpsilonThetaVsThetaAndPhi(NULL)
+		fEvaluateEpsilonVsThetaAndPhi(NULL),fEvaluateEpsilonThetaVsThetaAndPhi(NULL),
+		bIsIdeal(0), bIsMagic(0), bIsCameraAcceptance(0)
 {
 	    cout << endl;
 		cout << endl;
@@ -64,9 +82,10 @@ JDInstrument::JDInstrument(Double_t distanceCameraCenterMax,Double_t wobbleDist)
 //
 //	new (QUIM)
 JDInstrument::JDInstrument(TGraph* cameraAcceptance, Double_t wobbleDist):
-		sInstrumentName(""), dWobbleDist(wobbleDist), sInstrumentPath(""),
+		dWobbleDist(wobbleDist),
 		gCameraAcceptance(NULL),fEvaluateEfficiencyVsTheta(NULL),
-		fEvaluateEpsilonVsThetaAndPhi(NULL),fEvaluateEpsilonThetaVsThetaAndPhi(NULL)
+		fEvaluateEpsilonVsThetaAndPhi(NULL),fEvaluateEpsilonThetaVsThetaAndPhi(NULL),
+		bIsIdeal(0), bIsMagic(0), bIsCameraAcceptance(0)
 {
 	    cout << endl;
 		cout << endl;
@@ -97,7 +116,8 @@ JDInstrument::JDInstrument(TGraph* cameraAcceptance, Double_t wobbleDist):
 JDInstrument::JDInstrument(TString instrumentName, Double_t wobble, TString instrumentPath):
 		sInstrumentName(instrumentName), dWobbleDist(wobble), sInstrumentPath(instrumentPath),
 		gCameraAcceptance(NULL),fEvaluateEfficiencyVsTheta(NULL),
-		fEvaluateEpsilonVsThetaAndPhi(NULL),fEvaluateEpsilonThetaVsThetaAndPhi(NULL)
+		fEvaluateEpsilonVsThetaAndPhi(NULL),fEvaluateEpsilonThetaVsThetaAndPhi(NULL),
+		bIsIdeal(0), bIsMagic(0), bIsCameraAcceptance(0)
 {
 	    cout << endl;
 		cout << endl;

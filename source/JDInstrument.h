@@ -153,9 +153,9 @@ private:
 	///////////////////////////////////////////////////////
 	//Bool_T
 	///////////////////////////////////////////////////////
-	Bool_t bIsIdeal=0;
-	Bool_t bIsMagic=0;
-	Bool_t bIsCameraAcceptance=0;
+	Bool_t bIsIdeal;
+	Bool_t bIsMagic;
+	Bool_t bIsCameraAcceptance;
 
 };
 

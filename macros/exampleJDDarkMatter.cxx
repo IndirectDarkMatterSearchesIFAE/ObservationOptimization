@@ -438,6 +438,56 @@ void DrawNormLOSFromTGraph()
 }
 
 //-------------------------------------
+//  This function ... (QUIM)
+void DrawJFactorFromTxtFile()
+{
+
+	TString txtFile = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization/references/JFactor/JFactorSegue.txt";
+	JDDarkMatter* 	JFactor = new JDDarkMatter(txtFile);
+	JFactor->SetCandidate("Annihilation");
+	JFactor->SetSourceName("Segue");
+	TF1* functionJFactor = JFactor->GetTF1JFactorVsTheta();
+	TF1* functionJFactorFromLOS = JFactor->GetTF1JFactorFromLOSVsTheta();
+	functionJFactorFromLOS->SetLineColor(1);
+	functionJFactorFromLOS->SetLineStyle(2);
+
+
+	Double_t thetaMax = JFactor->GetThetaMax();
+
+	functionJFactor->SetLineColor(2);
+	functionJFactor->SetLineStyle(1);
+	TCanvas* canvas = new TCanvas("canvas","",600,550);
+	TH1I* dummy = new TH1I("dummy", JFactor->GetAuthor(),1,0.01,JFactor->GetThetaMax());
+	dummy->SetMaximum(JFactor->GetJFactorMax()*10.);
+	dummy->SetMinimum(JFactor->GetJFactorMax()*0.01);
+	dummy->SetStats(0);
+	dummy->SetXTitle(" #theta ");
+	if (JFactor->GetCandidate() == "Annihilation")	{dummy->SetYTitle(" J Factor [GeV^{2}/cm^{5}]");}
+	else if (JFactor->GetCandidate() == "Decay")	{dummy->SetYTitle(" J Factor [GeV/cm^{2}]");	}
+	dummy->GetXaxis()->SetTitleOffset(1.3);
+	dummy->GetYaxis()->SetTitleOffset(1.5);
+	dummy->DrawCopy();
+	gPad->SetLogx();
+	gPad->SetLogy();
+	gPad->SetGridy();
+	gPad->SetGridx();
+	functionJFactor->Draw("same");
+	functionJFactorFromLOS->Draw("same");
+
+	TLegend* leg=new TLegend(.18,.15,.88,.25);
+	leg->AddEntry(functionJFactor, JFactor->GetSourceName()+" "+JFactor->GetCandidate()+" ("+JFactor->GetAuthor()+")", "l");
+	leg->SetFillColor(0);
+	leg->SetLineColor(1);
+	leg->SetBorderSize(1);
+	leg->SetTextSize(0.037);
+	leg->Draw();
+	gPad->Modified();
+	gPad->Update();
+
+//	canvas->Print("/home/david/Documents/DarkMatter/Resultats/JFactor/"+author+"_"+candidate+"_"+source+".png");
+}
+
+//-------------------------------------
 //  This function shows the JFactor of the author, source and candidate we want.
 //	(QUIM) Declare author, source, candidate
 void DrawJFactorFromLOS()
@@ -450,6 +500,7 @@ void DrawJFactorFromLOS()
 
 	JDDarkMatter* 	JFactor = new JDDarkMatter(author, source, candidate, mySourcePath);
 	TF1* functionJFactorFromLOS = JFactor->GetTF1JFactorFromLOSVsTheta();
+
 	TF1* functionJFactor = JFactor->GetTF1JFactorVsTheta();
 	functionJFactor->SetLineColor(2);
 	functionJFactor->SetLineStyle(1);
@@ -472,7 +523,6 @@ void DrawJFactorFromLOS()
 	functionJFactorFromLOS->SetLineStyle(2);
 	functionJFactor->Draw("same");
 	functionJFactorFromLOS->Draw("same");
-
 	// This is for plotting purposes only
 	TString isBonnivard = (JFactor->GetIsBonnivard()? "arxiv:1504.02048" : "");
 	TString isGeringer = (JFactor->GetIsGeringer()? "arxiv:1408.0002" : "");
@@ -490,18 +540,23 @@ void DrawJFactorFromLOS()
 
 }
 
+
+
 void exampleJDDarkMatter()
 {
 //	PrintListOfPossibilities();
 
 //	DrawJFactorFromReferences();
-//	DrawLOSFromReferences();
+//	DrawLOSFromReferences();	// (QUIM) this is useful for the DonutMC
 //	DrawNormalizedLOSFromReferences();
 
 //	DrawJFactorFromTGraph();
 //	DrawLOSFromTGraph();
 //	DrawNormLOSFromTGraph();
 
+//	DrawJFactorFromTxtFile();
+
 	DrawJFactorFromLOS();
+
 
 }

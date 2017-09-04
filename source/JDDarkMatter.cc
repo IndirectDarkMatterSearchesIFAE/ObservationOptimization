@@ -10,15 +10,33 @@
  */
 
 #include "JDDarkMatter.h"
+#include "JDOptimization.h"
+
 #include <TGraph.h>
 #include <TMath.h>
 #include <Rtypes.h>
 #include <stddef.h>
 #include <fstream>
 #include <iostream>
+#include <Rtypes.h>
+#include <TAttFill.h>
+#include <TAttLine.h>
+#include <TAttText.h>
+#include <TAxis.h>
+#include <TCanvas.h>
+#include <TF1.h>
+#include <TF2.h>
+#include <TGraph.h>
+#include <TH1.h>
+#include <TLegend.h>
+#include <TPave.h>
+#include <TString.h>
+#include <TVirtualPad.h>
+#include <TStyle.h>
+
 using namespace std;
 
-const static double Deg2Rad = TMath::Pi()/180.;
+//const static double Deg2Rad = TMath::Pi()/180.;
 static const Double_t SolarMass2GeV = 1.1154e57;  			// [GeV/SolarM]
 static const Double_t kpc2cm        = 3.08568e21; 			// [cm/kpc]
 
@@ -28,7 +46,9 @@ static const Double_t kpc2cm        = 3.08568e21; 			// [cm/kpc]
 //	This is the constructor is new (QUIM)
 JDDarkMatter::JDDarkMatter():
 		sAuthor(""), sSource(""), sCandidate(""), sMySourcePath (""),
-		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL)
+		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL),
+		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0),
+		dDeg2Rad(TMath::Pi()/180.)
 {
 	cout << endl;
 	cout << endl;
@@ -44,7 +64,9 @@ JDDarkMatter::JDDarkMatter():
 //	This is the constructor is new (QUIM)
 JDDarkMatter::JDDarkMatter(TGraph* jfactor):
 		sAuthor(""), sSource(""), sCandidate(""), sMySourcePath (""),
-		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL)
+		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL),
+		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0),
+		dDeg2Rad(TMath::Pi()/180.)
 {
 	cout << endl;
 	cout << endl;
@@ -53,6 +75,34 @@ JDDarkMatter::JDDarkMatter(TGraph* jfactor):
 	cout << endl;
 
 	if(SetJFactorFromTGraph(jfactor))
+	{
+		cout << "   ***********************************" << endl;
+		cout << "   ***                             ***" << endl;
+		cout << "   ***   JFactor could not be set  ***" << endl;
+		cout << "   ***                             ***" << endl;
+		cout << "   ***********************************" << endl;
+		return;
+
+	}
+	CreateFunctionsDM();
+}
+
+//-----------------------------------------------
+//
+//	This is the constructor is new (QUIM)
+JDDarkMatter::JDDarkMatter(TString txtFile):
+		sAuthor(""), sSource(""), sCandidate(""), sMySourcePath (""),
+		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL),
+		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0),
+		dDeg2Rad(TMath::Pi()/180.)
+{
+	cout << endl;
+	cout << endl;
+	cout << "   Constructor JDDarkMatter..." << endl;
+	cout << endl;
+	cout << endl;
+
+	if(SetJFactorFromTxtFile(txtFile))
 	{
 		cout << "   ***********************************" << endl;
 		cout << "   ***                             ***" << endl;
@@ -80,7 +130,9 @@ JDDarkMatter::JDDarkMatter(TGraph* jfactor):
 //
 JDDarkMatter::JDDarkMatter(TString author, TString source, TString candidate, TString mySourcePath):
 		sAuthor(author), sSource(source), sCandidate(candidate), sMySourcePath (mySourcePath),
-		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL)
+		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL),
+		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0),
+		dDeg2Rad(TMath::Pi()/180.)
 {
 	cout << endl;
 	cout << endl;
@@ -131,16 +183,19 @@ void JDDarkMatter::CreateFunctionsDM()
 	fEvaluateJFactorVsTheta = new TF1("fEvaluateJFactorVsTheta",this,&JDDarkMatter::TGraphEvaluateJFactorVsTheta,0.,GetThetaMax(),0,"JDDarkMatter","TGraphEvaluateJFactorVsTheta");
 	fEvaluateLOSVsTheta = new TF1("fEvaluateLOSVsTheta", this, &JDDarkMatter::EvaluateLOSVsTheta,0.,GetThetaMax(),0, "JDDarkMatter", "EvaluateLOSVsTheta");
 	fIntegrateJFactorFromLOSVsTheta = new TF1("fIntegrateJFactorFromLOSVsTheta",this,&JDDarkMatter::IntegrateJFactorFromLOSVsTheta,0.,GetThetaMax(),0,"JDDarkMatter","IntegrateJFactorFromLOSVsTheta");
-	fEvaluateLOSThetaVsTheta = new TF1("fEvaluateLOSThetaVsTheta", this, &JDDarkMatter::EvaluateLOSThetaVsTheta, 0., GetThetaMax() , 0, "JDDarkMatter", "EvaluateLOSThetaVsTheta");
+	fIntegrateJFactorOffFromLOSVsTheta = new TF1("fIntegrateJFactorOffFromLOSVsTheta",this,&JDDarkMatter::IntegrateJFactorOffFromLOSVsTheta,0.,GetThetaMax(),1,"JDDarkMatter","IntegrateJFactorOffFromLOSVsTheta");
+
+	//	fEvaluateLOSThetaVsTheta = new TF1("fEvaluateLOSThetaVsTheta", this, &JDDarkMatter::EvaluateLOSThetaVsTheta, 0., GetThetaMax() , 0, "JDDarkMatter", "EvaluateLOSThetaVsTheta");
 	fEvaluateNormLOSVsTheta = new TF1("fEvaluateNormLOSVsTheta", this, &JDDarkMatter::EvaluateNormLOSVsTheta, 0., GetThetaMax() , 1, "JDDarkMatter", "EvaluateNormLOSVsTheta");
 
 	fEvaluateLOSThetaVsThetaPhi = new TF2("fEvaluateLOSThetaVsThetaPhi", this, &JDDarkMatter::EvaluateLOSThetaVsThetaPhi,0.,GetThetaMax(),-TMath::Pi(),TMath::Pi(),0, "JDDarkMatter", "EvaluateLOSThetaVsThetaPhi");
+	fEvaluateLOSOffThetaVsThetaPhi = new TF2("fEvaluateLOSOffThetaVsThetaPhi", this, &JDDarkMatter::EvaluateLOSOffThetaVsThetaPhi,0.,GetThetaMax(),-TMath::Pi(),TMath::Pi(),1, "JDDarkMatter", "EvaluateLOSOffThetaVsThetaPhi");
 
 }
 
 //-----------------------------------------------
 //	New (QUIM)
-Bool_t JDDarkMatter::SetJFactorFromTGraph(TGraph* jfactor)
+Bool_t JDDarkMatter::SetJFactorFromTGraph(TGraph* jfactor)//, Bool_t verbose=0)
 {
 	SetIsJFactor(1);
 
@@ -149,12 +204,47 @@ Bool_t JDDarkMatter::SetJFactorFromTGraph(TGraph* jfactor)
 	SetNumPointsJFactorGraph((Int_t)gJFactor->GetN());
 	if(GetNumPointsJFactorGraph()<=0) return -1;
 
-
 	Int_t numPoint = GetNumPointsJFactorGraph();
 	SetJFactorMin(gJFactor->GetY()[0]);
 	SetJFactorMax(gJFactor->GetY()[numPoint-1]);
 	SetThetaMax(gJFactor->GetX()[numPoint-1]);
 
+//	if (verbose==1)	for(Int_t i=0; i<numPoint;i++){cout << gJFactor->GetX()[i] << " " << gJFactor->GetY()[i] << endl;}
+
+	return 0;
+}
+
+//-----------------------------------------------
+//	New (QUIM)
+Bool_t JDDarkMatter::SetJFactorFromTxtFile(TString txtFile)//, Bool_t verbose=0)
+{
+	Double_t theta, dJ;
+	Int_t contador=0;
+
+	gJFactor = new TGraph();
+
+	ifstream file (txtFile);
+	while(file >> theta >> dJ)
+	{
+		// only for Tests
+		//		if (verbose==1)	cout << theta << " " << dJ << endl;
+
+		gJFactor->SetPoint(contador,theta,dJ);
+
+
+		if(contador==0) SetJFactorMin(dJ);
+
+		contador ++;
+	}
+
+	SetNumPointsJFactorGraph(contador);
+	SetJFactorMax(dJ);
+	SetThetaMax(theta);
+	file.close();
+
+	if(GetNumPointsJFactorGraph()<=0) return -1;
+
+	SetIsJFactor(1);
 	return 0;
 }
 
@@ -344,7 +434,17 @@ Double_t JDDarkMatter::TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par)
 Double_t JDDarkMatter::IntegrateJFactorFromLOSVsTheta(Double_t* x, Double_t* par)
 {
 	return fEvaluateLOSThetaVsThetaPhi->Integral(0.,x[0],0.,2*TMath::Pi(),1e-6);
-//	return fEvaluateLOSThetaVsThetaPhi->Integral(0.,x[0],0.,360.,1e-6);
+}
+
+//-----------------------------------------------
+// new (QUIM)
+//
+// x[0] 	= dTheta [deg]
+// par[0] 	= offset [deg]
+Double_t JDDarkMatter::IntegrateJFactorOffFromLOSVsTheta(Double_t* x, Double_t* par)
+{
+	fEvaluateLOSOffThetaVsThetaPhi->SetParameter(0,par[0]);
+	return fEvaluateLOSOffThetaVsThetaPhi->Integral(0.,x[0],0.,2*TMath::Pi(),1e-6);
 }
 
 //----------------------------------------------------
@@ -354,7 +454,7 @@ Double_t JDDarkMatter::IntegrateJFactorFromLOSVsTheta(Double_t* x, Double_t* par
 // 	x[0]		= theta	[deg]
 Double_t JDDarkMatter::EvaluateLOSVsTheta(Double_t* x, Double_t* par)
 {
-	return fEvaluateJFactorVsTheta->Derivative(x[0])/(2*TMath::Pi()*TMath::Sin(x[0]*Deg2Rad));
+	return fEvaluateJFactorVsTheta->Derivative(x[0])/(2*TMath::Pi()*TMath::Sin(x[0]*dDeg2Rad));
 }
 
 ////----------------------------------------------------
@@ -374,11 +474,29 @@ Double_t JDDarkMatter::EvaluateLOSVsTheta(Double_t* x, Double_t* par)
 //
 // x[0]		= theta	[deg]
 // x[1]		= phi	[rad]
+// par[0]	= offset	[deg]
 Double_t JDDarkMatter::EvaluateLOSThetaVsThetaPhi(Double_t* x, Double_t* par)
 {
-	Double_t X0rad =x[0]/180.*TMath::Pi();
+	Double_t X0rad =x[0]*dDeg2Rad;	// x[0] in radians
+
 	return fEvaluateLOSVsTheta->Eval(x[0])*X0rad;
 }
+
+//----------------------------------------------------
+// It evaluates the LOS vs Theta. The LOS is calculated from the derivative of the JFactor divided by 2*PI*Sin(theta)
+//
+// x[0]		= theta	[deg]
+// x[1]		= phi	[rad]
+// par[0]	= offset	[deg]
+Double_t JDDarkMatter::EvaluateLOSOffThetaVsThetaPhi(Double_t* x, Double_t* par)
+{
+	Double_t X0rad =x[0]/180.*TMath::Pi();	// x[0] in radians
+
+	Double_t distFromHalo=TMath::Sqrt(x[0]*x[0]+par[0]*par[0]-2*x[0]*par[0]*TMath::Cos(x[1]));
+
+	return fEvaluateLOSVsTheta->Eval(distFromHalo)*X0rad;
+}
+
 
 //----------------------------------------------------
 // new (QUIM
@@ -495,4 +613,6 @@ void JDDarkMatter::GetWarning()
 	cout << "  ***" << endl;
 	cout << "  ***  	- 	JFactor not defined..." << endl;
 	cout << " " << endl;
+	cout << "  *****************************" << endl;
+
 }
