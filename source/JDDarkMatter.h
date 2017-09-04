@@ -14,6 +14,8 @@
 
 #include <TF1.h>
 #include <TGraph.h>
+#include <TF2.h>
+
 using namespace std;
 
 class JDDarkMatter {
@@ -21,6 +23,7 @@ public:
 
 	JDDarkMatter();
 	JDDarkMatter(TGraph* jfactor);
+	JDDarkMatter(TString txtFile);
 	JDDarkMatter(TString author, TString source, TString candidate, TString mySourcePath);
 	virtual ~JDDarkMatter();
 
@@ -33,7 +36,8 @@ public:
 	void SetAuthor(TString author) 						{sAuthor=author;}
 	void SetThetaMax(Double_t thetaMax) 				{dThetaMax=thetaMax;}
 
-	Bool_t SetJFactorFromTGraph(TGraph* jfactor);
+	Bool_t SetJFactorFromTGraph(TGraph* jfactor);//, Bool_t verbose);
+	Bool_t SetJFactorFromTxtFile(TString txtFile);//, Bool_t verbose);
 
 	//Getters********
 
@@ -67,6 +71,13 @@ public:
 		return fIntegrateJFactorFromLOSVsTheta;
 	}
 
+	TF1* GetTF1JFactorOffFromLOSVsTheta(Double_t offset=20)
+	{
+		if(!GetIsJFactor()) GetWarning();
+		fIntegrateJFactorOffFromLOSVsTheta->SetParameter(0,offset);
+		return fIntegrateJFactorOffFromLOSVsTheta;
+	}
+
 	TF1* GetTF1LOSVsTheta()
 	{
 		if(!GetIsJFactor()) GetWarning();
@@ -80,15 +91,16 @@ public:
 		return fEvaluateNormLOSVsTheta;
 	}
 
-	///////////////////////////////////////////////////////
-	//TF2
-	///////////////////////////////////////////////////////
-
-	TF2* GetTF2LOSVsThetaPhi()
+	TF1* GetTF2LOSVsTheta()
 	{
 		if(!GetIsJFactor()) GetWarning();
 		return fEvaluateLOSVsTheta;
 	}
+	///////////////////////////////////////////////////////
+	//TF2
+	///////////////////////////////////////////////////////
+
+
 
 	///////////////////////////////////////////////////////
 	//Double_t
@@ -138,11 +150,13 @@ protected:
 
 	Double_t TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par);
 	Double_t IntegrateJFactorFromLOSVsTheta(Double_t* x, Double_t* par);
+	Double_t IntegrateJFactorOffFromLOSVsTheta(Double_t* x, Double_t* par);
 	Double_t EvaluateLOSVsTheta(Double_t* x, Double_t* par);
 	Double_t EvaluateLOSThetaVsTheta(Double_t* x, Double_t* par);
 	Double_t EvaluateNormLOSVsTheta(Double_t* x, Double_t* par);
 
 	Double_t EvaluateLOSThetaVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t EvaluateLOSOffThetaVsThetaPhi(Double_t* x, Double_t* par);
 
 private:
 
@@ -169,6 +183,8 @@ private:
 	Double_t dJFactorMax;
 	Double_t dJFactorMin;
 
+	Double_t dDeg2Rad;
+
 	///////////////////////////////////////////////////////
 	//TGraph
 	///////////////////////////////////////////////////////
@@ -186,21 +202,22 @@ private:
 	TF1* fEvaluateLOSThetaVsTheta;
 	TF1* fEvaluateNormLOSVsTheta;
 	TF1* fIntegrateJFactorFromLOSVsTheta;
+	TF1* fIntegrateJFactorOffFromLOSVsTheta;
 
 	///////////////////////////////////////////////////////
 	//TF2
 	///////////////////////////////////////////////////////
 
 	TF2* fEvaluateLOSThetaVsThetaPhi;
+	TF2* fEvaluateLOSOffThetaVsThetaPhi;
 
 	///////////////////////////////////////////////////////
 	//Bool_t
 	///////////////////////////////////////////////////////
 
-	Bool_t bIsBonnivard=0;
-	Bool_t bIsGeringer=0;
-	Bool_t bIsJFactor=0;
-
+	Bool_t bIsBonnivard;
+	Bool_t bIsGeringer;
+	Bool_t bIsJFactor;
 
 };
 
