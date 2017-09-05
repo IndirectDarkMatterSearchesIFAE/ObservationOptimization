@@ -249,7 +249,7 @@ Bool_t JDInstrument::SetCameraAcceptanceFromInstrument(Bool_t verbose)
 		cout << "         -> No distance to camera center max defined." << endl;
 		cout << "            use JDInstrument(Double_t distanceCameraCenterMax) instead" << endl;
 		cout << "   "<< endl;
-		return -1;
+		return 1;
 	}
 	else if(GetInstrumentName()=="MAGICPointLike")
 	{
@@ -280,7 +280,7 @@ Bool_t JDInstrument::SetCameraAcceptanceFromInstrument(Bool_t verbose)
 		if(contador>0) return 0;
 	}
 
-	return -1;
+	return 1;
 }
 
 //-----------------------------------------------

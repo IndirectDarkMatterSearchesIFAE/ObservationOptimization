@@ -433,7 +433,7 @@ void PlotEfficiencyFromTGraph()
 
 void exampleJDInstrument()
 {
-//	PrintListOfPossibilities();
+	PrintListOfPossibilities();
 
 //	PlotCameraAcceptanceFromIDEAL();
 //	PlotEfficiencyFromIDEAL();

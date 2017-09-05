@@ -26,11 +26,11 @@ public:
 	void GetListOfQFactors();
 
 
-	TF1* GetTF1EffectiveJFactorFromLOSVsTheta()
-	{
-		if(!GetIsJFactor()) GetWarning();
-		return fIntegrateEffectiveJFactorFromLOSVsTheta;
-	}
+//	TF1* GetTF1EffectiveJFactorFromLOSVsTheta()
+//	{
+//		if(!GetIsJFactor()) GetWarning();
+//		return fIntegrateEffectiveJFactorFromLOSVsTheta;
+//	}
 
 
 	TF1* GetTF1QFactorVsTheta(Int_t type=0, Double_t thetaNorm=1)

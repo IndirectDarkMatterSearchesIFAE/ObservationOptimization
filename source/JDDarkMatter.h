@@ -2,7 +2,7 @@
  * DM.h
  *
  *  Created on: 03/07/2017
- *  Authors: David Navarro Gironés 	<<david.navarrogir@e-campus.uab.cat>>
+ *  Authors: David Navarro Gironés 	<<david.navarro.girones@gmail.com>>
  *  		 Joaquim Palacio 		<<jpalacio@ifae.es>>
  *
  *  		 ADD A GENERAL DESCRIPTION ON THE CLASS, THE MAIN FUNCTIONS, THE VARIABLES
@@ -36,8 +36,8 @@ public:
 	void SetAuthor(TString author) 						{sAuthor=author;}
 	void SetThetaMax(Double_t thetaMax) 				{dThetaMax=thetaMax;}
 
-	Bool_t SetJFactorFromTGraph(TGraph* jfactor);//, Bool_t verbose);
-	Bool_t SetJFactorFromTxtFile(TString txtFile);//, Bool_t verbose);
+	Bool_t SetJFactorFromTGraph(TGraph* jfactor, Bool_t verbose=0);//, Bool_t verbose);
+	Bool_t SetJFactorFromTxtFile(TString txtFile, Bool_t verbose=0);//, Bool_t verbose);
 
 	//Getters********
 
@@ -91,16 +91,21 @@ public:
 		return fEvaluateNormLOSVsTheta;
 	}
 
-	TF1* GetTF2LOSVsTheta()
-	{
-		if(!GetIsJFactor()) GetWarning();
-		return fEvaluateLOSVsTheta;
-	}
 	///////////////////////////////////////////////////////
 	//TF2
 	///////////////////////////////////////////////////////
 
+	TF2* GetTF2LOSThetaVSThetaPhi()
+	{
+		if(!GetIsJFactor()) GetWarning();
+		return fEvaluateLOSThetaVsThetaPhi;
+	}
 
+	TF2* GetTF2LOSOffThetaVSThetaPhi()
+	{
+		if(!GetIsJFactor()) GetWarning();
+		return fEvaluateLOSOffThetaVsThetaPhi;
+	}
 
 	///////////////////////////////////////////////////////
 	//Double_t
@@ -152,7 +157,6 @@ protected:
 	Double_t IntegrateJFactorFromLOSVsTheta(Double_t* x, Double_t* par);
 	Double_t IntegrateJFactorOffFromLOSVsTheta(Double_t* x, Double_t* par);
 	Double_t EvaluateLOSVsTheta(Double_t* x, Double_t* par);
-	Double_t EvaluateLOSThetaVsTheta(Double_t* x, Double_t* par);
 	Double_t EvaluateNormLOSVsTheta(Double_t* x, Double_t* par);
 
 	Double_t EvaluateLOSThetaVsThetaPhi(Double_t* x, Double_t* par);
@@ -199,7 +203,6 @@ private:
 
 	TF1* fEvaluateJFactorVsTheta;
 	TF1* fEvaluateLOSVsTheta;
-	TF1* fEvaluateLOSThetaVsTheta;
 	TF1* fEvaluateNormLOSVsTheta;
 	TF1* fIntegrateJFactorFromLOSVsTheta;
 	TF1* fIntegrateJFactorOffFromLOSVsTheta;

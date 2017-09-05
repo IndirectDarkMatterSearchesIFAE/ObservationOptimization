@@ -2,7 +2,7 @@
  * JDDM.cc
  *
  *  Created on: 03/07/2017
- *  Authors: David Navarro Gironés 	<<david.navarrogir@e-campus.uab.cat>>
+ *  Authors: David Navarro Gironés 	<<david.navarro.girones@gmail.com>>
  *  		 Joaquim Palacio 		<<jpalacio@ifae.es>>
  *
  *  		 ADD A GENERAL DESCRIPTION ON THE CLASS, THE MAIN FUNCTIONS, THE VARIABLES
@@ -10,7 +10,6 @@
  */
 
 #include "JDDarkMatter.h"
-#include "JDOptimization.h"
 
 #include <TGraph.h>
 #include <TMath.h>
@@ -36,17 +35,18 @@
 
 using namespace std;
 
-//const static double Deg2Rad = TMath::Pi()/180.;
 static const Double_t SolarMass2GeV = 1.1154e57;  			// [GeV/SolarM]
 static const Double_t kpc2cm        = 3.08568e21; 			// [cm/kpc]
 
 
 //-----------------------------------------------
 //
-//	This is the constructor is new (QUIM)
+//	This is the constructor used to show the possibilities that offers the JDDarkMatter class
 JDDarkMatter::JDDarkMatter():
 		sAuthor(""), sSource(""), sCandidate(""), sMySourcePath (""),
-		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL),
+		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL), fEvaluateNormLOSVsTheta(NULL),
+		fIntegrateJFactorFromLOSVsTheta(NULL), fIntegrateJFactorOffFromLOSVsTheta(NULL),
+		fEvaluateLOSThetaVsThetaPhi(NULL), fEvaluateLOSOffThetaVsThetaPhi(NULL),
 		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0),
 		dDeg2Rad(TMath::Pi()/180.)
 {
@@ -61,10 +61,12 @@ JDDarkMatter::JDDarkMatter():
 
 //-----------------------------------------------
 //
-//	This is the constructor is new (QUIM)
+//	This is the constructor used when the data is given by a TGraph
 JDDarkMatter::JDDarkMatter(TGraph* jfactor):
 		sAuthor(""), sSource(""), sCandidate(""), sMySourcePath (""),
-		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL),
+		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL), fEvaluateNormLOSVsTheta(NULL),
+		fIntegrateJFactorFromLOSVsTheta(NULL), fIntegrateJFactorOffFromLOSVsTheta(NULL),
+		fEvaluateLOSThetaVsThetaPhi(NULL), fEvaluateLOSOffThetaVsThetaPhi(NULL),
 		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0),
 		dDeg2Rad(TMath::Pi()/180.)
 {
@@ -74,7 +76,7 @@ JDDarkMatter::JDDarkMatter(TGraph* jfactor):
 	cout << endl;
 	cout << endl;
 
-	if(SetJFactorFromTGraph(jfactor))
+	if(!SetJFactorFromTGraph(jfactor))
 	{
 		cout << "   ***********************************" << endl;
 		cout << "   ***                             ***" << endl;
@@ -89,10 +91,12 @@ JDDarkMatter::JDDarkMatter(TGraph* jfactor):
 
 //-----------------------------------------------
 //
-//	This is the constructor is new (QUIM)
+//	This is the constructor used when the data is given by a txtFile
 JDDarkMatter::JDDarkMatter(TString txtFile):
 		sAuthor(""), sSource(""), sCandidate(""), sMySourcePath (""),
-		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL),
+		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL), fEvaluateNormLOSVsTheta(NULL),
+		fIntegrateJFactorFromLOSVsTheta(NULL), fIntegrateJFactorOffFromLOSVsTheta(NULL),
+		fEvaluateLOSThetaVsThetaPhi(NULL), fEvaluateLOSOffThetaVsThetaPhi(NULL),
 		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0),
 		dDeg2Rad(TMath::Pi()/180.)
 {
@@ -102,7 +106,7 @@ JDDarkMatter::JDDarkMatter(TString txtFile):
 	cout << endl;
 	cout << endl;
 
-	if(SetJFactorFromTxtFile(txtFile))
+	if(!SetJFactorFromTxtFile(txtFile))
 	{
 		cout << "   ***********************************" << endl;
 		cout << "   ***                             ***" << endl;
@@ -118,19 +122,21 @@ JDDarkMatter::JDDarkMatter(TString txtFile):
 
 //-----------------------------------------------
 //
-//	This is the constructor.
+//	This is the constructor used when the references are used.
 //
 //	Possible variables are:
-// 	sAuthor 	= (TString) name of author 				### (QUIM) Geringer or Bonnivard
-//	sSource 	= (TString) name of dark matter halo	### (QUIM) provide a list of the possible sources¿?
-// 	sCandidate 	= (TString) type of signal				### (QUIM) Annihilation or Decay
-//  sMyPath     = (TString) name of the path			### (QUIM) Explain what is this path used for...
+// 	sAuthor 	= (TString) name of author
+//	sSource 	= (TString) name of dark matter halo
+// 	sCandidate 	= (TString) type of signal
+//  sMyPath     = (TString) name of the path			This is the path where the data is located
 //
 //	It redirects us to CreateFunctionDM()
 //
 JDDarkMatter::JDDarkMatter(TString author, TString source, TString candidate, TString mySourcePath):
 		sAuthor(author), sSource(source), sCandidate(candidate), sMySourcePath (mySourcePath),
-		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL),
+		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL), fEvaluateNormLOSVsTheta(NULL),
+		fIntegrateJFactorFromLOSVsTheta(NULL), fIntegrateJFactorOffFromLOSVsTheta(NULL),
+		fEvaluateLOSThetaVsThetaPhi(NULL), fEvaluateLOSOffThetaVsThetaPhi(NULL),
 		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0),
 		dDeg2Rad(TMath::Pi()/180.)
 {
@@ -140,7 +146,7 @@ JDDarkMatter::JDDarkMatter(TString author, TString source, TString candidate, TS
 	cout << endl;
 	cout << endl;
 
-	if(SetJFactorFromReferences())
+	if(!SetJFactorFromReferences())
 	{
 		cout << "   ****************************************************" << endl;
 		cout << "   ***                                              ***" << endl;
@@ -158,35 +164,41 @@ JDDarkMatter::JDDarkMatter(TString author, TString source, TString candidate, TS
 //  It deletes the functions in order not to be reused
 JDDarkMatter::~JDDarkMatter()
 {
-	//(QUIM) Javi deletes all TF(?), not sure whether we need to delete gJactor,
-	// but probably doesn't hurt.
-	if (gJFactor)								delete gJFactor;
-	if (fEvaluateJFactorVsTheta)				delete fEvaluateJFactorVsTheta;
-	if (fEvaluateLOSVsTheta)					delete fEvaluateLOSVsTheta;
+
+	if (gJFactor)									delete gJFactor;
+	if (fEvaluateJFactorVsTheta)					delete fEvaluateJFactorVsTheta;
+	if (fEvaluateLOSVsTheta)						delete fEvaluateLOSVsTheta;
+	if (fEvaluateNormLOSVsTheta)					delete fEvaluateNormLOSVsTheta;
+	if (fIntegrateJFactorFromLOSVsTheta)			delete fIntegrateJFactorFromLOSVsTheta;
+	if (fIntegrateJFactorOffFromLOSVsTheta)			delete fIntegrateJFactorOffFromLOSVsTheta;
+	if (fEvaluateLOSThetaVsThetaPhi)				delete fEvaluateLOSThetaVsThetaPhi;
+	if (fEvaluateLOSOffThetaVsThetaPhi)				delete fEvaluateLOSOffThetaVsThetaPhi;
 
 		cout << endl;
 		cout << endl;
 		cout << "   Destructor JDDarkMatter..." << endl;
 		cout << endl;
 		cout << endl;
+
 }
 
 //-----------------------------------------------
 //	This function creates the important functions of this class. The functions are:
-//	void SetJFactor(): 				redirects us to "void ReadJFactor...()" (different functions depending on the chosen author)
-//	TF1 fEvaluateJFactorVsTheta: 	evaluates the JFactor vs Theta; JFactor [~GeV,~cm]     theta [deg]
-//	TF1 fEvaluateLOSVsTheta: 		evaluates the LOS vs Theta; LOS [~GeV, ~cm] theta [deg]
+//	TF1 fEvaluateJFactorVsTheta: 			evaluates the JFactor vs Theta; JFactor [~GeV,~cm]     theta [deg]
+//	TF1 fEvaluateLOSVsTheta: 				evaluates the LOS vs Theta; LOS [~GeV, ~cm] 	theta [deg]
+//	TF1 fEvaluateNormLOSVsTheta:			evaluates the LOS normalized at a certain parameter vs Theta; LOS [~GeV, ~cm] 	theta [deg]
+//	TF1 fIntegrateJFactorFromLOSVsTheta:	integrates the LOS to obtain the JFactor vs Theta; JFactor [~GeV,~cm]     theta [deg]
+//	TF1 fIntegrateJFactorOffFromLOSVsTheta:	integrates the LOS on the OFF region to obtain the JFactor vs Theta; JFactor [~GeV,~cm]     theta [deg]
+//  TF2 fEvaluateLOSThetaVsThetaPhi:		evaluates the LOS multiplied by Theta vs Theta and Phi; LOS [~GeV, ~cm] 	theta [deg] 	phi[rad]
+//  TF2 fEvaluateLOSOffThetaVsThetaPhi:		evaluates the LOS on the OFF multiplied by Theta vs Theta and Phi; LOS [~GeV, ~cm] 	theta [deg] 	phi[rad]
 void JDDarkMatter::CreateFunctionsDM()
 {
-	SetIsJFactor(1);
 
 	fEvaluateJFactorVsTheta = new TF1("fEvaluateJFactorVsTheta",this,&JDDarkMatter::TGraphEvaluateJFactorVsTheta,0.,GetThetaMax(),0,"JDDarkMatter","TGraphEvaluateJFactorVsTheta");
 	fEvaluateLOSVsTheta = new TF1("fEvaluateLOSVsTheta", this, &JDDarkMatter::EvaluateLOSVsTheta,0.,GetThetaMax(),0, "JDDarkMatter", "EvaluateLOSVsTheta");
+	fEvaluateNormLOSVsTheta = new TF1("fEvaluateNormLOSVsTheta", this, &JDDarkMatter::EvaluateNormLOSVsTheta, 0., GetThetaMax() , 1, "JDDarkMatter", "EvaluateNormLOSVsTheta");
 	fIntegrateJFactorFromLOSVsTheta = new TF1("fIntegrateJFactorFromLOSVsTheta",this,&JDDarkMatter::IntegrateJFactorFromLOSVsTheta,0.,GetThetaMax(),0,"JDDarkMatter","IntegrateJFactorFromLOSVsTheta");
 	fIntegrateJFactorOffFromLOSVsTheta = new TF1("fIntegrateJFactorOffFromLOSVsTheta",this,&JDDarkMatter::IntegrateJFactorOffFromLOSVsTheta,0.,GetThetaMax(),1,"JDDarkMatter","IntegrateJFactorOffFromLOSVsTheta");
-
-	//	fEvaluateLOSThetaVsTheta = new TF1("fEvaluateLOSThetaVsTheta", this, &JDDarkMatter::EvaluateLOSThetaVsTheta, 0., GetThetaMax() , 0, "JDDarkMatter", "EvaluateLOSThetaVsTheta");
-	fEvaluateNormLOSVsTheta = new TF1("fEvaluateNormLOSVsTheta", this, &JDDarkMatter::EvaluateNormLOSVsTheta, 0., GetThetaMax() , 1, "JDDarkMatter", "EvaluateNormLOSVsTheta");
 
 	fEvaluateLOSThetaVsThetaPhi = new TF2("fEvaluateLOSThetaVsThetaPhi", this, &JDDarkMatter::EvaluateLOSThetaVsThetaPhi,0.,GetThetaMax(),-TMath::Pi(),TMath::Pi(),0, "JDDarkMatter", "EvaluateLOSThetaVsThetaPhi");
 	fEvaluateLOSOffThetaVsThetaPhi = new TF2("fEvaluateLOSOffThetaVsThetaPhi", this, &JDDarkMatter::EvaluateLOSOffThetaVsThetaPhi,0.,GetThetaMax(),-TMath::Pi(),TMath::Pi(),1, "JDDarkMatter", "EvaluateLOSOffThetaVsThetaPhi");
@@ -194,29 +206,37 @@ void JDDarkMatter::CreateFunctionsDM()
 }
 
 //-----------------------------------------------
-//	New (QUIM)
-Bool_t JDDarkMatter::SetJFactorFromTGraph(TGraph* jfactor)//, Bool_t verbose=0)
+//
+//	This boolean is TRUE(1) if the JFactor can be read and FALSE(0) if the JFactor can not be read
+//	It fills a TGraph with the data given by the user with another TGraph
+//	It sets the maximum and minimum value of the JFactor and the maximum value of theta
+//	If the process is correct, the boolean SetIsJFactor is TRUE
+Bool_t JDDarkMatter::SetJFactorFromTGraph(TGraph* jfactor, Bool_t verbose)//, Bool_t verbose=0)
 {
-	SetIsJFactor(1);
 
 	gJFactor =jfactor;
 
 	SetNumPointsJFactorGraph((Int_t)gJFactor->GetN());
-	if(GetNumPointsJFactorGraph()<=0) return -1;
+	if(GetNumPointsJFactorGraph()<=0) return 0;
 
 	Int_t numPoint = GetNumPointsJFactorGraph();
 	SetJFactorMin(gJFactor->GetY()[0]);
 	SetJFactorMax(gJFactor->GetY()[numPoint-1]);
 	SetThetaMax(gJFactor->GetX()[numPoint-1]);
 
-//	if (verbose==1)	for(Int_t i=0; i<numPoint;i++){cout << gJFactor->GetX()[i] << " " << gJFactor->GetY()[i] << endl;}
+	if (verbose==1)	for(Int_t i=0; i<numPoint;i++){cout << gJFactor->GetX()[i] << " " << gJFactor->GetY()[i] << endl;}
 
-	return 0;
+	SetIsJFactor(1);
+	return 1;
 }
 
 //-----------------------------------------------
-//	New (QUIM)
-Bool_t JDDarkMatter::SetJFactorFromTxtFile(TString txtFile)//, Bool_t verbose=0)
+//
+//	This boolean is TRUE(1) if the JFactor can be read and FALSE(0) if the JFactor can not be read
+//	It fills a TGraph with the data given by the user with a txtFile
+//	It sets the maximum and minimum value of the JFactor and the maximum value of theta
+//	If the process is correct, the boolean SetIsJFactor is TRUE
+Bool_t JDDarkMatter::SetJFactorFromTxtFile(TString txtFile, Bool_t verbose)//, Bool_t verbose=0)
 {
 	Double_t theta, dJ;
 	Int_t contador=0;
@@ -227,7 +247,7 @@ Bool_t JDDarkMatter::SetJFactorFromTxtFile(TString txtFile)//, Bool_t verbose=0)
 	while(file >> theta >> dJ)
 	{
 		// only for Tests
-		//		if (verbose==1)	cout << theta << " " << dJ << endl;
+		if (verbose==1)	cout << theta << " " << dJ << endl;
 
 		gJFactor->SetPoint(contador,theta,dJ);
 
@@ -242,14 +262,16 @@ Bool_t JDDarkMatter::SetJFactorFromTxtFile(TString txtFile)//, Bool_t verbose=0)
 	SetThetaMax(theta);
 	file.close();
 
-	if(GetNumPointsJFactorGraph()<=0) return -1;
+	if(GetNumPointsJFactorGraph()<=0) return 0;
 
 	SetIsJFactor(1);
-	return 0;
+	return 1;
 }
 
 //-----------------------------------------------
-//	This function creates the two ReadJFactor functions.
+//	This boolean is TRUE(1) if the JFactor can be read and FALSE(0) if the JFactor can not be read
+//	It creates the two ReadJFactor functions, depending on the author.
+//	If the process is correct, the boolean SetIsBonnivard(Geringer) is TRUE(FALSE)
 // 	It redirects to other function depending on which author we are taking into account.
 Bool_t JDDarkMatter::SetJFactorFromReferences(Bool_t verbose)
 {
@@ -266,7 +288,7 @@ Bool_t JDDarkMatter::SetJFactorFromReferences(Bool_t verbose)
 		SetIsBonnivard(1);
 
 		ReadJFactorBonnivard(verbose);
-		return 0;
+		return 1;
 	}
 	else if (GetAuthor() == "Geringer")
 	{
@@ -280,20 +302,19 @@ Bool_t JDDarkMatter::SetJFactorFromReferences(Bool_t verbose)
 		SetIsGeringer(1);
 
 		ReadJFactorGeringer(verbose);
-		return 0;
+		return 1;
 	}
 
-	return -1;
+	return 0;
 }
 
 
 //-----------------------------------------------
 //	This function reads the JFactor data of Bonnivard
-//	It fulfills a TGraph with this data
+//	It fulfills a TGraph (number of points, theta [deg], JFactor[~GeV, ~cm]) with this data
+//	It sets the maximum and minimum value of the JFactor and the maximum value of theta
 //	It allows to distinguish between Decay or Annihilation
 //
-// 	### (QUIM) Specify Bonnivard reference
-// 	### (QUIM) Specify details of the TGraph (for example TGraph(npoint,theta[deg],Jfactor [~GeV,~cm])
 //	### (QUIM) The number of points of the TGraph is it automatically by the reference. Would it be usefull to safe it?
 //	### (QUIM) Declare dTheta, dJ, dJ_m1, dJ_p1, dJ_m2, dJ_p2
 
@@ -332,6 +353,8 @@ void JDDarkMatter::ReadJFactorBonnivard(Bool_t verbose)
 					SetJFactorMax(dJ*(TMath::Power(SolarMass2GeV,1.)/TMath::Power(kpc2cm,2.)));
 					SetThetaMax(theta);
 					file.close();
+					SetIsJFactor(1);
+
 		}
 
 		else if(GetCandidate() == "Annihilation")
@@ -352,6 +375,8 @@ void JDDarkMatter::ReadJFactorBonnivard(Bool_t verbose)
 				SetJFactorMax(dJ*(TMath::Power(SolarMass2GeV,2.)/TMath::Power(kpc2cm,5.)));
 				SetThetaMax(theta);
 				file.close();
+				SetIsJFactor(1);
+
 		}
 
 		else
@@ -365,10 +390,10 @@ void JDDarkMatter::ReadJFactorBonnivard(Bool_t verbose)
 
 //-----------------------------------------------
 //	This function reads the JFactor data of Geringer
-//	It fulfills a TGraph with this data
+//	It fulfills a TGraph (number of points, theta [deg], JFactor[~GeV, ~cm]) with this data
+//	It sets the maximum and minimum value of the JFactor and the maximum value of theta
 //	It allows to distinguish between Decay or Annihilation
-// 	### (QUIM) Specify Geringer reference
-// 	### (QUIM) Specify details of the TGraph (for example TGraph(npoint,theta[deg],Jfactor [~GeV,~cm])
+//
 //	### (QUIM) The number of points of the TGraph is it automatically by the reference. Would it be usefull to safe it?
 //	### (QUIM) Declare dTheta, LogJann2m, LogJann1m, LogJann, LogJann1p, LogJann2p
 //	### (QUIM) Declare LogJdec2m, LogJdec1m, LogJdec, LogJdec1p, LogJdec2p
@@ -383,10 +408,6 @@ void JDDarkMatter::ReadJFactorGeringer(Bool_t verbose)
 			cout << "    GetSourcePath() = " << GetSourcePath() << endl;
 			cout << " " << endl;
 		}
-
-	// (QUIM) both cases Decay/Annihilation are the same,
-	// it would be better to add the if inside one of the whiles (**1),
-	// and to reduce the number of lines of the function.
 
 	gJFactor = new TGraph();
 
@@ -415,20 +436,21 @@ void JDDarkMatter::ReadJFactorGeringer(Bool_t verbose)
 		SetNumPointsJFactorGraph(contador);
 		SetThetaMax(theta);
 		file.close();
+		SetIsJFactor(1);
 
 }
 
 //-----------------------------------------------
-// It evaluates the TGraph JFactor [(QUIM) units] vs Theta
+// It evaluates the TGraph JFactor [~GeV, ~cm] vs Theta [deg]
 //
-// x[0] 	= dTheta [(QUIM) units]
+// x[0] 	= dTheta [deg]
 Double_t JDDarkMatter::TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par)
 {
 	return gJFactor->Eval(x[0]);
 }
 
 //-----------------------------------------------
-// new (QUIM)
+// It integrates the LOS [~GeV, ~cm] vs Theta [deg] and Phi [rad] multiplied by Theta [deg] in order to obtain the JFactor [~GeV, ~cm]
 //
 // x[0] 	= dTheta [deg]
 Double_t JDDarkMatter::IntegrateJFactorFromLOSVsTheta(Double_t* x, Double_t* par)
@@ -437,7 +459,7 @@ Double_t JDDarkMatter::IntegrateJFactorFromLOSVsTheta(Double_t* x, Double_t* par
 }
 
 //-----------------------------------------------
-// new (QUIM)
+// It integrates the LOS [~GeV, ~cm] vs Theta [deg] and Phi [rad] on the OFF region multiplied by Theta [deg] in order to obtain the JFactor [~GeV, ~cm]
 //
 // x[0] 	= dTheta [deg]
 // par[0] 	= offset [deg]
@@ -448,13 +470,23 @@ Double_t JDDarkMatter::IntegrateJFactorOffFromLOSVsTheta(Double_t* x, Double_t* 
 }
 
 //----------------------------------------------------
-// 	It evaluates the LOS vs Theta.
+// 	It evaluates the LOS [~GeV, ~cm] vs Theta [deg]
 //	The LOS is calculated from the derivative of the JFactor divided by 2*PI*Sin(theta)
 //
 // 	x[0]		= theta	[deg]
 Double_t JDDarkMatter::EvaluateLOSVsTheta(Double_t* x, Double_t* par)
 {
 	return fEvaluateJFactorVsTheta->Derivative(x[0])/(2*TMath::Pi()*TMath::Sin(x[0]*dDeg2Rad));
+}
+
+//----------------------------------------------------
+// 	It evaluates the LOS [~GeV, ~cm] vs Theta [deg] normalized with the LOS at a certain Theta
+//
+// 	x[0]		= theta	[deg]
+// par[0] 		= offset [deg]
+Double_t JDDarkMatter::EvaluateNormLOSVsTheta(Double_t* x, Double_t* par)
+{
+	return fEvaluateJFactorVsTheta->Derivative(x[0])/fEvaluateJFactorVsTheta->Derivative(par[0]);
 }
 
 ////----------------------------------------------------
@@ -468,6 +500,12 @@ Double_t JDDarkMatter::EvaluateLOSVsTheta(Double_t* x, Double_t* par)
 //	return fEvaluateLOSVsTheta->Eval(x[0]);
 //}
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  **********************************************************************************************************
+//	WARNING: I would say the correct function is LOS multiplied by Sinus Theta and not LOS multiplied by Theta.
+//		   	 In case is LOS multiplied by Theta I don't understand why it has to be converted to rad.
+//  **********************************************************************************************************
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //----------------------------------------------------
 // It evaluates the LOS vs Theta. The LOS is calculated from the derivative of the JFactor divided by 2*PI*Sin(theta)
@@ -479,7 +517,7 @@ Double_t JDDarkMatter::EvaluateLOSThetaVsThetaPhi(Double_t* x, Double_t* par)
 {
 	Double_t X0rad =x[0]*dDeg2Rad;	// x[0] in radians
 
-	return fEvaluateLOSVsTheta->Eval(x[0])*X0rad;
+	return fEvaluateLOSVsTheta->Eval(x[0])*X0rad;//Per què ha d'estar en radians?
 }
 
 //----------------------------------------------------
@@ -495,14 +533,6 @@ Double_t JDDarkMatter::EvaluateLOSOffThetaVsThetaPhi(Double_t* x, Double_t* par)
 	Double_t distFromHalo=TMath::Sqrt(x[0]*x[0]+par[0]*par[0]-2*x[0]*par[0]*TMath::Cos(x[1]));
 
 	return fEvaluateLOSVsTheta->Eval(distFromHalo)*X0rad;
-}
-
-
-//----------------------------------------------------
-// new (QUIM
-Double_t JDDarkMatter::EvaluateNormLOSVsTheta(Double_t* x, Double_t* par)
-{
-	return fEvaluateJFactorVsTheta->Derivative(x[0])/fEvaluateJFactorVsTheta->Derivative(par[0]);
 }
 
 void JDDarkMatter::GetListOfCandidates()
@@ -601,6 +631,7 @@ void JDDarkMatter::GetListOfConstructors()
 	cout << "    List of available constructors is:" << endl;
 	cout << "    	- 	JDDarkMatter()" << endl;
 	cout << "    	- 	JDDarkMatter(TGraph* jfactor)" << endl;
+	cout << "    	- 	JDDarkMatter(TString txtFile)" << endl;
 	cout << "    	- 	JDDarkMatter(TString author, TString source, TString candidate, TString mySourcePath)" << endl;
 	cout << " " << endl;
 }

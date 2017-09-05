@@ -2,7 +2,7 @@
  * JDDM.cc
  *
  *  Created on: 03/07/2017
- *  Authors: David Navarro Gironés 	<<david.navarrogir@e-campus.uab.cat>>
+ *  Authors: David Navarro Gironés 	<<david.navarro.girones@gmail.com>>
  *  		 Joaquim Palacio 		<<jpalacio@ifae.es>>
  *
  *  		 ADD A GENERAL DESCRIPTION ON THE CLASS, THE MAIN FUNCTIONS, THE VARIABLES
@@ -64,7 +64,7 @@ void DrawJFactorFromReferences()
 	TString author = "Bonnivard";
 	TString source = "uma2";
 	TString candidate = "Annihilation";
-	TString mySourcePath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization";
+	TString mySourcePath = "/home/david/Work/eclipse/workspace/TFG/ObservationOptimization";
 
 	JDDarkMatter* 	JFactor = new JDDarkMatter(author, source, candidate, mySourcePath);
 	TF1* functionJFactor = JFactor->GetTF1JFactorVsTheta();
@@ -442,7 +442,7 @@ void DrawNormLOSFromTGraph()
 void DrawJFactorFromTxtFile()
 {
 
-	TString txtFile = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization/references/JFactor/JFactorSegue.txt";
+	TString txtFile = "/home/david/Work/eclipse/workspace/TFG/ObservationOptimization/references/JFactor/JFactorSegue.txt";
 	JDDarkMatter* 	JFactor = new JDDarkMatter(txtFile);
 	JFactor->SetCandidate("Annihilation");
 	JFactor->SetSourceName("Segue");
@@ -496,7 +496,7 @@ void DrawJFactorFromLOS()
 	TString author = "Bonnivard";
 	TString source = "uma2";
 	TString candidate = "Annihilation";
-	TString mySourcePath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization";
+	TString mySourcePath = "/home/david/Work/eclipse/workspace/TFG/ObservationOptimization";
 
 	JDDarkMatter* 	JFactor = new JDDarkMatter(author, source, candidate, mySourcePath);
 	TF1* functionJFactorFromLOS = JFactor->GetTF1JFactorFromLOSVsTheta();
@@ -535,7 +535,7 @@ void DrawJFactorFromLOS()
 	leg->SetBorderSize(1);
 	leg->SetTextSize(0.037);
 	leg->Draw();
-	gPad->Modified();
+//	gPad->Modified();
 	gPad->Update();
 
 }
@@ -546,7 +546,7 @@ void exampleJDDarkMatter()
 {
 //	PrintListOfPossibilities();
 
-//	DrawJFactorFromReferences();
+	DrawJFactorFromReferences();
 //	DrawLOSFromReferences();	// (QUIM) this is useful for the DonutMC
 //	DrawNormalizedLOSFromReferences();
 
@@ -556,7 +556,7 @@ void exampleJDDarkMatter()
 
 //	DrawJFactorFromTxtFile();
 
-	DrawJFactorFromLOS();
+//	DrawJFactorFromLOS();
 
 
 }
