@@ -5,6 +5,13 @@
  *  Authors: David Navarro Gironés 	<<david.navarro.girones@gmail.com>>
  *  		 Joaquim Palacio 		<<jpalacio@ifae.es>>
  *
+ *
+ *			 THIS CLASS IS THE ONE RELATED WITH THE DARK MATTER DATA.
+ *			 WITH THIS CLASS YOU CAN EVALUATE THE JFACTOR VS THETA, THE LOS VS THETA AND PHI, THE JFACTOR OBTAINED BY INTEGRATING THE LOS
+ *  		 VARIABLES:
+ *  		 	THETA 	[DEG]
+ *  		 	PHI	  	[RAD]
+ *  		 	OFFSET	[DEG]
  *  		 ADD A GENERAL DESCRIPTION ON THE CLASS, THE MAIN FUNCTIONS, THE VARIABLES
  *  		 AND MENTION THE "runExample#.C" THAT SHOWS HOW TO USE IT
  */

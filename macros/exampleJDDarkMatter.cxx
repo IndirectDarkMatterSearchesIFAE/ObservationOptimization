@@ -5,6 +5,7 @@
  *  Authors: David Navarro Gironés 	<<david.navarro.girones@gmail.com>>
  *  		 Joaquim Palacio 		<<jpalacio@ifae.es>>
  *
+ *
  *  		 ADD A GENERAL DESCRIPTION ON THE CLASS, THE MAIN FUNCTIONS, THE VARIABLES
  *  		 AND MENTION THE "runExample#.C" THAT SHOWS HOW TO USE IT
  */
@@ -28,8 +29,6 @@
 
 //this works home
 #include "../source/JDDarkMatter.cc"
-//#include "../source/JDInstrument.cc"
-//#include "../source/JDOptimization.cc"
 
 //#include </home/david/Work/Software/root_v6.06.08/include/TStyle.h>
 
