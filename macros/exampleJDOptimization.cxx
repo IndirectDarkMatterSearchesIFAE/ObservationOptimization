@@ -126,6 +126,7 @@ void PlotQ1Factor() // J_on/Sqrt{theta^2 + J_off}
 	Double_t wobbleDist=.4;	// [deg]
 
 	JDOptimization* QFactor = new JDOptimization(txtFile, instrumentName, distanceCameraCenterMax, wobbleDist);
+	TH2D* histQFactorVsThetaWobble= QFactor->GetTH2QFactorVsThetaWobble(1,0.1,0.4);
 	TF2* functionQFactorVsThetaWobble= QFactor->GetTF2QFactorVsThetaWobble(1,0.1,0.4);
 	TF1* functionQFactor0VsTheta= QFactor->GetTF1QFactor0VsTheta();
 	TF1* functionQFactor1VsTheta= QFactor->GetTF1QFactor1VsTheta();
@@ -220,10 +221,26 @@ void PlotQ1Factor() // J_on/Sqrt{theta^2 + J_off}
 	gPad->SetGridy();
 	gPad->SetGridx();
 	functionQFactorVsThetaWobble->Draw("colz same");
-//	cout <<	functionQFactorVsThetaWobble->Eval(0.1,0.1) << endl;
 	gPad->Modified();
 	gPad->Update();
 
+	TCanvas* canvas3 = new TCanvas("canvas3","",600,550);
+	histQFactorVsThetaWobble->Draw("colz");
+	gPad->SetLogx();
+//	gPad->SetLogy();
+	gPad->SetLogz();
+	gPad->SetGridy();
+	gPad->SetGridx();
+	gPad->Modified();
+	gPad->Update();
+
+	Double_t theta,wobble;
+	QFactor->GetOptimalThetaAndWobble(theta,wobble);
+	cout << "   ************************************  " << endl;
+	cout << "   Optimized values have been calculated" << endl;
+	cout << "   theta Optimal = " << theta << " [deg] " << endl;
+	cout << "   wobble Optimal = " << wobble << " [deg] " << endl;
+	cout << "   ************************************  " << endl;
 }
 
 void exampleJDOptimization()

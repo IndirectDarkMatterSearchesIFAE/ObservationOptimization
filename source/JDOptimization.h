@@ -26,11 +26,11 @@ public:
 	void GetListOfQFactors();
 
 
-	TF1* GetTF1EffectiveJFactorFromLOSVsTheta()
-	{
-		if(!GetIsJFactor()) GetWarning();
-		return fIntegrateEffectiveJFactorFromLOSVsTheta;
-	}
+//	TF1* GetTF1EffectiveJFactorFromLOSVsTheta()
+//	{
+//		if(!GetIsJFactor()) GetWarning();
+//		return fIntegrateEffectiveJFactorFromLOSVsTheta;
+//	}
 
 
 	TF1* GetTF1QFactorVsTheta(Int_t type=0, Double_t thetaNorm=1)
@@ -70,8 +70,72 @@ public:
 		return fEvaluateQ1FactorVsTheta;
 	}
 
-//	TH2D* GetTH2DQFactorVsThetaWobble()
-//	void* GetOptimalThetaAndWobble(Double_t &theta, Double_t &wobble)
+	void GetOptimalThetaAndWobble(Double_t &thetaOpt, Double_t &wobbleOpt)
+	{
+		TH2D* h2 = GetTH2QFactorVsThetaWobble();
+		Int_t numBinsX = h2->GetNbinsX();
+		Int_t numBinsY = h2->GetNbinsY();
+
+		Double_t qfactorMax=0;
+
+		for(Int_t i=1; i<numBinsX+1; i++)
+		{
+			for(Int_t j=1; j<numBinsY+1; j++)
+				{
+					Double_t qfactor = h2->GetBinContent(i,j);
+					if(qfactor>qfactorMax)
+					{
+						qfactorMax=qfactor;
+						thetaOpt=h2->ProjectionX()->GetBinCenter(i);
+						wobbleOpt=h2->ProjectionY()->GetBinCenter(j);
+					}
+				}
+		}
+
+		if(qfactorMax>0.)
+		{
+			cout << "   ****************************************" << endl;
+			cout << "   ***                                  ***" << endl;
+			cout << "   ***  Optimal theta and wobble found  ***" << endl;
+			cout << "   ***                                  ***" << endl;
+			cout << "   ****************************************" << endl;
+		}
+		else
+		{
+			cout << "   **************************************************" << endl;
+			cout << "   ***                                            ***" << endl;
+			cout << "   ***  WARNING:                                  ***" << endl;
+			cout << "   ***  problem occurred maximizing the qfactor   ***" << endl;
+			cout << "   ***                                            ***" << endl;
+			cout << "   **************************************************" << endl;
+		}
+
+		return;
+	}
+
+	TH2D* GetTH2QFactorVsThetaWobble(Int_t type=0, Double_t thetaNorm=1, Double_t wobbleNorm=0.4)
+	{
+		TF2* qFactor=GetTF2QFactorVsThetaWobble(type, thetaNorm, wobbleNorm);
+		Double_t resolution = 0.1; 			//[deg/nºbin]
+		Double_t thetaMax = GetThetaMax();		// [deg]
+		Int_t numBinsX = thetaMax/resolution; 	// [nºbins]
+		Double_t wobbleMax = GetDistCameraCenterMax();		// [deg]
+		Int_t numBinsY = wobbleMax/resolution; 				// [nºbins]
+
+
+		TH2D* h2 = new TH2D("h2","",numBinsX,0.,thetaMax,numBinsY,0.,wobbleMax);
+		for(Int_t i=1; i<numBinsX+1; i++)
+		{
+//			cout << i << " " << numBinsX << endl;
+			for(Int_t j=1; j<numBinsY+1; j++)
+				{
+//					cout << j << " " << numBinsY << endl;
+					h2->SetBinContent(i,j,qFactor->Eval(h2->ProjectionX()->GetBinCenter(i),h2->ProjectionY()->GetBinCenter(j)));
+				}
+		}
+
+		return h2;
+	}
 
 
 	TF2* GetTF2QFactorVsThetaWobble(Int_t type=0, Double_t thetaNorm=1, Double_t wobbleNorm=0.4)
