@@ -75,26 +75,6 @@ void PlotQ0Factor()	// J/theta
 	gPad->Modified();
 	gPad->Update();
 
-	TCanvas* canvas2 = new TCanvas("canvas2","",600,550);
-	TH1I* dummy1 = new TH1I("dummy1","" ,1,1e-2,thetaMax);
-	dummy1->SetMaximum(3.);
-	dummy1->SetMinimum(0.);
-	dummy1->SetStats(0);
-	dummy1->SetXTitle(" #theta [deg]");
-	if(QFactor->GetCandidate()=="Annihilation"){	dummy->SetYTitle(" QFactor_{Ann} ");}
-	else if(QFactor->GetCandidate()=="Decay"){	dummy->SetYTitle(" QFactor_{Dec} ");}
-	dummy1->GetXaxis()->SetTitleOffset(1.3);
-	dummy1->GetYaxis()->SetTitleOffset(1.5);
-	dummy1->DrawCopy();
-	gPad->SetLogx();
-//	gPad->SetLogy();
-	gPad->SetGridy();
-	gPad->SetGridx();
-	functionQFactorVsTheta->Draw("same");
-	leg->Draw();
-	gPad->Modified();
-	gPad->Update();
-
 }
 
 //-------------------------------------
