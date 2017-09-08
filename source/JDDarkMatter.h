@@ -35,7 +35,7 @@ public:
 	void SetCandidate(TString candidate) 				{sCandidate=candidate;}
 	void SetAuthor(TString author) 						{sAuthor=author;}
 	void SetThetaMax(Double_t thetaMax) 				{dThetaMax=thetaMax;}
-	void SetIs_m1(Bool_t is_m1)							{bIs_m1=is_m1;}
+	void SetIsMinusSig1(Bool_t isMinusSig1)				{bIsMinusSig1=isMinusSig1;}
 
 	Bool_t SetJFactorFromTGraph(TGraph* jfactor, Bool_t verbose=0);//, Bool_t verbose);
 	Bool_t SetJFactorFromTxtFile(TString txtFile, Bool_t verbose=0);//, Bool_t verbose);
@@ -135,7 +135,7 @@ public:
 	Bool_t GetIsBonnivard() 	{return bIsBonnivard;}
 	Bool_t GetIsGeringer() 		{return bIsGeringer;}
 	Bool_t GetIsJFactor()		{return bIsJFactor;}
-	Bool_t GetIs_m1()			{return bIs_m1;}
+	Bool_t GetIsMinusSig1()		{return bIsMinusSig1;}
 
 protected:
 
@@ -162,8 +162,8 @@ protected:
 	Double_t EvaluateLOSVsTheta(Double_t* x, Double_t* par);
 	Double_t EvaluateNormLOSVsTheta(Double_t* x, Double_t* par);
 
-	Double_t EvaluateLOSThetaVsThetaPhi(Double_t* x, Double_t* par);
-	Double_t EvaluateLOSOffThetaVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t EvaluateLOSThetaVsThetaPhi(Int_t* a=0, Double_t* x, Double_t* par);
+	Double_t EvaluateLOSOffThetaVsThetaPhi(Int_t* a=0, Double_t* x, Double_t* par);
 
 private:
 
@@ -225,7 +225,7 @@ private:
 	Bool_t bIsBonnivard;
 	Bool_t bIsGeringer;
 	Bool_t bIsJFactor;
-	Bool_t bIs_m1;
+	Bool_t bIsMinusSig1;
 
 };
 

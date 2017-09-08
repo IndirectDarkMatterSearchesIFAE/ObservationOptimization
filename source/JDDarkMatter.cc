@@ -144,7 +144,7 @@ JDDarkMatter::JDDarkMatter(TString author, TString source, TString candidate, TS
 		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL), fEvaluateNormLOSVsTheta(NULL),
 		fIntegrateJFactorFromLOSVsTheta(NULL), fIntegrateJFactorOffFromLOSVsTheta(NULL),
 		fEvaluateLOSThetaVsThetaPhi(NULL), fEvaluateLOSOffThetaVsThetaPhi(NULL),
-		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0), bIs_m1(0),
+		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0), bIsMinusSig1(0),
 		dDeg2Rad(TMath::Pi()/180.)
 {
 	cout << endl;
@@ -207,8 +207,8 @@ void JDDarkMatter::CreateFunctionsDM()
 	fIntegrateJFactorFromLOSVsTheta = new TF1("fIntegrateJFactorFromLOSVsTheta",this,&JDDarkMatter::IntegrateJFactorFromLOSVsTheta,0.,GetThetaMax(),0,"JDDarkMatter","IntegrateJFactorFromLOSVsTheta");
 	fIntegrateJFactorOffFromLOSVsTheta = new TF1("fIntegrateJFactorOffFromLOSVsTheta",this,&JDDarkMatter::IntegrateJFactorOffFromLOSVsTheta,0.,GetThetaMax(),1,"JDDarkMatter","IntegrateJFactorOffFromLOSVsTheta");
 
-	fEvaluateLOSThetaVsThetaPhi = new TF2("fEvaluateLOSThetaVsThetaPhi", this, &JDDarkMatter::EvaluateLOSThetaVsThetaPhi,0.,GetThetaMax(),-TMath::Pi(),TMath::Pi(),0, "JDDarkMatter", "EvaluateLOSThetaVsThetaPhi");
-	fEvaluateLOSOffThetaVsThetaPhi = new TF2("fEvaluateLOSOffThetaVsThetaPhi", this, &JDDarkMatter::EvaluateLOSOffThetaVsThetaPhi,0.,GetThetaMax(),-TMath::Pi(),TMath::Pi(),1, "JDDarkMatter", "EvaluateLOSOffThetaVsThetaPhi");
+	fEvaluateLOSThetaVsThetaPhi = new TF2("fEvaluateLOSThetaVsThetaPhi", this, &JDDarkMatter::EvaluateLOSThetaVsThetaPhi,0.,GetThetaMax(),0.,2*TMath::Pi(),0, "JDDarkMatter", "EvaluateLOSThetaVsThetaPhi");
+	fEvaluateLOSOffThetaVsThetaPhi = new TF2("fEvaluateLOSOffThetaVsThetaPhi", this, &JDDarkMatter::EvaluateLOSOffThetaVsThetaPhi,0.,GetThetaMax(),0.,2*TMath::Pi(),1, "JDDarkMatter", "EvaluateLOSOffThetaVsThetaPhi");
 
 }
 
@@ -467,7 +467,7 @@ void JDDarkMatter::ReadJFactorGeringer(Bool_t verbose)
 // x[0] 	= dTheta [deg]
 Double_t JDDarkMatter::TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par)
 {
-	if (GetIs_m1()==0)
+	if (GetIsMinusSig1()==0)
 	{
 		cout<<"Estic al JFactor"<<endl;
 		return gJFactor->Eval(x[0]);
@@ -543,11 +543,19 @@ Double_t JDDarkMatter::EvaluateNormLOSVsTheta(Double_t* x, Double_t* par)
 // x[0]		= theta	[deg]
 // x[1]		= phi	[rad]
 // par[0]	= offset	[deg]
-Double_t JDDarkMatter::EvaluateLOSThetaVsThetaPhi(Double_t* x, Double_t* par)
+Double_t JDDarkMatter::EvaluateLOSThetaVsThetaPhi(Int_t* a=0, Double_t* x, Double_t* par)
 {
 	Double_t X0rad =x[0]*dDeg2Rad;	// x[0] in radians
 
-	return fEvaluateLOSVsTheta->Eval(x[0])*X0rad;//Per què ha d'estar en radians?
+	if (a==0)
+	{
+	return fEvaluateLOSVsTheta->Eval(x[0])*TMath::Sin(X0rad);//Per què ha d'estar en radians?
+	}
+
+	else
+	{
+	return fEvaluateLOSVsTheta->Eval(x[0])*X0rad;
+	}
 }
 
 //----------------------------------------------------
@@ -556,13 +564,21 @@ Double_t JDDarkMatter::EvaluateLOSThetaVsThetaPhi(Double_t* x, Double_t* par)
 // x[0]		= theta	[deg]
 // x[1]		= phi	[rad]
 // par[0]	= offset	[deg]
-Double_t JDDarkMatter::EvaluateLOSOffThetaVsThetaPhi(Double_t* x, Double_t* par)
+Double_t JDDarkMatter::EvaluateLOSOffThetaVsThetaPhi(Int_t* a=0, Double_t* x, Double_t* par)
 {
 	Double_t X0rad =x[0]/180.*TMath::Pi();	// x[0] in radians
 
-	Double_t distFromHalo=TMath::Sqrt(x[0]*x[0]+par[0]*par[0]+2*x[0]*par[0]*TMath::Cos(x[1]));
+	Double_t distFromHalo=TMath::Sqrt(x[0]*x[0]+par[0]*par[0]-2*x[0]*par[0]*TMath::Cos(x[1])+(TMath::Pi()/2));
 
+	if (a==0)
+	{
+	return fEvaluateLOSVsTheta->Eval(distFromHalo)*TMath::Sin(X0rad);
+	}
+
+	else
+	{
 	return fEvaluateLOSVsTheta->Eval(distFromHalo)*X0rad;
+	}
 }
 
 void JDDarkMatter::GetListOfCandidates()

@@ -208,9 +208,9 @@ void JDInstrument::CreateFunctionsInstrument()
 	fEvaluateEpsilonVsTheta = new TF1("fEvaluateEpsilonVsTheta", this, &JDInstrument::EvaluateEpsilonVsTheta, 0., GetDistCameraCenterMax(), 0, "JDInstrument", "EvaluateEpsilonVsTheta");
 	fEvaluateEfficiencyVsTheta = new TF1("fEvaluateEfficiencyVsTheta", this, &JDInstrument::EvaluateEfficiencyVsTheta, 0., GetDistCameraCenterMax(), 0, "JDInstrument", "EvaluateEfficiencyVsTheta");
 
-	fEvaluateEpsilonVsThetaAndPhi = new TF2("fEvaluateEpsilonVsThetaAndPhi", this, &JDInstrument::EvaluateEpsilonVsThetaAndPhi, 0., GetDistCameraCenterMax(), -TMath::Pi(), TMath::Pi(), 1, "JDInstrument", "EvaluateEpsilonVsThetaAndPhi");
+	fEvaluateEpsilonVsThetaAndPhi = new TF2("fEvaluateEpsilonVsThetaAndPhi", this, &JDInstrument::EvaluateEpsilonVsThetaAndPhi, 0., GetDistCameraCenterMax(), 0., 2*TMath::Pi(), 1, "JDInstrument", "EvaluateEpsilonVsThetaAndPhi");
 	fEvaluateEpsilonVsXAndY = new TF2("fEvaluateEpsilonVsXAndY", this, &JDInstrument::EvaluateEpsilonVsXAndY, -GetDistCameraCenterMax(), GetDistCameraCenterMax(), -GetDistCameraCenterMax(), GetDistCameraCenterMax(), 1, "JDInstrument", "EvaluateEpsilonVsXAndY");
-	fEvaluateEpsilonThetaVsThetaAndPhi = new TF2("fEvaluateEpsilonThetaVsThetaAndPhi", this, &JDInstrument::EvaluateEpsilonThetaVsThetaAndPhi, 0., GetDistCameraCenterMax(), -TMath::Pi(), TMath::Pi(), 1, "JDInstrument", "EvaluateEpsilonThetaVsThetaAndPhi");
+	fEvaluateEpsilonThetaVsThetaAndPhi = new TF2("fEvaluateEpsilonThetaVsThetaAndPhi", this, &JDInstrument::EvaluateEpsilonThetaVsThetaAndPhi, 0., GetDistCameraCenterMax(), 0., 2*TMath::Pi(), 1, "JDInstrument", "EvaluateEpsilonThetaVsThetaAndPhi");
 }
 
 //-----------------------------------------------
@@ -398,7 +398,7 @@ Double_t JDInstrument::EvaluateEpsilonVsThetaAndPhi(Double_t* x, Double_t* par)
 	//		(see triangle slide-2)
 	// ISSUE: I think the reason why is +, is what you have said.
 	//		 - Power(a,0.50) =? Sqrt()
-	Double_t dccR = TMath::Power(TMath::Power(par[0],2)+TMath::Power(x[0],2)+2*par[0]*x[0]*TMath::Cos(x[1]),0.50);
+	Double_t dccR = TMath::Power(TMath::Power(par[0],2)+TMath::Power(x[0],2)-2*par[0]*x[0]*TMath::Cos(x[1]+(TMath::Pi()/2)),0.50);
 
 	if (dccR<=GetDistCameraCenterMax()) {	return gCameraAcceptance->Eval(dccR);}
 	else							 	{  return 1.e-20;}							// To make integrals converge
