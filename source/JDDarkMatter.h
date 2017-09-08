@@ -35,6 +35,7 @@ public:
 	void SetCandidate(TString candidate) 				{sCandidate=candidate;}
 	void SetAuthor(TString author) 						{sAuthor=author;}
 	void SetThetaMax(Double_t thetaMax) 				{dThetaMax=thetaMax;}
+	void SetIs_m1(Bool_t is_m1)							{bIs_m1=is_m1;}
 
 	Bool_t SetJFactorFromTGraph(TGraph* jfactor, Bool_t verbose=0);//, Bool_t verbose);
 	Bool_t SetJFactorFromTxtFile(TString txtFile, Bool_t verbose=0);//, Bool_t verbose);
@@ -107,6 +108,8 @@ public:
 		return fEvaluateLOSOffThetaVsThetaPhi;
 	}
 
+
+
 	///////////////////////////////////////////////////////
 	//Double_t
 	///////////////////////////////////////////////////////
@@ -132,7 +135,7 @@ public:
 	Bool_t GetIsBonnivard() 	{return bIsBonnivard;}
 	Bool_t GetIsGeringer() 		{return bIsGeringer;}
 	Bool_t GetIsJFactor()		{return bIsJFactor;}
-
+	Bool_t GetIs_m1()			{return bIs_m1;}
 
 protected:
 
@@ -150,7 +153,7 @@ protected:
 	//OTHERS********
 
 	void CreateFunctionsDM();
-	void ReadJFactorBonnivard(Bool_t verbose=0);
+	void ReadJFactorBonnivard(Bool_t verbose=0); //is_m1=0 -> JFactor; is_m1=1 -> JFactor_m1
 	void ReadJFactorGeringer(Bool_t verbose=0);
 
 	Double_t TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par);
@@ -196,6 +199,7 @@ private:
 	// (QUIM) you can specify here how this JFactor is going to be filled,
 	// make explicit that the same TGraph is used for Bon/Ger & Ann/Dec
 	TGraph* gJFactor;
+	TGraph* gJFactor_m1;
 
 	///////////////////////////////////////////////////////
 	//TF1
@@ -221,6 +225,7 @@ private:
 	Bool_t bIsBonnivard;
 	Bool_t bIsGeringer;
 	Bool_t bIsJFactor;
+	Bool_t bIs_m1;
 
 };
 

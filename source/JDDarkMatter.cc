@@ -144,7 +144,7 @@ JDDarkMatter::JDDarkMatter(TString author, TString source, TString candidate, TS
 		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL), fEvaluateNormLOSVsTheta(NULL),
 		fIntegrateJFactorFromLOSVsTheta(NULL), fIntegrateJFactorOffFromLOSVsTheta(NULL),
 		fEvaluateLOSThetaVsThetaPhi(NULL), fEvaluateLOSOffThetaVsThetaPhi(NULL),
-		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0),
+		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0), bIs_m1(0),
 		dDeg2Rad(TMath::Pi()/180.)
 {
 	cout << endl;
@@ -294,7 +294,7 @@ Bool_t JDDarkMatter::SetJFactorFromReferences(Bool_t verbose)
 
 		SetIsBonnivard(1);
 
-		ReadJFactorBonnivard(verbose);
+		ReadJFactorBonnivard();
 		return 1;
 	}
 	else if (GetAuthor() == "Geringer")
@@ -308,7 +308,7 @@ Bool_t JDDarkMatter::SetJFactorFromReferences(Bool_t verbose)
 
 		SetIsGeringer(1);
 
-		ReadJFactorGeringer(verbose);
+		ReadJFactorGeringer();
 		return 1;
 	}
 
@@ -330,6 +330,7 @@ void JDDarkMatter::ReadJFactorBonnivard(Bool_t verbose)
 	Int_t contador = 0;
 
 	gJFactor = new TGraph();
+	gJFactor_m1 = new TGraph();
 
 	Double_t dJ, dJ_m1, dJ_p1, dJ_m2, dJ_p2;
 	Double_t theta; // [deg]
@@ -347,7 +348,9 @@ void JDDarkMatter::ReadJFactorBonnivard(Bool_t verbose)
 			ifstream file (GetSourcePath()+"references/JFactor/Bonnivard/"+GetSourceName()+"_Dalphaint_cls_READ.output");
 					while(file >> theta >> dJ >> dJ_m1 >> dJ_p1 >> dJ_m2 >> dJ_p2)
 					{
+
 						gJFactor->SetPoint(contador,theta,(dJ*(TMath::Power(SolarMass2GeV,1.)/TMath::Power(kpc2cm,2.))));
+						gJFactor_m1->SetPoint(contador,theta,(dJ_m1*(TMath::Power(SolarMass2GeV,1.)/TMath::Power(kpc2cm,2.))));
 
 						// only for Tests
 						if (verbose==1) cout << theta << " " << dJ*(TMath::Power(SolarMass2GeV,1.)/TMath::Power(kpc2cm,2.)) << endl;
@@ -370,6 +373,7 @@ void JDDarkMatter::ReadJFactorBonnivard(Bool_t verbose)
 				while(file >> theta >> dJ >> dJ_m1 >> dJ_p1 >> dJ_m2 >> dJ_p2)
 				{
 					gJFactor->SetPoint(contador,theta,(dJ*(TMath::Power(SolarMass2GeV,2.)/TMath::Power(kpc2cm,5.))));
+					gJFactor_m1->SetPoint(contador,theta,(dJ*(TMath::Power(SolarMass2GeV,2.)/TMath::Power(kpc2cm,5.))));
 
 					// only for Tests
 					if (verbose==1) cout << theta << " " << dJ*(TMath::Power(SolarMass2GeV,2.)/TMath::Power(kpc2cm,5.)) << endl;
@@ -417,6 +421,7 @@ void JDDarkMatter::ReadJFactorGeringer(Bool_t verbose)
 		}
 
 	gJFactor = new TGraph();
+	gJFactor_m1 = new TGraph();
 
 	TString name;
 	Double_t LogJann2m, LogJann1m, LogJann, LogJann1p, LogJann2p;
@@ -430,8 +435,17 @@ void JDDarkMatter::ReadJFactorGeringer(Bool_t verbose)
 			>> LogJdec2m >> LogJdec1m >> LogJdec >> LogJdec1p >> LogJdec2p
 			>> a >> b >> c >> d >> e >> f >> g >> h >> i >> j)
 		{
-			if(GetCandidate() == "Decay")				gJFactor->SetPoint(contador, theta, TMath::Power(10., LogJdec));
-			else if (GetCandidate() == "Annihilation")	gJFactor->SetPoint(contador, theta, TMath::Power(10., LogJann));
+			if(GetCandidate() == "Decay")
+			{
+				gJFactor->SetPoint(contador, theta, TMath::Power(10., LogJdec));
+				gJFactor_m1->SetPoint(contador, theta, TMath::Power(10., LogJdec1m));
+			}
+
+			else if (GetCandidate() == "Annihilation")
+			{
+				gJFactor->SetPoint(contador, theta, TMath::Power(10., LogJann));
+				gJFactor_m1->SetPoint(contador, theta, TMath::Power(10., LogJann1m));
+			}
 			else
 				{
 					cout<<"ERROR: Candidate is not valid"<<endl;
@@ -453,7 +467,16 @@ void JDDarkMatter::ReadJFactorGeringer(Bool_t verbose)
 // x[0] 	= dTheta [deg]
 Double_t JDDarkMatter::TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par)
 {
-	return gJFactor->Eval(x[0]);
+	if (GetIs_m1()==0)
+	{
+		cout<<"Estic al JFactor"<<endl;
+		return gJFactor->Eval(x[0]);
+	}
+	else
+	{
+		cout<<"Estic al JFactor_m1"<<endl;
+	return gJFactor_m1->Eval(x[0]);
+	}
 }
 
 //-----------------------------------------------
@@ -537,7 +560,7 @@ Double_t JDDarkMatter::EvaluateLOSOffThetaVsThetaPhi(Double_t* x, Double_t* par)
 {
 	Double_t X0rad =x[0]/180.*TMath::Pi();	// x[0] in radians
 
-	Double_t distFromHalo=TMath::Sqrt(x[0]*x[0]+par[0]*par[0]-2*x[0]*par[0]*TMath::Cos(x[1]));
+	Double_t distFromHalo=TMath::Sqrt(x[0]*x[0]+par[0]*par[0]+2*x[0]*par[0]*TMath::Cos(x[1]));
 
 	return fEvaluateLOSVsTheta->Eval(distFromHalo)*X0rad;
 }

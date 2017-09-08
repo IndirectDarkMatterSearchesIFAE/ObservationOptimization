@@ -290,7 +290,7 @@ Bool_t JDInstrument::SetCameraAcceptanceFromTxtFile(TString txtFile, Bool_t verb
 	}
 
 	SetNumPointsCameraAcceptanceGraph(contador);
-	SetDistCenterCameraMax(DisCenterCamera);
+	SetDistCenterCameraMax(DistCenterCamera);
 	file.close();
 
 	if(GetNumPointsCameraAcceptanceGraph()<=0) return 0;
