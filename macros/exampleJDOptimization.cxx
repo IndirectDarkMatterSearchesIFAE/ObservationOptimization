@@ -110,13 +110,21 @@ void PlotQ1Factor() // J_on/Sqrt{theta^2 + J_off}
 	TString instrumentName= "IDEAL";
 	Double_t distanceCameraCenterMax=5;	// [deg]
 	Double_t wobbleDist=1.;	// [deg]
-	Double_t normalizationPoint=8.8136e+19;
 
 	JDOptimization* QFactor = new JDOptimization(author, source, candidate, mySourcePath, instrumentName, distanceCameraCenterMax, wobbleDist);
 	TF1* functionQFactorVsTheta = QFactor->GetTF1QFactorVsTheta(1,0.4);
 //	TF2* functionQFactorVsThetaWobble= QFactor->GetTF2QFactorVsThetaWobble(1,0.1,0.4);
 
 
+
+
+	TH2D* histQFactorVsThetaWobble= QFactor->GetTH2QFactorVsThetaWobble(1,0.1,0.4);
+	TF2* functionQFactorVsThetaWobble= QFactor->GetTF2QFactorVsThetaWobble(1,0.1,0.4);
+//	TF1* functionQFactor0VsTheta= QFactor->GetTF1QFactor0VsTheta();
+//	TF1* functionQFactor1VsTheta= QFactor->GetTF1QFactor1VsTheta();
+//	TF1* functionJFactorVsTheta= QFactor->GetTF1JFactorFromLOSVsTheta();
+//	TF1* functionJFactorOffVsTheta= QFactor->GetTF1JFactorOffFromLOSVsTheta();
+	QFactor->SetCandidate("Annihilation");
 	Double_t thetaMax = QFactor->GetThetaMax();
 	Double_t distCameraCenterMax = QFactor->GetDistCameraCenterMax();
 
@@ -421,10 +429,28 @@ void PlotQ3Factor()
 //	gPad->SetLogy();
 	gPad->SetGridy();
 	gPad->SetGridx();
-	functionQFactorVsTheta->Draw("same");
-	leg->Draw();
+//	functionQFactorVsTheta->Draw("same");
+//	functionQFactorVsThetaWobble->Draw("colz same");
 	gPad->Modified();
 	gPad->Update();
+
+	TCanvas* canvas3 = new TCanvas("canvas3","",600,550);
+//	histQFactorVsThetaWobble->Draw("colz");
+	gPad->SetLogx();
+//	gPad->SetLogy();
+	gPad->SetLogz();
+	gPad->SetGridy();
+	gPad->SetGridx();
+	gPad->Modified();
+	gPad->Update();
+
+	Double_t theta,wobble;
+	QFactor->GetOptimalThetaAndWobble(theta,wobble);
+	cout << "   ************************************  " << endl;
+	cout << "   Optimized values have been calculated" << endl;
+	cout << "   theta Optimal = " << theta << " [deg] " << endl;
+	cout << "   wobble Optimal = " << wobble << " [deg] " << endl;
+	cout << "   ************************************  " << endl;
 }
 void exampleJDOptimization()
 {
@@ -432,9 +458,9 @@ void exampleJDOptimization()
 //  Combined Class
 ///////////////////////////////////////////////////////////////
 
-//	PlotQ0Factor();		// 	J/theta
-//	PlotQ1Factor();		//	J_on/Sqrt{theta^2+J_off}
-	PlotQ2Factor();		//  J_1sm/theta
+	PlotQ0Factor();		// 	J/theta
+	PlotQ1Factor();		//	J_on/Sqrt{theta^2+J_off}
+//	PlotQ2Factor();		//  J_1sm/theta
 //	PlotQ3Factor();		//  J_eff/theta_eff
 
 
