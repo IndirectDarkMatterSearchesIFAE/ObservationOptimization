@@ -23,6 +23,7 @@ public:
 	JDInstrument();
 	JDInstrument(Double_t distanceCameraCenterMax, Double_t wobbleDist);
 	JDInstrument(TGraph* cameraAcceptance,Double_t wobbleDist);
+	JDInstrument(TString txtFile, Double_t wobbleDist);
 	JDInstrument(TString instrumentName, Double_t wobble, TString instrumentPath);
 	virtual ~JDInstrument();
 
@@ -42,10 +43,10 @@ public:
 	TString GetInstrumentName()			{return sInstrumentName;}
 	TString GetInstrumentPath()			{return sInstrumentPath;}
 
-	Int_t GetNumPointsJFactorGraph()	{return iNumPointsCameraAcceptanceGraph;}
+	Int_t GetNumPointsCameraAcceptanceGraph()	{return iNumPointsCameraAcceptanceGraph;}
 
 	Double_t GetDistCameraCenterMax()	{return dDistCenterCameraMax;}
-	Double_t GetThetaMax()				{return dThetaMax;}
+//	Double_t GetThetaMax()				{return dThetaMax;}
 	Double_t GetWobbleDistance()		{return dWobbleDist;}
 
 	TF1* GetTF1EpsilonVsTheta()
@@ -86,6 +87,7 @@ protected:
 	Bool_t SetCameraAcceptanceIdeal(Double_t distanceCenterCameraMax);
 	Bool_t SetCameraAcceptanceFromInstrument(Bool_t verbose = 0);
 	Bool_t SetCameraAcceptanceFromTGraph(TGraph* cameraAcceptance, Bool_t verbose = 0);
+	Bool_t SetCameraAcceptanceFromTxtFile(TString txtFile, Bool_t verbose = 0);
 
 	void SetNumPointsCameraAcceptanceGraph(Int_t numPoints)			{iNumPointsCameraAcceptanceGraph=numPoints;}
 
@@ -127,7 +129,7 @@ private:
 
 	Double_t dDistCenterCameraMax;
 	Double_t dWobbleDist;
-	Double_t dThetaMax;
+//	Double_t dThetaMax;
 
 	///////////////////////////////////////////////////////
 	//TGraph

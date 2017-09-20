@@ -2,7 +2,7 @@
  * DM.h
  *
  *  Created on: 03/07/2017
- *  Authors: David Navarro Gironés 	<<david.navarrogir@e-campus.uab.cat>>
+ *  Authors: David Navarro Gironés 	<<david.navarro.girones@gmail.com>>
  *  		 Joaquim Palacio 		<<jpalacio@ifae.es>>
  *
  *  		 ADD A GENERAL DESCRIPTION ON THE CLASS, THE MAIN FUNCTIONS, THE VARIABLES
@@ -35,9 +35,10 @@ public:
 	void SetCandidate(TString candidate) 				{sCandidate=candidate;}
 	void SetAuthor(TString author) 						{sAuthor=author;}
 	void SetThetaMax(Double_t thetaMax) 				{dThetaMax=thetaMax;}
+	void SetIsMinusSig1(Bool_t isMinusSig1)				{bIsMinusSig1=isMinusSig1;}
 
-	Bool_t SetJFactorFromTGraph(TGraph* jfactor);//, Bool_t verbose);
-	Bool_t SetJFactorFromTxtFile(TString txtFile);//, Bool_t verbose);
+	Bool_t SetJFactorFromTGraph(TGraph* jfactor, Bool_t verbose=0);//, Bool_t verbose);
+	Bool_t SetJFactorFromTxtFile(TString txtFile, Bool_t verbose=0);//, Bool_t verbose);
 
 	//Getters********
 
@@ -91,14 +92,21 @@ public:
 		return fEvaluateNormLOSVsTheta;
 	}
 
-	TF1* GetTF2LOSVsTheta()
-	{
-		if(!GetIsJFactor()) GetWarning();
-		return fEvaluateLOSVsTheta;
-	}
 	///////////////////////////////////////////////////////
 	//TF2
 	///////////////////////////////////////////////////////
+
+	TF2* GetTF2LOSThetaVSThetaPhi()
+	{
+		if(!GetIsJFactor()) GetWarning();
+		return fEvaluateLOSThetaVsThetaPhi;
+	}
+
+	TF2* GetTF2LOSOffThetaVSThetaPhi()
+	{
+		if(!GetIsJFactor()) GetWarning();
+		return fEvaluateLOSOffThetaVsThetaPhi;
+	}
 
 
 
@@ -127,7 +135,7 @@ public:
 	Bool_t GetIsBonnivard() 	{return bIsBonnivard;}
 	Bool_t GetIsGeringer() 		{return bIsGeringer;}
 	Bool_t GetIsJFactor()		{return bIsJFactor;}
-
+	Bool_t GetIsMinusSig1()		{return bIsMinusSig1;}
 
 protected:
 
@@ -145,18 +153,17 @@ protected:
 	//OTHERS********
 
 	void CreateFunctionsDM();
-	void ReadJFactorBonnivard(Bool_t verbose=0);
+	void ReadJFactorBonnivard(Bool_t verbose=0); //is_m1=0 -> JFactor; is_m1=1 -> JFactor_m1
 	void ReadJFactorGeringer(Bool_t verbose=0);
 
 	Double_t TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par);
 	Double_t IntegrateJFactorFromLOSVsTheta(Double_t* x, Double_t* par);
 	Double_t IntegrateJFactorOffFromLOSVsTheta(Double_t* x, Double_t* par);
 	Double_t EvaluateLOSVsTheta(Double_t* x, Double_t* par);
-	Double_t EvaluateLOSThetaVsTheta(Double_t* x, Double_t* par);
 	Double_t EvaluateNormLOSVsTheta(Double_t* x, Double_t* par);
 
-	Double_t EvaluateLOSThetaVsThetaPhi(Double_t* x, Double_t* par);
-	Double_t EvaluateLOSOffThetaVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t EvaluateLOSThetaVsThetaPhi(Int_t* a=0, Double_t* x, Double_t* par);
+	Double_t EvaluateLOSOffThetaVsThetaPhi(Int_t* a=0, Double_t* x, Double_t* par);
 
 private:
 
@@ -192,6 +199,7 @@ private:
 	// (QUIM) you can specify here how this JFactor is going to be filled,
 	// make explicit that the same TGraph is used for Bon/Ger & Ann/Dec
 	TGraph* gJFactor;
+	TGraph* gJFactor_m1;
 
 	///////////////////////////////////////////////////////
 	//TF1
@@ -199,7 +207,6 @@ private:
 
 	TF1* fEvaluateJFactorVsTheta;
 	TF1* fEvaluateLOSVsTheta;
-	TF1* fEvaluateLOSThetaVsTheta;
 	TF1* fEvaluateNormLOSVsTheta;
 	TF1* fIntegrateJFactorFromLOSVsTheta;
 	TF1* fIntegrateJFactorOffFromLOSVsTheta;
@@ -218,6 +225,7 @@ private:
 	Bool_t bIsBonnivard;
 	Bool_t bIsGeringer;
 	Bool_t bIsJFactor;
+	Bool_t bIsMinusSig1;
 
 };
 

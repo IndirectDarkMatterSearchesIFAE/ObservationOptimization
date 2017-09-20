@@ -25,11 +25,7 @@
 #include <iostream>
 #include <TStyle.h>
 
-#include "../source/JDDarkMatter.cc"
 #include "../source/JDInstrument.cc"
-#include "../source/JDOptimization.cc"
-
-
 
 using namespace std;
 
@@ -40,7 +36,7 @@ void PrintListOfPossibilities()
 	JDInstrument* Epsilon = new JDInstrument();
 	Epsilon->GetListOfInstruments();
 	Epsilon->GetUnits();
-//	Epsilon->GetListOfConstructors();
+	Epsilon->GetListOfConstructors();
 
 }
 
@@ -82,9 +78,6 @@ void PlotCameraAcceptanceFromIDEAL()
 	functionCameraAcceptance->Draw("same");
 
 	TF2* functionCameraAcceptanceVsThetaAndPhi = Epsilon->GetTF2EpsilonVsThetaAndPhi();
-	Double_t distCamCenterMax = Epsilon->GetDistCameraCenterMax();
-	// This is for plotting purposes only
-	TString isIDEAL = (Epsilon->GetIsIdeal()? "IDEAL" : "");
 
 	TCanvas* canvas1 = new TCanvas("canvas1","",600,550);
 	TH2I* dummy1 = new TH2I("dummy1", "Camera Acceptance",1,0.,distCamCenterMax, 1, -TMath::Pi(), TMath::Pi());
@@ -170,7 +163,7 @@ void PlotCameraAcceptanceFromMAGIC()
 
 	TString instrumentName= "MAGICPointLike";
 	Double_t wobble=0.4;	// [deg]
-	TString myInstrumentPath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization";
+	TString myInstrumentPath = "/home/david/Work/eclipse/workspace/TFG/ObservationOptimization";
 
 	JDInstrument* Epsilon = new JDInstrument(instrumentName, wobble, myInstrumentPath);
 	TF1* functionCameraAcceptance = Epsilon->GetTF1EpsilonVsTheta();
@@ -204,9 +197,7 @@ void PlotCameraAcceptanceFromMAGIC()
 	gPad->Update();
 
 	TF2* functionCameraAcceptanceVsThetaAndPhi = Epsilon->GetTF2EpsilonVsThetaAndPhi();
-	Double_t distCamCenterMax = Epsilon->GetDistCameraCenterMax();
 	// This is for plotting purposes only
-	TString isIDEAL = (Epsilon->GetIsIdeal()? "IDEAL" : "");
 
 	TCanvas* canvas1 = new TCanvas("canvas1","",600,550);
 	TH2I* dummy1 = new TH2I("dummy1", "Camera Acceptance",1,0.,distCamCenterMax, 1, -TMath::Pi(), TMath::Pi());
@@ -338,9 +329,6 @@ void PlotCameraAcceptanceFromTGraph()
 	gPad->Update();
 
 	TF2* functionCameraAcceptanceVsThetaAndPhi = Epsilon->GetTF2EpsilonVsThetaAndPhi();
-	Double_t distCamCenterMax = Epsilon->GetDistCameraCenterMax();
-	// This is for plotting purposes only
-	TString isIDEAL = (Epsilon->GetIsIdeal()? "IDEAL" : "");
 
 	TCanvas* canvas1 = new TCanvas("canvas1","",600,550);
 	TH2I* dummy1 = new TH2I("dummy1", "Camera Acceptance",1,0.,distCamCenterMax, 1, -TMath::Pi(), TMath::Pi());
@@ -431,6 +419,121 @@ void PlotEfficiencyFromTGraph()
 	gPad->Update();
 }
 
+void PlotCameraAcceptanceFromTxtFile()
+{
+	TString txtFile = "/home/david/Work/eclipse/workspace/TFG/ObservationOptimization/references/JFactor/JFactorSegue.txt";
+
+	TString instrumentName= "TEST";
+	Double_t wobble=0.4;	// [deg]
+
+	JDInstrument* Epsilon = new JDInstrument(txtFile,wobble);
+	Epsilon->SetInstrumentName(instrumentName);
+	TF1* functionCameraAcceptance = Epsilon->GetTF1EpsilonVsTheta();
+	Double_t distCamCenterMax = Epsilon->GetDistCameraCenterMax();
+
+	TLegend* leg=new TLegend(.18,.75,.80,.85);
+	leg->AddEntry(functionCameraAcceptance, Epsilon->GetInstrumentName()+Form("(w=%2.1f [deg])",Epsilon->GetWobbleDistance()),"l");
+	leg->SetFillColor(0);
+	leg->SetLineColor(1);
+	leg->SetBorderSize(1);
+	leg->SetTextSize(0.037);
+
+	TCanvas* canvas = new TCanvas("canvas","",600,550);
+	TH1I* dummy = new TH1I("dummy", "Camera Acceptance",1,0.,distCamCenterMax);
+	dummy->SetMaximum(1.5);
+	dummy->SetMinimum(0.);
+	dummy->SetStats(0);
+	dummy->SetXTitle(" distCamCenter [deg]");
+	dummy->SetYTitle(" Camera Acceptance [%]");
+	dummy->GetXaxis()->SetTitleOffset(1.3);
+	dummy->GetYaxis()->SetTitleOffset(1.5);
+	dummy->DrawCopy();
+	gPad->SetGridy();
+	gPad->SetGridx();
+	functionCameraAcceptance->Draw("same");
+	leg->Draw();
+	gPad->Modified();
+	gPad->Update();
+
+	TF2* functionCameraAcceptanceVsThetaAndPhi = Epsilon->GetTF2EpsilonVsThetaAndPhi();
+
+	TCanvas* canvas1 = new TCanvas("canvas1","",600,550);
+	TH2I* dummy1 = new TH2I("dummy1", "Camera Acceptance",1,0.,distCamCenterMax, 1, -TMath::Pi(), TMath::Pi());
+	dummy1->SetMaximum(1.5);
+	dummy1->SetMinimum(0.);
+	dummy1->SetStats(0);
+	dummy1->SetXTitle(" #Theta [deg]");
+	dummy1->SetYTitle(" #Phi [rad]");
+	dummy1->GetXaxis()->SetTitleOffset(1.3);
+	dummy1->GetYaxis()->SetTitleOffset(1.3);
+	dummy1->DrawCopy();
+	gPad->SetGridy();
+	gPad->SetGridx();
+	functionCameraAcceptanceVsThetaAndPhi->Draw("colz same");
+	leg->Draw();
+	gPad->Modified();
+	gPad->Update();
+
+	TF2* functionCameraAcceptanceVsXAndY = Epsilon->GetTF2EpsilonVsXAndY();
+
+	TCanvas* canvas2 = new TCanvas("canvas2","",600,550);
+	TH2I* dummy2 = new TH2I("dummy2", "Camera Acceptance",1,-distCamCenterMax,distCamCenterMax, 1, -distCamCenterMax,distCamCenterMax);
+	dummy2->SetMaximum(1.5);
+	dummy2->SetMinimum(0.);
+	dummy2->SetStats(0);
+	dummy2->SetXTitle(" #Theta_{x} [deg]");
+	dummy2->SetYTitle(" #Theta_{y} [deg]");
+	dummy2->GetXaxis()->SetTitleOffset(1.3);
+	dummy2->GetYaxis()->SetTitleOffset(1.3);
+	dummy2->DrawCopy();
+	gPad->SetGridy();
+	gPad->SetGridx();
+	functionCameraAcceptanceVsXAndY->Draw("colz same");
+	leg->Draw();
+	gPad->Modified();
+	gPad->Update();
+
+}
+
+void 	PlotEfficiencyFromTxtFile()
+{
+	TString txtFile = "/home/david/Work/eclipse/workspace/TFG/ObservationOptimization/references/JFactor/JFactorSegue.txt";
+
+	TString instrumentName= "TEST";
+	Double_t wobble=0.4;	// [deg]
+
+	JDInstrument* Epsilon = new JDInstrument(txtFile,wobble);
+	Epsilon->SetInstrumentName(instrumentName);
+	TF1* functionEfficientyVsTheta = Epsilon->GetTF1EfficiencyVsTheta();
+	Double_t distCamCenterMax = Epsilon->GetDistCameraCenterMax();
+
+	// This is for plotting purposes only
+	TString isMAGIC = (Epsilon->GetIsMAGIC()? "MAGICPointLike-arxiv:1409.5594" : "");
+
+	TLegend* leg=new TLegend(.18,.75,.80,.85);
+	leg->AddEntry(functionEfficientyVsTheta, Epsilon->GetInstrumentName()+Form("(w=%2.1f [deg])",Epsilon->GetWobbleDistance()),"l");
+	leg->SetFillColor(0);
+	leg->SetLineColor(1);
+	leg->SetBorderSize(1);
+	leg->SetTextSize(0.037);
+
+	TCanvas* canvas = new TCanvas("canvas","",600,550);
+	TH1I* dummy = new TH1I("dummy", "Efficiency",1,0.,distCamCenterMax);
+	dummy->SetMaximum(1.5);
+	dummy->SetMinimum(0.);
+	dummy->SetStats(0);
+	dummy->SetXTitle(" #Theta [deg]");
+	dummy->SetYTitle(" Efficiency [%]");
+	dummy->GetXaxis()->SetTitleOffset(1.3);
+	dummy->GetYaxis()->SetTitleOffset(1.5);
+	dummy->DrawCopy();
+	gPad->SetGridy();
+	gPad->SetGridx();
+	functionEfficientyVsTheta->Draw("same");
+	leg->Draw();
+	gPad->Modified();
+	gPad->Update();
+}
 void exampleJDInstrument()
 {
 //	PrintListOfPossibilities();
@@ -438,7 +541,7 @@ void exampleJDInstrument()
 //	PlotCameraAcceptanceFromIDEAL();
 //	PlotEfficiencyFromIDEAL();
 
-//	PlotCameraAcceptanceFromMAGIC();
+	PlotCameraAcceptanceFromMAGIC();
 //	PlotEfficiencyFromMAGIC();
 
 //	PlotCameraAcceptanceFromCTA(); 	// (QUIM)
@@ -447,4 +550,6 @@ void exampleJDInstrument()
 //	PlotCameraAcceptanceFromTGraph();
 //	PlotEfficiencyFromTGraph();
 
+//	PlotCameraAcceptanceFromTxtFile();
+//	PlotEfficiencyFromTxtFile();
 }
