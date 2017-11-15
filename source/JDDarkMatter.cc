@@ -74,7 +74,7 @@ JDDarkMatter::JDDarkMatter(TGraph* jfactor):
 		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL), fEvaluateNormLOSVsTheta(NULL),
 		fIntegrateJFactorFromLOSVsTheta(NULL), fIntegrateJFactorOffFromLOSVsTheta(NULL),
 		fEvaluateLOSThetaVsThetaPhi(NULL), fEvaluateLOSOffThetaVsThetaPhi(NULL),
-		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0),
+		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0), bIsSphericalCoordinates(1),
 		dDeg2Rad(TMath::Pi()/180.)
 {
 	cout << endl;
@@ -104,7 +104,7 @@ JDDarkMatter::JDDarkMatter(TString txtFile):
 		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL), fEvaluateNormLOSVsTheta(NULL),
 		fIntegrateJFactorFromLOSVsTheta(NULL), fIntegrateJFactorOffFromLOSVsTheta(NULL),
 		fEvaluateLOSThetaVsThetaPhi(NULL), fEvaluateLOSOffThetaVsThetaPhi(NULL),
-		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0),
+		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0), bIsSphericalCoordinates(1),
 		dDeg2Rad(TMath::Pi()/180.)
 {
 	cout << endl;
@@ -144,7 +144,7 @@ JDDarkMatter::JDDarkMatter(TString author, TString source, TString candidate, TS
 		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL), fEvaluateLOSVsTheta(NULL), fEvaluateNormLOSVsTheta(NULL),
 		fIntegrateJFactorFromLOSVsTheta(NULL), fIntegrateJFactorOffFromLOSVsTheta(NULL),
 		fEvaluateLOSThetaVsThetaPhi(NULL), fEvaluateLOSOffThetaVsThetaPhi(NULL),
-		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0), bIsMinusSig1(0),
+		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0), bIsSphericalCoordinates(1),
 		dDeg2Rad(TMath::Pi()/180.)
 {
 	cout << endl;
@@ -202,14 +202,26 @@ void JDDarkMatter::CreateFunctionsDM()
 {
 
 	fEvaluateJFactorVsTheta = new TF1("fEvaluateJFactorVsTheta",this,&JDDarkMatter::TGraphEvaluateJFactorVsTheta,0.,GetThetaMax(),0,"JDDarkMatter","TGraphEvaluateJFactorVsTheta");
+	fEvaluateJFactor_m1VsTheta = new TF1("fEvaluateJFactor_m1VsTheta",this,&JDDarkMatter::TGraphEvaluateJFactor_m1VsTheta,0.,GetThetaMax(),0,"JDDarkMatter","TGraphEvaluateJFactor_m1VsTheta");
+
 	fEvaluateLOSVsTheta = new TF1("fEvaluateLOSVsTheta", this, &JDDarkMatter::EvaluateLOSVsTheta,0.,GetThetaMax(),0, "JDDarkMatter", "EvaluateLOSVsTheta");
+	fEvaluateLOS_m1VsTheta = new TF1("fEvaluateLOS_m1VsTheta", this, &JDDarkMatter::EvaluateLOS_m1VsTheta,0.,GetThetaMax(),0, "JDDarkMatter", "EvaluateLOS_m1VsTheta");
+
 	fEvaluateNormLOSVsTheta = new TF1("fEvaluateNormLOSVsTheta", this, &JDDarkMatter::EvaluateNormLOSVsTheta, 0., GetThetaMax() , 1, "JDDarkMatter", "EvaluateNormLOSVsTheta");
+	fEvaluateNormLOS_m1VsTheta = new TF1("fEvaluateNormLOS_m1VsTheta", this, &JDDarkMatter::EvaluateNormLOS_m1VsTheta, 0., GetThetaMax() , 1, "JDDarkMatter", "EvaluateNormLOS_m1VsTheta");
+
 	fIntegrateJFactorFromLOSVsTheta = new TF1("fIntegrateJFactorFromLOSVsTheta",this,&JDDarkMatter::IntegrateJFactorFromLOSVsTheta,0.,GetThetaMax(),0,"JDDarkMatter","IntegrateJFactorFromLOSVsTheta");
+	fIntegrateJFactor_m1FromLOSVsTheta = new TF1("fIntegrateJFactor_m1FromLOSVsTheta",this,&JDDarkMatter::IntegrateJFactor_m1FromLOSVsTheta,0.,GetThetaMax(),0,"JDDarkMatter","IntegrateJFactor_m1FromLOSVsTheta");
+
 	fIntegrateJFactorOffFromLOSVsTheta = new TF1("fIntegrateJFactorOffFromLOSVsTheta",this,&JDDarkMatter::IntegrateJFactorOffFromLOSVsTheta,0.,GetThetaMax(),1,"JDDarkMatter","IntegrateJFactorOffFromLOSVsTheta");
+	fIntegrateJFactor_m1OffFromLOSVsTheta = new TF1("fIntegrateJFactor_m1OffFromLOSVsTheta",this,&JDDarkMatter::IntegrateJFactor_m1OffFromLOSVsTheta,0.,GetThetaMax(),1,"JDDarkMatter","IntegrateJFactor_m1OffFromLOSVsTheta");
 
+	fEvaluateQFactorVsTheta = new TF1("fEvaluateQFactorVsTheta", this, &JDDarkMatter::EvaluateQFactorVsTheta, 0., GetThetaMax(), 0, "JDDarkMatter", "TGraphEvaluateJFactorVsTheta");
 	fEvaluateLOSThetaVsThetaPhi = new TF2("fEvaluateLOSThetaVsThetaPhi", this, &JDDarkMatter::EvaluateLOSThetaVsThetaPhi,0.,GetThetaMax(),0.,2*TMath::Pi(),0, "JDDarkMatter", "EvaluateLOSThetaVsThetaPhi");
-	fEvaluateLOSOffThetaVsThetaPhi = new TF2("fEvaluateLOSOffThetaVsThetaPhi", this, &JDDarkMatter::EvaluateLOSOffThetaVsThetaPhi,0.,GetThetaMax(),0.,2*TMath::Pi(),1, "JDDarkMatter", "EvaluateLOSOffThetaVsThetaPhi");
+	fEvaluateLOS_m1ThetaVsThetaPhi = new TF2("fEvaluateLOS_m1ThetaVsThetaPhi", this, &JDDarkMatter::EvaluateLOS_m1ThetaVsThetaPhi,0.,GetThetaMax(),0.,2*TMath::Pi(),0, "JDDarkMatter", "EvaluateLOS_m1ThetaVsThetaPhi");
 
+	fEvaluateLOSOffThetaVsThetaPhi = new TF2("fEvaluateLOSOffThetaVsThetaPhi", this, &JDDarkMatter::EvaluateLOSOffThetaVsThetaPhi,0.,GetThetaMax(),0.,2*TMath::Pi(),1, "JDDarkMatter", "EvaluateLOSOffThetaVsThetaPhi");
+	fEvaluateLOS_m1OffThetaVsThetaPhi = new TF2("fEvaluateLOS_m1OffThetaVsThetaPhi", this, &JDDarkMatter::EvaluateLOS_m1OffThetaVsThetaPhi,0.,GetThetaMax(),0.,2*TMath::Pi(),1, "JDDarkMatter", "EvaluateLOS_m1OffThetaVsThetaPhi");
 }
 
 //-----------------------------------------------
@@ -249,17 +261,26 @@ Bool_t JDDarkMatter::SetJFactorFromTxtFile(TString txtFile, Bool_t verbose)//, B
 	Int_t contador=0;
 
 	gJFactor = new TGraph();
+	gJFactor_m1 = new TGraph();
+
+	while(contador==0)
+	{
+		gJFactor->SetPoint(contador,0.,0.);
+		gJFactor_m1->SetPoint(contador,0.,0.);
+
+		contador ++;
+	}
 
 	ifstream file (txtFile);
 	while(file >> theta >> dJ)
 	{
 		// only for Tests
-		if (verbose==1)	cout << theta << " " << dJ << endl;
-
+//		if (verbose==1)	cout << theta << " " << dJ << endl;
+//		cout << theta << " " << dJ << endl;
 		gJFactor->SetPoint(contador,theta,dJ);
+		gJFactor_m1->SetPoint(contador, theta, dJ);
 
-
-		if(contador==0) SetJFactorMin(dJ);
+		if(contador==1) SetJFactorMin(dJ);
 
 		contador ++;
 	}
@@ -342,10 +363,16 @@ void JDDarkMatter::ReadJFactorBonnivard(Bool_t verbose)
 			cout << " " << endl;
 		}
 
+	if (GetCandidate() == "Decay")
+	{
+			while(contador==0)
+			{
+				gJFactor->SetPoint(contador,0.,0.);
+				gJFactor_m1->SetPoint(contador,0.,0.);
+				contador ++;
+			}
 
-		if (GetCandidate() == "Decay")
-		{
-			ifstream file (GetSourcePath()+"references/JFactor/Bonnivard/"+GetSourceName()+"_Dalphaint_cls_READ.output");
+			ifstream file (GetSourcePath()+"/references/JFactor/Bonnivard/"+GetSourceName()+"_Dalphaint_cls_READ.output");
 					while(file >> theta >> dJ >> dJ_m1 >> dJ_p1 >> dJ_m2 >> dJ_p2)
 					{
 
@@ -354,7 +381,7 @@ void JDDarkMatter::ReadJFactorBonnivard(Bool_t verbose)
 
 						// only for Tests
 						if (verbose==1) cout << theta << " " << dJ*(TMath::Power(SolarMass2GeV,1.)/TMath::Power(kpc2cm,2.)) << endl;
-						if(contador==0) SetJFactorMin(dJ*(TMath::Power(SolarMass2GeV,1.)/TMath::Power(kpc2cm,2.)));
+						if(contador==1) SetJFactorMin(dJ*(TMath::Power(SolarMass2GeV,1.)/TMath::Power(kpc2cm,2.)));
 
 						contador ++;
 					}
@@ -369,15 +396,23 @@ void JDDarkMatter::ReadJFactorBonnivard(Bool_t verbose)
 
 		else if(GetCandidate() == "Annihilation")
 		{
+
+			while(contador==0)
+						{
+							gJFactor->SetPoint(contador,0.,0.);
+							gJFactor_m1->SetPoint(contador,0.,0.);
+							contador ++;
+						}
+
 			ifstream file (GetSourcePath()+"/references/JFactor/Bonnivard/"+GetSourceName()+"_Jalphaint_cls_READ.output");
 				while(file >> theta >> dJ >> dJ_m1 >> dJ_p1 >> dJ_m2 >> dJ_p2)
 				{
 					gJFactor->SetPoint(contador,theta,(dJ*(TMath::Power(SolarMass2GeV,2.)/TMath::Power(kpc2cm,5.))));
-					gJFactor_m1->SetPoint(contador,theta,(dJ*(TMath::Power(SolarMass2GeV,2.)/TMath::Power(kpc2cm,5.))));
+					gJFactor_m1->SetPoint(contador,theta,(dJ_m1*(TMath::Power(SolarMass2GeV,2.)/TMath::Power(kpc2cm,5.))));
 
 					// only for Tests
 					if (verbose==1) cout << theta << " " << dJ*(TMath::Power(SolarMass2GeV,2.)/TMath::Power(kpc2cm,5.)) << endl;
-					if(contador==0) SetJFactorMin(dJ*(TMath::Power(SolarMass2GeV,2.)/TMath::Power(kpc2cm,5.)));
+					if(contador==1) SetJFactorMin(dJ*(TMath::Power(SolarMass2GeV,2.)/TMath::Power(kpc2cm,5.)));
 
 					contador ++;
 				}
@@ -429,7 +464,14 @@ void JDDarkMatter::ReadJFactorGeringer(Bool_t verbose)
 	Double_t a,b,c,d,e,f,g,h,i,j;
 	Double_t theta; // [deg]
 
-	ifstream file (GetSourcePath()+"references/JFactor/GeringerSameth/GeringerSamethTable_"+GetSourceName()+".txt");
+	while(contador==0)
+				{
+					gJFactor->SetPoint(contador,0.,0.);
+					gJFactor_m1->SetPoint(contador,0.,0.);
+					contador ++;
+				}
+
+	ifstream file (GetSourcePath()+"/references/JFactor/GeringerSameth/GeringerSamethTable_"+GetSourceName()+".txt");
 	while(file	>> name >> theta
 			>> LogJann2m >> LogJann1m >> LogJann >> LogJann1p >> LogJann2p
 			>> LogJdec2m >> LogJdec1m >> LogJdec >> LogJdec1p >> LogJdec2p
@@ -437,24 +479,28 @@ void JDDarkMatter::ReadJFactorGeringer(Bool_t verbose)
 		{
 			if(GetCandidate() == "Decay")
 			{
+				if(contador==1) SetJFactorMin(TMath::Power(10., LogJdec));
 				gJFactor->SetPoint(contador, theta, TMath::Power(10., LogJdec));
 				gJFactor_m1->SetPoint(contador, theta, TMath::Power(10., LogJdec1m));
 			}
 
 			else if (GetCandidate() == "Annihilation")
 			{
+				if(contador==1) SetJFactorMin(TMath::Power(10., LogJann));
 				gJFactor->SetPoint(contador, theta, TMath::Power(10., LogJann));
 				gJFactor_m1->SetPoint(contador, theta, TMath::Power(10., LogJann1m));
 			}
 			else
-				{
-					cout<<"ERROR: Candidate is not valid"<<endl;
-					cout<<"Possibilities are: DECAY or ANNIHILATION"<<endl;
-					break;
-				}
+			{
+				cout<<"ERROR: Candidate is not valid"<<endl;
+				cout<<"Possibilities are: DECAY or ANNIHILATION"<<endl;
+				break;
+			}
 			contador ++;
 		}
 		SetNumPointsJFactorGraph(contador);
+		if(GetCandidate()== "Decay"){SetJFactorMax(TMath::Power(10., LogJdec));}
+		else if (GetCandidate()=="Annihilation"){SetJFactorMax(TMath::Power(10., LogJann));}
 		SetThetaMax(theta);
 		file.close();
 		SetIsJFactor(1);
@@ -467,16 +513,16 @@ void JDDarkMatter::ReadJFactorGeringer(Bool_t verbose)
 // x[0] 	= dTheta [deg]
 Double_t JDDarkMatter::TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par)
 {
-	if (GetIsMinusSig1()==0)
-	{
-		cout<<"Estic al JFactor"<<endl;
 		return gJFactor->Eval(x[0]);
-	}
-	else
-	{
-		cout<<"Estic al JFactor_m1"<<endl;
-	return gJFactor_m1->Eval(x[0]);
-	}
+}
+
+//-----------------------------------------------
+// It evaluates the TGraph JFactor_m1 [~GeV, ~cm] vs Theta [deg]
+//
+// x[0] 	= dTheta [deg]
+Double_t JDDarkMatter::TGraphEvaluateJFactor_m1VsTheta(Double_t* x, Double_t* par)
+{
+		return gJFactor_m1->Eval(x[0]);
 }
 
 //-----------------------------------------------
@@ -485,7 +531,18 @@ Double_t JDDarkMatter::TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par)
 // x[0] 	= dTheta [deg]
 Double_t JDDarkMatter::IntegrateJFactorFromLOSVsTheta(Double_t* x, Double_t* par)
 {
-	return fEvaluateLOSThetaVsThetaPhi->Integral(0.,x[0],0.,2*TMath::Pi(),1e-6);
+//	if(par[0]==0)
+	return fEvaluateLOSThetaVsThetaPhi->Integral(0.,x[0],0.,2*TMath::Pi(),1e-2);
+}
+
+//-----------------------------------------------
+// It integrates the LOS [~GeV, ~cm] vs Theta [deg] and Phi [rad] multiplied by Theta [deg] in order to obtain the JFactor_m1 [~GeV, ~cm]
+//
+// x[0] 	= dTheta [deg]
+Double_t JDDarkMatter::IntegrateJFactor_m1FromLOSVsTheta(Double_t* x, Double_t* par)
+{
+//	if(par[0]==0)
+	return fEvaluateLOS_m1ThetaVsThetaPhi->Integral(0.,x[0],0.,2*TMath::Pi(),1e-2);
 }
 
 //-----------------------------------------------
@@ -496,7 +553,18 @@ Double_t JDDarkMatter::IntegrateJFactorFromLOSVsTheta(Double_t* x, Double_t* par
 Double_t JDDarkMatter::IntegrateJFactorOffFromLOSVsTheta(Double_t* x, Double_t* par)
 {
 	fEvaluateLOSOffThetaVsThetaPhi->SetParameter(0,par[0]);
-	return fEvaluateLOSOffThetaVsThetaPhi->Integral(0.,x[0],0.,2*TMath::Pi(),1e-6);
+	return fEvaluateLOSOffThetaVsThetaPhi->Integral(0.,x[0],0.,2*TMath::Pi(),1e-2);
+}
+
+//-----------------------------------------------
+// It integrates the LOS [~GeV, ~cm] vs Theta [deg] and Phi [rad] on the OFF region multiplied by Theta [deg] in order to obtain the JFactor_m1 [~GeV, ~cm]
+//
+// x[0] 	= dTheta [deg]
+// par[0] 	= offset [deg]
+Double_t JDDarkMatter::IntegrateJFactor_m1OffFromLOSVsTheta(Double_t* x, Double_t* par)
+{
+	fEvaluateLOS_m1OffThetaVsThetaPhi->SetParameter(0,par[0]);
+	return fEvaluateLOS_m1OffThetaVsThetaPhi->Integral(0.,x[0],0.,2*TMath::Pi(),1e-2);
 }
 
 //----------------------------------------------------
@@ -510,6 +578,17 @@ Double_t JDDarkMatter::EvaluateLOSVsTheta(Double_t* x, Double_t* par)
 }
 
 //----------------------------------------------------
+// 	It evaluates the LOS [~GeV, ~cm] vs Theta [deg]
+//	The LOS is calculated from the derivative of the JFactor_m1 divided by 2*PI*Sin(theta)
+//
+// 	x[0]		= theta	[deg]
+Double_t JDDarkMatter::EvaluateLOS_m1VsTheta(Double_t* x, Double_t* par)
+{
+	return fEvaluateJFactor_m1VsTheta->Derivative(x[0])/(2*TMath::Pi()*TMath::Sin(x[0]*dDeg2Rad));
+}
+
+
+//----------------------------------------------------
 // 	It evaluates the LOS [~GeV, ~cm] vs Theta [deg] normalized with the LOS at a certain Theta
 //
 // 	x[0]		= theta	[deg]
@@ -517,6 +596,16 @@ Double_t JDDarkMatter::EvaluateLOSVsTheta(Double_t* x, Double_t* par)
 Double_t JDDarkMatter::EvaluateNormLOSVsTheta(Double_t* x, Double_t* par)
 {
 	return fEvaluateJFactorVsTheta->Derivative(x[0])/fEvaluateJFactorVsTheta->Derivative(par[0]);
+}
+
+//----------------------------------------------------
+// 	It evaluates the LOS_m1 [~GeV, ~cm] vs Theta [deg] normalized with the LOS_m1 at a certain Theta
+//
+// 	x[0]		= theta	[deg]
+// par[0] 		= offset [deg]
+Double_t JDDarkMatter::EvaluateNormLOS_m1VsTheta(Double_t* x, Double_t* par)
+{
+	return fEvaluateJFactor_m1VsTheta->Derivative(x[0])/fEvaluateJFactor_m1VsTheta->Derivative(par[0]);
 }
 
 ////----------------------------------------------------
@@ -543,11 +632,11 @@ Double_t JDDarkMatter::EvaluateNormLOSVsTheta(Double_t* x, Double_t* par)
 // x[0]		= theta	[deg]
 // x[1]		= phi	[rad]
 // par[0]	= offset	[deg]
-Double_t JDDarkMatter::EvaluateLOSThetaVsThetaPhi(Int_t* a=0, Double_t* x, Double_t* par)
+Double_t JDDarkMatter::EvaluateLOSThetaVsThetaPhi(Double_t* x, Double_t* par)
 {
 	Double_t X0rad =x[0]*dDeg2Rad;	// x[0] in radians
 
-	if (a==0)
+	if (GetIsSphericalCoordinates()==1)
 	{
 	return fEvaluateLOSVsTheta->Eval(x[0])*TMath::Sin(X0rad);//Per què ha d'estar en radians?
 	}
@@ -559,18 +648,39 @@ Double_t JDDarkMatter::EvaluateLOSThetaVsThetaPhi(Int_t* a=0, Double_t* x, Doubl
 }
 
 //----------------------------------------------------
+// It evaluates the LOS_m1 vs Theta. The LOS is calculated from the derivative of the JFactor divided by 2*PI*Sin(theta)
+//
+// x[0]		= theta	[deg]
+// x[1]		= phi	[rad]
+// par[0]	= offset	[deg]
+Double_t JDDarkMatter::EvaluateLOS_m1ThetaVsThetaPhi(Double_t* x, Double_t* par)
+{
+	Double_t X0rad =x[0]*dDeg2Rad;	// x[0] in radians
+
+	if (GetIsSphericalCoordinates()==1)
+	{
+	return fEvaluateLOS_m1VsTheta->Eval(x[0])*TMath::Sin(X0rad);//Per què ha d'estar en radians?
+	}
+
+	else
+	{
+	return fEvaluateLOS_m1VsTheta->Eval(x[0])*X0rad;
+	}
+}
+
+//----------------------------------------------------
 // It evaluates the LOS vs Theta. The LOS is calculated from the derivative of the JFactor divided by 2*PI*Sin(theta)
 //
 // x[0]		= theta	[deg]
 // x[1]		= phi	[rad]
 // par[0]	= offset	[deg]
-Double_t JDDarkMatter::EvaluateLOSOffThetaVsThetaPhi(Int_t* a=0, Double_t* x, Double_t* par)
+Double_t JDDarkMatter::EvaluateLOSOffThetaVsThetaPhi(Double_t* x, Double_t* par)
 {
 	Double_t X0rad =x[0]/180.*TMath::Pi();	// x[0] in radians
 
-	Double_t distFromHalo=TMath::Sqrt(x[0]*x[0]+par[0]*par[0]-2*x[0]*par[0]*TMath::Cos(x[1])+(TMath::Pi()/2));
+	Double_t distFromHalo=TMath::Sqrt(x[0]*x[0]+par[0]*par[0]-2*x[0]*par[0]*TMath::Cos(x[1]+(TMath::Pi()/2)));
 
-	if (a==0)
+	if (GetIsSphericalCoordinates()==1)
 	{
 	return fEvaluateLOSVsTheta->Eval(distFromHalo)*TMath::Sin(X0rad);
 	}
@@ -579,6 +689,34 @@ Double_t JDDarkMatter::EvaluateLOSOffThetaVsThetaPhi(Int_t* a=0, Double_t* x, Do
 	{
 	return fEvaluateLOSVsTheta->Eval(distFromHalo)*X0rad;
 	}
+}
+
+//----------------------------------------------------
+// It evaluates the LOS_m1 vs Theta. The LOS is calculated from the derivative of the JFactor divided by 2*PI*Sin(theta)
+//
+// x[0]		= theta	[deg]
+// x[1]		= phi	[rad]
+// par[0]	= offset	[deg]
+Double_t JDDarkMatter::EvaluateLOS_m1OffThetaVsThetaPhi(Double_t* x, Double_t* par)
+{
+	Double_t X0rad =x[0]/180.*TMath::Pi();	// x[0] in radians
+
+	Double_t distFromHalo=TMath::Sqrt(x[0]*x[0]+par[0]*par[0]-2*x[0]*par[0]*TMath::Cos(x[1]+(TMath::Pi()/2)));
+
+	if (GetIsSphericalCoordinates()==1)
+	{
+	return fEvaluateLOS_m1VsTheta->Eval(distFromHalo)*TMath::Sin(X0rad);
+	}
+
+	else
+	{
+	return fEvaluateLOS_m1VsTheta->Eval(distFromHalo)*X0rad;
+	}
+}
+
+Double_t JDDarkMatter::EvaluateQFactorVsTheta(Double_t* x, Double_t* par)
+{
+	return (fEvaluateJFactorVsTheta->Eval(x[0])/x[0])/(fEvaluateJFactorVsTheta->Eval(0.1)/0.1);
 }
 
 void JDDarkMatter::GetListOfCandidates()

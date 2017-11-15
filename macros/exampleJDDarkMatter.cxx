@@ -131,8 +131,8 @@ void DrawLOSFromReferences()
 	dummy1->GetXaxis()->SetTitleOffset(1.3);
 	dummy1->GetYaxis()->SetTitleOffset(1.5);
 	dummy1->DrawCopy();
-	gPad->SetLogx();
-	gPad->SetLogy();
+//	gPad->SetLogx();
+//	gPad->SetLogy();
 	gPad->SetGridy();
 	gPad->SetGridx();
 	functionLOS->Draw("same");
@@ -446,12 +446,13 @@ void DrawJFactorFromTxtFile()
 	JFactor->SetCandidate("Annihilation");
 	JFactor->SetSourceName("Segue");
 	TF1* functionJFactor = JFactor->GetTF1JFactorVsTheta();
-	TF1* functionJFactorFromLOS = JFactor->GetTF1JFactorFromLOSVsTheta();
-	functionJFactorFromLOS->SetLineColor(1);
-	functionJFactorFromLOS->SetLineStyle(2);
+//	TF1* functionJFactorFromLOS = JFactor->GetTF1JFactorFromLOSVsTheta();
+//	functionJFactorFromLOS->SetLineColor(1);
+//	functionJFactorFromLOS->SetLineStyle(2);
 
 
 	Double_t thetaMax = JFactor->GetThetaMax();
+	cout<<thetaMax<<endl;
 
 	functionJFactor->SetLineColor(2);
 	functionJFactor->SetLineStyle(1);
@@ -471,7 +472,7 @@ void DrawJFactorFromTxtFile()
 	gPad->SetGridy();
 	gPad->SetGridx();
 	functionJFactor->Draw("same");
-	functionJFactorFromLOS->Draw("same");
+//	functionJFactorFromLOS->Draw("same");
 
 	TLegend* leg=new TLegend(.18,.15,.88,.25);
 	leg->AddEntry(functionJFactor, JFactor->GetSourceName()+" "+JFactor->GetCandidate()+" ("+JFactor->GetAuthor()+")", "l");
@@ -545,7 +546,7 @@ void exampleJDDarkMatter()
 {
 //	PrintListOfPossibilities();
 
-	DrawJFactorFromReferences();
+//	DrawJFactorFromReferences();
 //	DrawLOSFromReferences();	// (QUIM) this is useful for the DonutMC
 //	DrawNormalizedLOSFromReferences();
 
@@ -553,7 +554,7 @@ void exampleJDDarkMatter()
 //	DrawLOSFromTGraph();
 //	DrawNormLOSFromTGraph();
 
-//	DrawJFactorFromTxtFile();
+	DrawJFactorFromTxtFile();
 
 //	DrawJFactorFromLOS();
 
