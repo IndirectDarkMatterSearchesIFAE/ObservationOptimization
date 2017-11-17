@@ -38,7 +38,8 @@ using namespace std;
 JDInstrument::JDInstrument():
 		gCameraAcceptance(NULL), fEvaluateEpsilonVsTheta(NULL), fEvaluateEfficiencyVsTheta(NULL),
 		fEvaluateEpsilonVsThetaAndPhi(NULL), fEvaluateEpsilonVsXAndY(NULL), fEvaluateEpsilonThetaVsThetaAndPhi(NULL),
-		bIsIdeal(0), bIsMagic(0), bIsCameraAcceptance(0)
+		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0), bIsSphericalCoordinates(1),
+		dDeg2Rad(TMath::Pi()/180.)
 {
 	    cout << endl;
 		cout << endl;
@@ -56,15 +57,16 @@ JDInstrument::JDInstrument():
 //	There are two values that have to be given:
 //		distanceCameraCenterMax: Radius of the camera [deg]
 //		wobbleDist: Distance from the centre of the camera where the object of interest is placed [deg]
-JDInstrument::JDInstrument(Double_t distanceCameraCenterMax,Double_t wobbleDist):
-		dWobbleDist(wobbleDist),
+JDInstrument::JDInstrument(Double_t distanceCameraCenterMax,Double_t wobbleDist, TString instrumentName):
+		dWobbleDist(wobbleDist), sInstrumentName(instrumentName),
 		gCameraAcceptance(NULL), fEvaluateEpsilonVsTheta(NULL), fEvaluateEfficiencyVsTheta(NULL),
 		fEvaluateEpsilonVsThetaAndPhi(NULL), fEvaluateEpsilonVsXAndY(NULL), fEvaluateEpsilonThetaVsThetaAndPhi(NULL),
-		bIsIdeal(0), bIsMagic(0), bIsCameraAcceptance(0)
+		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0), bIsSphericalCoordinates(1),
+		dDeg2Rad(TMath::Pi()/180.)
 {
 	    cout << endl;
 		cout << endl;
-		cout << "   Constructor JDInstrument..." << endl;
+		cout << "   Constructor JDInstrument IDEAL..." << endl;
 		cout << endl;
 		cout << endl;
 
@@ -90,7 +92,8 @@ JDInstrument::JDInstrument(TGraph* cameraAcceptance, Double_t wobbleDist):
 		dWobbleDist(wobbleDist),
 		gCameraAcceptance(NULL), fEvaluateEpsilonVsTheta(NULL), fEvaluateEfficiencyVsTheta(NULL),
 		fEvaluateEpsilonVsThetaAndPhi(NULL), fEvaluateEpsilonVsXAndY(NULL), fEvaluateEpsilonThetaVsThetaAndPhi(NULL),
-		bIsIdeal(0), bIsMagic(0), bIsCameraAcceptance(0)
+		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0),  bIsSphericalCoordinates(1),
+		dDeg2Rad(TMath::Pi()/180.)
 {
 	    cout << endl;
 		cout << endl;
@@ -117,7 +120,8 @@ JDInstrument::JDInstrument(TString txtFile, Double_t wobbleDist):
 		dWobbleDist(wobbleDist),
 		gCameraAcceptance(NULL), fEvaluateEpsilonVsTheta(NULL), fEvaluateEfficiencyVsTheta(NULL),
 		fEvaluateEpsilonVsThetaAndPhi(NULL), fEvaluateEpsilonVsXAndY(NULL), fEvaluateEpsilonThetaVsThetaAndPhi(NULL),
-		bIsIdeal(0), bIsMagic(0), bIsCameraAcceptance(0)
+		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0),  bIsSphericalCoordinates(1),
+		dDeg2Rad(TMath::Pi()/180.)
 {
 	cout << endl;
 	cout << endl;
@@ -150,7 +154,8 @@ JDInstrument::JDInstrument(TString instrumentName, Double_t wobble, TString inst
 		sInstrumentName(instrumentName), dWobbleDist(wobble), sInstrumentPath(instrumentPath),
 		gCameraAcceptance(NULL), fEvaluateEpsilonVsTheta(NULL), fEvaluateEfficiencyVsTheta(NULL),
 		fEvaluateEpsilonVsThetaAndPhi(NULL), fEvaluateEpsilonVsXAndY(NULL), fEvaluateEpsilonThetaVsThetaAndPhi(NULL),
-		bIsIdeal(0), bIsMagic(0), bIsCameraAcceptance(0)
+		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0),  bIsSphericalCoordinates(1),
+		dDeg2Rad(TMath::Pi()/180.)
 {
 	    cout << endl;
 		cout << endl;
@@ -206,7 +211,7 @@ void JDInstrument::CreateFunctionsInstrument()
 {
 
 	fEvaluateEpsilonVsTheta = new TF1("fEvaluateEpsilonVsTheta", this, &JDInstrument::EvaluateEpsilonVsTheta, 0., GetDistCameraCenterMax(), 0, "JDInstrument", "EvaluateEpsilonVsTheta");
-	fEvaluateEfficiencyVsTheta = new TF1("fEvaluateEfficiencyVsTheta", this, &JDInstrument::EvaluateEfficiencyVsTheta, 0., GetDistCameraCenterMax(), 0, "JDInstrument", "EvaluateEfficiencyVsTheta");
+	fEvaluateEfficiencyVsTheta = new TF1("fEvaluateEfficiencyVsTheta", this, &JDInstrument::EvaluateEfficiencyVsTheta, 0., GetDistCameraCenterMax(), 1, "JDInstrument", "EvaluateEfficiencyVsTheta");
 
 	fEvaluateEpsilonVsThetaAndPhi = new TF2("fEvaluateEpsilonVsThetaAndPhi", this, &JDInstrument::EvaluateEpsilonVsThetaAndPhi, 0., GetDistCameraCenterMax(), 0., 2*TMath::Pi(), 1, "JDInstrument", "EvaluateEpsilonVsThetaAndPhi");
 	fEvaluateEpsilonVsXAndY = new TF2("fEvaluateEpsilonVsXAndY", this, &JDInstrument::EvaluateEpsilonVsXAndY, -GetDistCameraCenterMax(), GetDistCameraCenterMax(), -GetDistCameraCenterMax(), GetDistCameraCenterMax(), 1, "JDInstrument", "EvaluateEpsilonVsXAndY");
@@ -316,7 +321,7 @@ Bool_t JDInstrument::SetCameraAcceptanceFromInstrument(Bool_t verbose)
 
 	Double_t distanceCenterCamera;					// [deg]
 	Double_t rateVsDistanceCC,rateVsDistanceCC0;	// [deg]
-
+	Double_t sensitivityVsDistanceCC, sensitivityVsDistanceCC0;
 	if(GetInstrumentName()=="IDEAL")
 	{
 		cout << "   "<< endl;
@@ -356,6 +361,63 @@ Bool_t JDInstrument::SetCameraAcceptanceFromInstrument(Bool_t verbose)
 		if(contador>0) return 1;
 	}
 
+	else if(GetInstrumentName()=="CTANorth50To80GeV")
+	{
+		ifstream file (GetInstrumentPath()+"/references/IACTPerformance/CTAperformance/CTANorth50To80GeVSensitivity.txt");
+
+		cout << "   "<< endl;
+		cout << "   Reading camera acceptance from: "<< endl;
+		cout << "   CTA   "<< endl;
+		cout << "   "<< endl;
+		SetIsCTA(1);
+
+		while(file 	>> distanceCenterCamera >> sensitivityVsDistanceCC)
+			{
+				if (contador==0){
+					rateVsDistanceCC0=1/TMath::Power(sensitivityVsDistanceCC,2);
+				}
+
+				if(verbose)cout << distanceCenterCamera  << " " <<  rateVsDistanceCC << endl;
+
+				gCameraAcceptance->SetPoint(contador,distanceCenterCamera,((1/TMath::Power(sensitivityVsDistanceCC,2))/rateVsDistanceCC0));
+
+				contador++;
+			}
+		SetDistCenterCameraMax(distanceCenterCamera);
+		file.close();
+		SetIsCameraAcceptance(1);
+		if(contador>0) return 1;
+	}
+
+	else if(GetInstrumentName()=="Sensitivity")
+	{
+		ifstream file (GetInstrumentPath()+"/references/IACTPerformance/MAGICPointLike/Sensitivity.txt");
+
+		cout << "   "<< endl;
+		cout << "   Reading camera acceptance from: "<< endl;
+		cout << "   CTA   "<< endl;
+		cout << "   "<< endl;
+		SetIsCTA(1);
+
+		while(file 	>> distanceCenterCamera >> sensitivityVsDistanceCC)
+			{
+				if (contador==0)
+				{
+					rateVsDistanceCC0=1/TMath::Power(sensitivityVsDistanceCC,2);
+				}
+
+				gCameraAcceptance->SetPoint(contador,distanceCenterCamera,((1/TMath::Power(sensitivityVsDistanceCC,2))/rateVsDistanceCC0));
+
+				contador++;
+			}
+		SetDistCenterCameraMax(distanceCenterCamera);
+		file.close();
+		SetIsCameraAcceptance(1);
+		if(contador>0) return 1;
+	}
+
+	//CTA north 50-80 Gev, 50-80 TeV. Epsilon ~ 1/(sensitivitat²)
+
 	return 0;
 }
 
@@ -366,7 +428,7 @@ Bool_t JDInstrument::SetCameraAcceptanceFromInstrument(Bool_t verbose)
 Double_t JDInstrument::EvaluateEpsilonVsTheta(Double_t* x, Double_t* par)
 {
 
-	if (x[0]<=GetDistCameraCenterMax()) {	return gCameraAcceptance->Eval(x[0]);}
+	if (x[0]<=GetDistCameraCenterMax()) {  return gCameraAcceptance->Eval(x[0]);}
 	else							 	{  return 1.e-20;}							// To make integrals converge
 }
 
@@ -400,7 +462,7 @@ Double_t JDInstrument::EvaluateEpsilonVsThetaAndPhi(Double_t* x, Double_t* par)
 	//		 - Power(a,0.50) =? Sqrt()
 	Double_t dccR = TMath::Power(TMath::Power(par[0],2)+TMath::Power(x[0],2)-2*par[0]*x[0]*TMath::Cos(x[1]+(TMath::Pi()/2)),0.50);
 
-	if (dccR<=GetDistCameraCenterMax()) {	return gCameraAcceptance->Eval(dccR);}
+	if (dccR<=GetDistCameraCenterMax()) {  return gCameraAcceptance->Eval(dccR);}
 	else							 	{  return 1.e-20;}							// To make integrals converge
 }
 
@@ -414,9 +476,19 @@ Double_t JDInstrument::EvaluateEpsilonVsThetaAndPhi(Double_t* x, Double_t* par)
 //  par[0] = wobble [deg]
 Double_t JDInstrument::EvaluateEpsilonThetaVsThetaAndPhi(Double_t* x, Double_t* par)
 {
+
+	Double_t X0rad =x[0]*dDeg2Rad;
 	fEvaluateEpsilonVsThetaAndPhi->SetParameter(0,par[0]);
 
-	return fEvaluateEpsilonVsThetaAndPhi->Eval(x[0], x[1])*x[0];
+//	if (GetIsSphericalCoordinates()==1)
+//	{
+//		return fEvaluateEpsilonVsThetaAndPhi->Eval(x[0], x[1])*TMath::Sin(X0rad);
+//	}
+//
+//	else
+//	{
+		return fEvaluateEpsilonVsThetaAndPhi->Eval(x[0], x[1])*x[0];
+//	}
 }
 
 //-----------------------------------------------
@@ -426,9 +498,12 @@ Double_t JDInstrument::EvaluateEpsilonThetaVsThetaAndPhi(Double_t* x, Double_t* 
 //	x[0] = theta [deg]
 Double_t JDInstrument::EvaluateEfficiencyVsTheta(Double_t* x, Double_t* par)
 {
-	fEvaluateEpsilonThetaVsThetaAndPhi->SetParameter(0,GetWobbleDistance());
+	Double_t X0rad =x[0]*dDeg2Rad;
+	fEvaluateEpsilonThetaVsThetaAndPhi->SetParameter(0,par[0]);
 
-	return fEvaluateEpsilonThetaVsThetaAndPhi->Integral(0., x[0], -TMath::Pi(), TMath::Pi(), 1.e-4)/(TMath::Pi()*TMath::Power(x[0],2));
+	return fEvaluateEpsilonThetaVsThetaAndPhi->Integral(0., x[0], 0., 2*TMath::Pi(), 1.e-2)/(TMath::Pi()*TMath::Power(x[0],2));
+//	return fEvaluateEpsilonThetaVsThetaAndPhi->Integral(0., x[0], 0., 2*TMath::Pi(), 1.e-6)/((1-TMath::Cos(X0rad))*2*TMath::Pi());
+//	return fEvaluateEpsilonThetaVsThetaAndPhi->Integral(0., X0rad, 0., 2*TMath::Pi(), 1.e-6);
 }
 
 void JDInstrument::GetListOfInstruments()
@@ -445,8 +520,8 @@ void JDInstrument::GetUnits()
 {
 	cout << " " << endl;
 	cout << "    All units are given in:" << endl;
-	cout << "    	- Acceptance ~ %" << endl;
-	cout << "    	- Efficiency ~ %" << endl;
+	cout << "    	- Acceptance ~ [1]" << endl;
+	cout << "    	- Efficiency ~ [1]" << endl;
 	cout << "    	- ~deg" << endl;
 	cout << " " << endl;
 }

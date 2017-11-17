@@ -35,7 +35,7 @@ public:
 	void SetCandidate(TString candidate) 				{sCandidate=candidate;}
 	void SetAuthor(TString author) 						{sAuthor=author;}
 	void SetThetaMax(Double_t thetaMax) 				{dThetaMax=thetaMax;}
-	void SetIsMinusSig1(Bool_t isMinusSig1)				{bIsMinusSig1=isMinusSig1;}
+	void SetIsSphericalCoordinates(Bool_t isSphericalCoordinates)				{bIsSphericalCoordinates=isSphericalCoordinates;}
 
 	Bool_t SetJFactorFromTGraph(TGraph* jfactor, Bool_t verbose=0);//, Bool_t verbose);
 	Bool_t SetJFactorFromTxtFile(TString txtFile, Bool_t verbose=0);//, Bool_t verbose);
@@ -66,10 +66,23 @@ public:
 		return fEvaluateJFactorVsTheta;
 	}
 
+	TF1* GetTF1JFactor_m1VsTheta()
+	{
+		if(!GetIsJFactor()) GetWarning();
+		return fEvaluateJFactor_m1VsTheta;
+	}
+
 	TF1* GetTF1JFactorFromLOSVsTheta()
 	{
 		if(!GetIsJFactor()) GetWarning();
 		return fIntegrateJFactorFromLOSVsTheta;
+	}
+
+
+	TF1* GetTF1JFactor_m1FromLOSVsTheta()
+	{
+		if(!GetIsJFactor()) GetWarning();
+		return fIntegrateJFactor_m1FromLOSVsTheta;
 	}
 
 	TF1* GetTF1JFactorOffFromLOSVsTheta(Double_t offset=20)
@@ -79,10 +92,23 @@ public:
 		return fIntegrateJFactorOffFromLOSVsTheta;
 	}
 
+	TF1* GetTF1JFactor_m1OffFromLOSVsTheta(Double_t offset=20)
+	{
+		if(!GetIsJFactor()) GetWarning();
+		fIntegrateJFactor_m1OffFromLOSVsTheta->SetParameter(0,offset);
+		return fIntegrateJFactor_m1OffFromLOSVsTheta;
+	}
+
 	TF1* GetTF1LOSVsTheta()
 	{
 		if(!GetIsJFactor()) GetWarning();
 		return fEvaluateLOSVsTheta;
+	}
+
+	TF1* GetTF1LOS_m1VsTheta()
+	{
+		if(!GetIsJFactor()) GetWarning();
+		return fEvaluateLOS_m1VsTheta;
 	}
 
 	TF1* GetTF1NormLOSVsTheta(Double_t normTheta)
@@ -90,6 +116,13 @@ public:
 		if(!GetIsJFactor()) GetWarning();
 		fEvaluateNormLOSVsTheta->SetParameter(0,normTheta);
 		return fEvaluateNormLOSVsTheta;
+	}
+
+	TF1* GetTF1NormLOS_m1VsTheta(Double_t normTheta)
+	{
+		if(!GetIsJFactor()) GetWarning();
+		fEvaluateNormLOS_m1VsTheta->SetParameter(0,normTheta);
+		return fEvaluateNormLOS_m1VsTheta;
 	}
 
 	///////////////////////////////////////////////////////
@@ -102,10 +135,22 @@ public:
 		return fEvaluateLOSThetaVsThetaPhi;
 	}
 
+	TF2* GetTF2LOS_m1ThetaVSThetaPhi()
+	{
+		if(!GetIsJFactor()) GetWarning();
+		return fEvaluateLOS_m1ThetaVsThetaPhi;
+	}
+
 	TF2* GetTF2LOSOffThetaVSThetaPhi()
 	{
 		if(!GetIsJFactor()) GetWarning();
 		return fEvaluateLOSOffThetaVsThetaPhi;
+	}
+
+	TF2* GetTF2LOS_m1OffThetaVSThetaPhi()
+	{
+		if(!GetIsJFactor()) GetWarning();
+		return fEvaluateLOS_m1OffThetaVsThetaPhi;
 	}
 
 
@@ -132,10 +177,10 @@ public:
 	//Bool_t
 	///////////////////////////////////////////////////////
 
-	Bool_t GetIsBonnivard() 	{return bIsBonnivard;}
-	Bool_t GetIsGeringer() 		{return bIsGeringer;}
-	Bool_t GetIsJFactor()		{return bIsJFactor;}
-	Bool_t GetIsMinusSig1()		{return bIsMinusSig1;}
+	Bool_t GetIsBonnivard() 					{return bIsBonnivard;}
+	Bool_t GetIsGeringer() 						{return bIsGeringer;}
+	Bool_t GetIsJFactor()						{return bIsJFactor;}
+	Bool_t GetIsSphericalCoordinates()			{return bIsSphericalCoordinates;}
 
 protected:
 
@@ -157,13 +202,28 @@ protected:
 	void ReadJFactorGeringer(Bool_t verbose=0);
 
 	Double_t TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par);
-	Double_t IntegrateJFactorFromLOSVsTheta(Double_t* x, Double_t* par);
-	Double_t IntegrateJFactorOffFromLOSVsTheta(Double_t* x, Double_t* par);
-	Double_t EvaluateLOSVsTheta(Double_t* x, Double_t* par);
-	Double_t EvaluateNormLOSVsTheta(Double_t* x, Double_t* par);
+	Double_t TGraphEvaluateJFactor_m1VsTheta(Double_t* x, Double_t* par);
 
-	Double_t EvaluateLOSThetaVsThetaPhi(Int_t* a=0, Double_t* x, Double_t* par);
-	Double_t EvaluateLOSOffThetaVsThetaPhi(Int_t* a=0, Double_t* x, Double_t* par);
+	Double_t IntegrateJFactorFromLOSVsTheta(Double_t* x, Double_t* par);
+	Double_t IntegrateJFactor_m1FromLOSVsTheta(Double_t* x, Double_t* par);
+
+	Double_t IntegrateJFactorOffFromLOSVsTheta(Double_t* x, Double_t* par);
+	Double_t IntegrateJFactor_m1OffFromLOSVsTheta(Double_t* x, Double_t* par);
+
+	Double_t EvaluateLOSVsTheta(Double_t* x, Double_t* par);
+	Double_t EvaluateLOS_m1VsTheta(Double_t* x, Double_t* par);
+
+	Double_t EvaluateNormLOSVsTheta(Double_t* x, Double_t* par);
+	Double_t EvaluateNormLOS_m1VsTheta(Double_t* x, Double_t* par);
+
+	Double_t EvaluateQFactorVsTheta(Double_t* x, Double_t* par);
+
+
+	Double_t EvaluateLOSThetaVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t EvaluateLOS_m1ThetaVsThetaPhi(Double_t* x, Double_t* par);
+
+	Double_t EvaluateLOSOffThetaVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t EvaluateLOS_m1OffThetaVsThetaPhi(Double_t* x, Double_t* par);
 
 private:
 
@@ -206,17 +266,31 @@ private:
 	///////////////////////////////////////////////////////
 
 	TF1* fEvaluateJFactorVsTheta;
+	TF1* fEvaluateJFactor_m1VsTheta;
+
 	TF1* fEvaluateLOSVsTheta;
+	TF1* fEvaluateLOS_m1VsTheta;
+
 	TF1* fEvaluateNormLOSVsTheta;
+	TF1* fEvaluateNormLOS_m1VsTheta;
+
 	TF1* fIntegrateJFactorFromLOSVsTheta;
+	TF1* fIntegrateJFactor_m1FromLOSVsTheta;
+
 	TF1* fIntegrateJFactorOffFromLOSVsTheta;
+	TF1* fIntegrateJFactor_m1OffFromLOSVsTheta;
+
+	TF1* fEvaluateQFactorVsTheta;
 
 	///////////////////////////////////////////////////////
 	//TF2
 	///////////////////////////////////////////////////////
 
 	TF2* fEvaluateLOSThetaVsThetaPhi;
+	TF2* fEvaluateLOS_m1ThetaVsThetaPhi;
+
 	TF2* fEvaluateLOSOffThetaVsThetaPhi;
+	TF2* fEvaluateLOS_m1OffThetaVsThetaPhi;
 
 	///////////////////////////////////////////////////////
 	//Bool_t
@@ -225,8 +299,7 @@ private:
 	Bool_t bIsBonnivard;
 	Bool_t bIsGeringer;
 	Bool_t bIsJFactor;
-	Bool_t bIsMinusSig1;
-
+	Bool_t bIsSphericalCoordinates;
 };
 
 

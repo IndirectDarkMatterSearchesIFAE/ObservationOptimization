@@ -21,7 +21,7 @@
 class JDInstrument {
 public:
 	JDInstrument();
-	JDInstrument(Double_t distanceCameraCenterMax, Double_t wobbleDist);
+	JDInstrument(Double_t distanceCameraCenterMax, Double_t wobbleDist, TString instrumentName);
 	JDInstrument(TGraph* cameraAcceptance,Double_t wobbleDist);
 	JDInstrument(TString txtFile, Double_t wobbleDist);
 	JDInstrument(TString instrumentName, Double_t wobble, TString instrumentPath);
@@ -38,7 +38,9 @@ public:
 
 	Bool_t GetIsIdeal()						{return bIsIdeal;}
 	Bool_t GetIsMAGIC()						{return bIsMagic;}
+	Bool_t GetIsCTA()						{return bIsCTA;}
 	Bool_t GetIsCameraAcceptance()			{return bIsCameraAcceptance;}
+	Bool_t GetIsSphericalCoordinates()		{return bIsSphericalCoordinates;}
 
 	TString GetInstrumentName()			{return sInstrumentName;}
 	TString GetInstrumentPath()			{return sInstrumentPath;}
@@ -49,15 +51,17 @@ public:
 //	Double_t GetThetaMax()				{return dThetaMax;}
 	Double_t GetWobbleDistance()		{return dWobbleDist;}
 
+
 	TF1* GetTF1EpsilonVsTheta()
 	{
 		if(!GetIsCameraAcceptance()) GetWarning();
 		return fEvaluateEpsilonVsTheta;
 	}
 
-	TF1* GetTF1EfficiencyVsTheta()
+	TF1* GetTF1EfficiencyVsTheta(Double_t WobbleDistance)
 	{
 		if(!GetIsCameraAcceptance()) GetWarning();
+		fEvaluateEfficiencyVsTheta->SetParameter(0, WobbleDistance);
 		return fEvaluateEfficiencyVsTheta;
 	}
 
@@ -66,6 +70,13 @@ public:
 		if(!GetIsCameraAcceptance()) GetWarning();
 		fEvaluateEpsilonVsThetaAndPhi->SetParameter(0,GetWobbleDistance());
 		return fEvaluateEpsilonVsThetaAndPhi;
+	}
+
+	TF2* GetTF2EpsilonThetaVsThetaAndPhi()
+	{
+		if(!GetIsCameraAcceptance()) GetWarning();
+		fEvaluateEpsilonThetaVsThetaAndPhi->SetParameter(0,GetWobbleDistance());
+		return fEvaluateEpsilonThetaVsThetaAndPhi;
 	}
 
 	TF2* GetTF2EpsilonVsXAndY()
@@ -93,6 +104,7 @@ protected:
 
 	void SetIsIdeal(Bool_t isIdeal)									{bIsIdeal=isIdeal;}
 	void SetIsMagic(Bool_t isMagic)									{bIsMagic=isMagic;}
+	void SetIsCTA(Bool_t isCTA)										{bIsCTA=isCTA;}
 	void SetIsCameraAcceptance(Bool_t isCameraAcceptance)			{bIsCameraAcceptance=isCameraAcceptance;}
 	void SetWobbleDist(Double_t wobbleDist)							{dWobbleDist=wobbleDist;}
 
@@ -130,6 +142,8 @@ private:
 	Double_t dDistCenterCameraMax;
 	Double_t dWobbleDist;
 //	Double_t dThetaMax;
+	Double_t dDeg2Rad;
+
 
 	///////////////////////////////////////////////////////
 	//TGraph
@@ -157,7 +171,9 @@ private:
 	///////////////////////////////////////////////////////
 	Bool_t bIsIdeal;
 	Bool_t bIsMagic;
+	Bool_t bIsCTA;
 	Bool_t bIsCameraAcceptance;
+	Bool_t bIsSphericalCoordinates;
 
 };
 

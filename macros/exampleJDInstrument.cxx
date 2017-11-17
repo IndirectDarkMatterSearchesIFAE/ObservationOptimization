@@ -47,9 +47,9 @@ void PlotCameraAcceptanceFromIDEAL()
 
 	TString instrumentName= "IDEAL";
 	Double_t distanceCameraCenterMax=5;	// [deg]
-	Double_t wobbleDist=1.;	// [deg]
+	Double_t wobbleDist=0.;	// [deg]
 
-	JDInstrument* Epsilon = new JDInstrument(distanceCameraCenterMax,wobbleDist);
+	JDInstrument* Epsilon = new JDInstrument(distanceCameraCenterMax,wobbleDist, instrumentName);
 	TF1* functionCameraAcceptance = Epsilon->GetTF1EpsilonVsTheta();
 	Double_t distCamCenterMax = Epsilon->GetDistCameraCenterMax();
 
@@ -80,7 +80,7 @@ void PlotCameraAcceptanceFromIDEAL()
 	TF2* functionCameraAcceptanceVsThetaAndPhi = Epsilon->GetTF2EpsilonVsThetaAndPhi();
 
 	TCanvas* canvas1 = new TCanvas("canvas1","",600,550);
-	TH2I* dummy1 = new TH2I("dummy1", "Camera Acceptance",1,0.,distCamCenterMax, 1, -TMath::Pi(), TMath::Pi());
+	TH2I* dummy1 = new TH2I("dummy1", "Camera Acceptance",1,0.,distCamCenterMax, 1, 0., 2*TMath::Pi());
 	dummy1->SetMaximum(1.5);
 	dummy1->SetMinimum(0.);
 	dummy1->SetStats(0);
@@ -126,8 +126,8 @@ void PlotEfficiencyFromIDEAL()
 	Double_t distanceCameraCenterMax=5;	// [deg]
 	Double_t wobbleDist=1.;	// [deg]
 
-	JDInstrument* Epsilon = new JDInstrument(distanceCameraCenterMax,wobbleDist);
-	TF1* functionEfficientyVsTheta = Epsilon->GetTF1EfficiencyVsTheta();
+	JDInstrument* Epsilon = new JDInstrument(distanceCameraCenterMax,wobbleDist, instrumentName);
+	TF1* functionEfficientyVsTheta = Epsilon->GetTF1EfficiencyVsTheta(0.);
 	Double_t distCamCenterMax = Epsilon->GetDistCameraCenterMax();
 
 	// This is for plotting purposes only
@@ -539,9 +539,9 @@ void exampleJDInstrument()
 //	PrintListOfPossibilities();
 
 //	PlotCameraAcceptanceFromIDEAL();
-//	PlotEfficiencyFromIDEAL();
+	PlotEfficiencyFromIDEAL();
 
-	PlotCameraAcceptanceFromMAGIC();
+//	PlotCameraAcceptanceFromMAGIC();
 //	PlotEfficiencyFromMAGIC();
 
 //	PlotCameraAcceptanceFromCTA(); 	// (QUIM)

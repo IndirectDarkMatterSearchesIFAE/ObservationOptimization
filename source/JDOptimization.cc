@@ -34,26 +34,52 @@
 
 using namespace std;
 
-////-----------------------------------------------
-//// new (QUIM)
-//// CASE OF ENTERING THE DARK MATTER DATA WITH A TXT FILE
-//JDOptimization::JDOptimization(TString txtFile, TString instrumentName, Double_t distCameraCenter, Double_t wobble):
-//fEvaluateQ0FactorVsTheta(NULL), fEvaluateJFactorFromLOS_OnVsTheta(NULL), fEvaluateJFactorFromLOS_OffVsTheta(NULL),
-//fEvaluateJFactorFromLOS_TotalVsTheta(NULL), fEvaluateLOSPerSinusThetaVsDcg(NULL), fEvaluateQFactorFromLOS_TotalVsTheta(NULL),
-//fEvaluateJFactorEffectiveVsTheta(NULL),
-//dDeg2Rad(TMath::Pi()/180.)
-//{
-//	    cout << endl;
-//		cout << endl;
-//		cout << "   Constructor JDOptimization..." << endl;
-//		cout << endl;
-//		cout << endl;
-//
-//		jdDarkMatter= new JDDarkMatter(txtFile);
-//		jdInstrument= new JDInstrument(distCameraCenter, wobble);
-//
-//		CreateFunctions();
-//}
+//-----------------------------------------------
+// new (QUIM)
+// CASE OF ENTERING THE DARK MATTER DATA WITH A TXT FILE
+JDOptimization::	JDOptimization(TString txtFile, TString myInstrumentPath, TString instrumentName, Double_t distCameraCenter, Double_t wobble):
+fEvaluateQ0FactorVsThetaWobble(NULL),fEvaluateQ1FactorVsThetaWobble(NULL),fEvaluateQ2FactorVsThetaWobble(NULL),
+fEvaluateQ0FactorVsTheta(NULL), fEvaluateQ1FactorVsTheta(NULL),fEvaluateQ2FactorVsTheta(NULL), bIsJFactorOnLessOff(1),
+dDeg2Rad(TMath::Pi()/180.)
+{
+
+	cout << endl;
+	cout << endl;
+	cout << "   Constructor JDOptimization..." << endl;
+	cout << endl;
+	cout << endl;
+
+	if (instrumentName == "IDEAL")
+	{
+		jdDarkMatter= new JDDarkMatter(txtFile);
+		jdInstrument= new JDInstrument(distCameraCenter, wobble, instrumentName);
+	}
+
+	else if (instrumentName == "MAGICPointLike" || instrumentName == "Sensitivity")
+	{
+		jdDarkMatter= new JDDarkMatter(txtFile);
+		jdInstrument= new JDInstrument(instrumentName, wobble, myInstrumentPath);
+	}
+
+	else if (instrumentName == "CTANorth50To80GeV")
+	{
+		jdDarkMatter= new JDDarkMatter(txtFile);
+		jdInstrument= new JDInstrument(instrumentName, wobble, myInstrumentPath);
+	}
+
+	else
+	{
+
+		cout << "   "<< endl;
+		cout << "   ERROR: The instrument name chosen is not one of the possibilities "<< endl;
+		cout << "   "<< endl;
+
+		jdInstrument= new JDInstrument();
+		jdInstrument->GetListOfInstruments();
+	}
+
+		CreateFunctions();
+}
 
 ////-----------------------------------------------
 //// new (QUIM)
@@ -68,9 +94,9 @@ using namespace std;
 ////	instrumentName	= (TString) name of the instrument
 ////	wobble			= (Double_t) wobble distance
 ////	myInstrumentPath= (TString) name of the path of the instrument
-JDOptimization::JDOptimization(TString author, TString source, TString candidate, TString mySourcePath, TString instrumentName, Double_t distCameraCenter, Double_t wobble):
+JDOptimization::JDOptimization(TString author, TString source, TString candidate, TString mySourcePath, TString myInstrumentPath, TString instrumentName, Double_t distCameraCenter, Double_t wobble):
 fEvaluateQ0FactorVsThetaWobble(NULL),fEvaluateQ1FactorVsThetaWobble(NULL),fEvaluateQ2FactorVsThetaWobble(NULL),
-fEvaluateQ0FactorVsTheta(NULL), fEvaluateQ1FactorVsTheta(NULL),fEvaluateQ2FactorVsTheta(NULL),
+fEvaluateQ0FactorVsTheta(NULL), fEvaluateQ1FactorVsTheta(NULL),fEvaluateQ2FactorVsTheta(NULL), bIsJFactorOnLessOff(1),
 dDeg2Rad(TMath::Pi()/180.)
 {
 	    cout << endl;
@@ -82,23 +108,29 @@ dDeg2Rad(TMath::Pi()/180.)
 		if (instrumentName == "IDEAL")
 		{
 			jdDarkMatter= new JDDarkMatter(author, source, candidate, mySourcePath);
-			jdInstrument= new JDInstrument(distCameraCenter, wobble);
+			jdInstrument= new JDInstrument(distCameraCenter, wobble, instrumentName);
 		}
 
 		else if (instrumentName == "MAGICPointLike")
 		{
 			jdDarkMatter= new JDDarkMatter(author, source, candidate, mySourcePath);
-			jdInstrument= new JDInstrument(distCameraCenter, wobble);
+			jdInstrument= new JDInstrument(instrumentName, wobble, myInstrumentPath);
 		}
 
-		else if (instrumentName == "CTA")
+		else if (instrumentName == "Sensitivity")
 		{
-			// FALTA L'OPCIÓ D'ENTRAR INFORMACIÓ A PARTIR DE CTA
+			jdDarkMatter= new JDDarkMatter(author, source, candidate, mySourcePath);
+			jdInstrument= new JDInstrument(instrumentName, wobble, myInstrumentPath);
+		}
+
+		else if (instrumentName == "CTANorth50To80GeV")
+		{
+			jdDarkMatter= new JDDarkMatter(author, source, candidate, mySourcePath);
+			jdInstrument= new JDInstrument(instrumentName, wobble, myInstrumentPath);
 		}
 
 		else
 		{
-
 			cout << "   "<< endl;
 			cout << "   ERROR: The instrument name chosen is not one of the possibilities "<< endl;
 			cout << "   "<< endl;
@@ -151,31 +183,48 @@ void JDOptimization::CreateFunctions()
 	// 	LEAKAGE + ACCEPTANCE:	Q4 = int_LOS_On_eff/Sqrt(theta_eff*theta_eff + int_LOS_Off_eff)
 
 	//	J_on/theta
-		fEvaluateQ0FactorVsTheta = new TF1("fEvaluateQ0FactorVsTheta", this, &JDOptimization::EvaluateQ0FactorVsTheta, 0., GetThetaMax(), 1, "JDOptimization", "EvaluateQ0FactorVsTheta");
+		fEvaluateQ0FactorVsTheta = new TF1("fEvaluateQ0FactorVsTheta", this, &JDOptimization::EvaluateQ0FactorVsTheta, 0.001, GetThetaMax(), 1, "JDOptimization", "EvaluateQ0FactorVsTheta");
 	//	J_on/Sqrt{theta^2+J_off}
-		fEvaluateQ1FactorVsTheta = new TF1("fEvaluateQ1FactorVsTheta", this, &JDOptimization::EvaluateQ1FactorVsTheta, 0., GetThetaMax(), 1, "JDOptimization", "EvaluateQ1FactorVsTheta");
+		fEvaluateQ1FactorVsTheta = new TF1("fEvaluateQ1FactorVsTheta", this, &JDOptimization::EvaluateQ1FactorVsTheta, 0.001, GetThetaMax(), 1, "JDOptimization", "EvaluateQ1FactorVsTheta");
 	//	J_m1/theta
-		fEvaluateQ2FactorVsTheta = new TF1("fEvaluateQ2FactorVsTheta", this, &JDOptimization::EvaluateQ2FactorVsTheta, 0., GetThetaMax(), 1, "JDOptimization", "EvaluateQ2FactorVsTheta");
+		fEvaluateQ2FactorVsTheta = new TF1("fEvaluateQ2FactorVsTheta", this, &JDOptimization::EvaluateQ2FactorVsTheta, 0.001, GetThetaMax(), 1, "JDOptimization", "EvaluateQ2FactorVsTheta");
 	//	J_eff/theta_eff
-		fEvaluateQ3FactorVsTheta = new TF1("fEvaluateQ3FactorVsTheta", this, &JDOptimization::EvaluateQ3FactorVsTheta, 0., GetThetaMax(), 1, "JDOptimization", "EvaluateQ3FactorVsTheta");
+		fEvaluateQ3FactorVsTheta = new TF1("fEvaluateQ3FactorVsTheta", this, &JDOptimization::EvaluateQ3FactorVsTheta, 0.001, GetThetaMax(), 1, "JDOptimization", "EvaluateQ3FactorVsTheta");
 
 	// J_on_1sm/Sqrt{theta^2 + J_off_1sm}
-		fEvaluateQ12FactorVsTheta = new TF1("fEvaluateQ12FactorVsTheta", this, &JDOptimization::EvaluateQ12FactorVsTheta, 0., GetThetaMax(), 1, "JDOptimization", "EvaluateQ12FactorVsTheta");
+		fEvaluateQ12FactorVsTheta = new TF1("fEvaluateQ12FactorVsTheta", this, &JDOptimization::EvaluateQ12FactorVsTheta, 0.001, GetThetaMax(), 1, "JDOptimization", "EvaluateQ12FactorVsTheta");
 	// J_on_eff/Sqrt{(theta_eff)^2 + J_off_eff}
-		fEvaluateQ13FactorVsTheta = new TF1("fEvaluateQ13FactorVsTheta", this, &JDOptimization::EvaluateQ13FactorVsTheta, 0., GetThetaMax(), 1, "JDOptimization", "EvaluateQ13FactorVsTheta");
+		fEvaluateQ13FactorVsTheta = new TF1("fEvaluateQ13FactorVsTheta", this, &JDOptimization::EvaluateQ13FactorVsTheta, 0.001, GetThetaMax(), 1, "JDOptimization", "EvaluateQ13FactorVsTheta");
 	// J_1sm_eff/theta_eff
-		fEvaluateQ23FactorVsTheta = new TF1("fEvaluateQ23FactorVsTheta", this, &JDOptimization::EvaluateQ23FactorVsTheta, 0., GetThetaMax(), 1, "JDOptimization", "EvaluateQ23FactorVsTheta");
+		fEvaluateQ23FactorVsTheta = new TF1("fEvaluateQ23FactorVsTheta", this, &JDOptimization::EvaluateQ23FactorVsTheta, 0.001, GetThetaMax(), 1, "JDOptimization", "EvaluateQ23FactorVsTheta");
 	// J_on_1sm_eff/Sqrt{(theta_eff)^2 + J_off_1sm_eff}
-		fEvaluateQ123FactorVsTheta = new TF1("fEvaluateQ123FactorVsTheta", this, &JDOptimization::EvaluateQ123FactorVsTheta, 0., GetThetaMax(), 1, "JDOptimization", "EvaluateQ123FactorVsTheta");
+		fEvaluateQ123FactorVsTheta = new TF1("fEvaluateQ123FactorVsTheta", this, &JDOptimization::EvaluateQ123FactorVsTheta, 0.001, GetThetaMax(), 1, "JDOptimization", "EvaluateQ123FactorVsTheta");
 
 		// ENS DÓNA UN TF2, A DIFERÈNCIA DEL D'ABANS TENIM LA DEPENDÈNCIA EN EL WOBBLE
 
 		//	J_on/theta
+		fEvaluateQ0FactorVsThetaWobble = new TF2("fEvaluateQ0FactorVsThetaWobble", this, &JDOptimization::EvaluateQ0FactorVsThetaWobble, 0.001, GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "EvaluateQ0FactorVsThetaWobble");
 		//	J_on/Sqrt{theta^2+J_off}
-		fEvaluateQ1FactorVsThetaWobble = new TF2("fEvaluateQ1FactorVsThetaWobble", this, &JDOptimization::EvaluateQ1FactorVsThetaWobble, 0., GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "EvaluateQ1FactorVsThetaWobble");
+		fEvaluateQ1FactorVsThetaWobble = new TF2("fEvaluateQ1FactorVsThetaWobble", this, &JDOptimization::EvaluateQ1FactorVsThetaWobble, 0.001, GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "EvaluateQ1FactorVsThetaWobble");
+		//	J_m1/theta
+		fEvaluateQ2FactorVsThetaWobble = new TF2("fEvaluateQ2FactorVsThetaWobble", this, &JDOptimization::EvaluateQ2FactorVsThetaWobble, 0.001, GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "EvaluateQ2FactorVsThetaWobble");
 		//	J_eff/theta_eff
-		fEvaluateQ2FactorVsThetaWobble = new TF2("fEvaluateQ2FactorVsThetaWobble", this, &JDOptimization::EvaluateQ2FactorVsThetaWobble, 0., GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "EvaluateQ2FactorVsThetaWobble");
+		fEvaluateQ3FactorVsThetaWobble = new TF2("fEvaluateQ3FactorVsThetaWobble", this, &JDOptimization::EvaluateQ3FactorVsThetaWobble, 0.001, GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "EvaluateQ3FactorVsThetaWobble");
+		// J_on_1sm/Sqrt{theta^2 + J_off_1sm}
+		fEvaluateQ12FactorVsThetaWobble = new TF2("fEvaluateQ12FactorVsThetaWobble", this, &JDOptimization::EvaluateQ12FactorVsThetaWobble, 0.001, GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "EvaluateQ12FactorVsThetaWobble");
+		// J_on_eff/Sqrt{(theta_eff)^2 + J_off_eff}
+		fEvaluateQ13FactorVsThetaWobble = new TF2("fEvaluateQ13FactorVsThetaWobble", this, &JDOptimization::EvaluateQ13FactorVsThetaWobble, 0.001, GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "EvaluateQ13FactorVsThetaWobble");
+		// J_1sm_eff/theta_eff
+		fEvaluateQ23FactorVsThetaWobble = new TF2("fEvaluateQ23FactorVsThetaWobble", this, &JDOptimization::EvaluateQ23FactorVsThetaWobble, 0.001, GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "EvaluateQ23FactorVsThetaWobble");
+		// J_on_1sm_eff/Sqrt{(theta_eff)^2 + J_off_1sm_eff}
+		fEvaluateQ123FactorVsThetaWobble = new TF2("fEvaluateQ123FactorVsThetaWobble", this, &JDOptimization::EvaluateQ123FactorVsThetaWobble, 0.001, GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "EvaluateQ123FactorVsThetaWobble");
 
+		// J_on_1sm/Sqrt{theta^2 + J_off_1sm}
+//		fEvaluateQ12FactorVsThetaWobble = new TF2("fEvaluateQ2FactorVsThetaWobble", this, &JDOptimization::EvaluateQ2FactorVsThetaWobble, 0., GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "EvaluateQ2FactorVsThetaWobble");
+//		// J_on_eff/Sqrt{(theta_eff)^2 + J_off_eff}
+//		fEvaluateQ13FactorVsThetaWobble = new TF2("fEvaluateQ2FactorVsThetaWobble", this, &JDOptimization::EvaluateQ2FactorVsThetaWobble, 0., GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "EvaluateQ2FactorVsThetaWobble");
+//		// J_on_1sm_eff/Sqrt{(theta_eff)^2 + J_off_1sm_eff}
+//		fEvaluateQ123FactorVsThetaWobble = new TF2("fEvaluateQ2FactorVsThetaWobble", this, &JDOptimization::EvaluateQ2FactorVsThetaWobble, 0., GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "EvaluateQ2FactorVsThetaWobble");
 
 }
 
@@ -184,8 +233,15 @@ void JDOptimization::CreateFunctions()
 //	Q0 = (JFactor/Theta) vs Theta
 // x[0] 	= theta	[deg]
 // par[0] 	= theta of normalization	[deg]
+// par[1]	= normalization factor [~GeV,~cm,~deg]
 Double_t JDOptimization::EvaluateQ0FactorVsTheta(Double_t* x, Double_t* par)
 {
+//	if(par[1]>0.1)
+//	{
+//		return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])/x[0])/par[1];
+//	}
+//	else
+	{
 	if(par[0]<0.)
 	{
 		return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])/x[0]);
@@ -194,6 +250,7 @@ Double_t JDOptimization::EvaluateQ0FactorVsTheta(Double_t* x, Double_t* par)
 	{
 		return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])/x[0])
 			 /(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])/par[0]);
+	}
 	}
 }
 
@@ -204,24 +261,47 @@ Double_t JDOptimization::EvaluateQ0FactorVsTheta(Double_t* x, Double_t* par)
 // par[0] 	= theta of normalization	[deg]
 Double_t JDOptimization::EvaluateQ1FactorVsTheta(Double_t* x, Double_t* par)
 {
-	if(par[0]<0.)
+	if (GetIsJFactorOnLessOff())
 	{
-		return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0]))/
-				 TMath::Sqrt(
-				 TMath::Power(x[0],2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*jdInstrument->GetWobbleDistance())->Eval(x[0]));
+
+		if (par[0]<0.)
+			{
+				return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])
+						-jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(x[0]))/x[0];
+			}
+			else
+			{
+			 return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])
+					 -jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(x[0]))/x[0]
+					 /
+					 (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])/par[0]);
+//					 (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])
+//					 -jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(par[0]))/par[0];
+			}
 	}
+
 	else
 	{
-	 return ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0]))/
-			 	 TMath::Sqrt(
-				 TMath::Power(x[0],2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(x[0])))
-	 	 	 /
-			 ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0]))/
-			 	 TMath::Sqrt(
-				 TMath::Power(par[0],2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(par[0])));
+		if (par[0]<0.)
+		{
+			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0]))/
+					 TMath::Sqrt(
+					 TMath::Power(x[0],2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(x[0]));
+		}
+		else
+		{
+		 return ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0]))/
+					 TMath::Sqrt(
+					 TMath::Power(x[0],2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(x[0])))
+				 /
+				 ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0]))/
+					 TMath::Sqrt(
+					 TMath::Power(par[0],2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(par[0])));
+		}
+
 	}
 }
 
@@ -234,11 +314,11 @@ Double_t JDOptimization::EvaluateQ2FactorVsTheta(Double_t* x, Double_t* par)
 {
 	if(par[0]<0.)
 		{
-			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])/x[0]);
+			return (jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(x[0])/x[0]);
 		}
 		else
 		{
-			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])/x[0])
+			return (jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(x[0])/x[0])
 				 /(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])/par[0]);
 		}
 }
@@ -252,12 +332,14 @@ Double_t JDOptimization::EvaluateQ3FactorVsTheta(Double_t* x, Double_t* par)
 {
 	if(par[0]<0.)
 		{
-			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])/x[0])*(TMath::Power(jdInstrument->GetTF1EfficiencyVsTheta()->Eval(x[0]),0.5));
+			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])/x[0])*(TMath::Power(jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]),0.5));
 		}
 		else
 		{
-			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])/x[0])*(TMath::Power(jdInstrument->GetTF1EfficiencyVsTheta()->Eval(x[0]),0.5))
-				 /(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])/par[0])*(TMath::Power(jdInstrument->GetTF1EfficiencyVsTheta()->Eval(par[0]),0.5));
+			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])/x[0])*(TMath::Power(jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]),0.5))
+					 /(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])/par[0]);
+
+//									 /(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])/par[0])*(TMath::Power(jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(par[0]),0.5));
 		}
 }
 
@@ -269,24 +351,46 @@ Double_t JDOptimization::EvaluateQ3FactorVsTheta(Double_t* x, Double_t* par)
 // par[0] 	= theta of normalization	[deg]
 Double_t JDOptimization::EvaluateQ12FactorVsTheta(Double_t* x, Double_t* par)
 {
-	if(par[0]<0.)
+	if (GetIsJFactorOnLessOff())
 	{
-		return (jdDarkMatter->GetTF1JFactorFromLOSVsTheta()->Eval(x[0]))/
-				 TMath::Sqrt(
-				 TMath::Power(x[0],2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*jdInstrument->GetWobbleDistance())->Eval(x[0]));
+		if(par[0]<0.)
+		{
+			return (jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(x[0])
+					-jdDarkMatter->GetTF1JFactor_m1OffFromLOSVsTheta(2*jdInstrument->GetWobbleDistance())->Eval(x[0]))/x[0];
+		}
+		else
+		{
+			return (jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(x[0])
+					-jdDarkMatter->GetTF1JFactor_m1OffFromLOSVsTheta(2*jdInstrument->GetWobbleDistance())->Eval(x[0]))/x[0]
+					/
+					(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])/par[0]);
+//					 /
+//					(jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(par[0])
+//					-jdDarkMatter->GetTF1JFactor_m1OffFromLOSVsTheta(2*jdInstrument->GetWobbleDistance())->Eval(par[0]))/par[0];
+		}
 	}
+
 	else
 	{
-	 return ((jdDarkMatter->GetTF1JFactorFromLOSVsTheta()->Eval(x[0]))/
-			 	 TMath::Sqrt(
-				 TMath::Power(x[0],2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(x[0])))
-	 	 	 /
-			 ((jdDarkMatter->GetTF1JFactorFromLOSVsTheta()->Eval(par[0]))/
-			 	 TMath::Sqrt(
-				 TMath::Power(par[0],2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(par[0])));
+		if(par[0]<0.)
+		{
+			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0]))/
+					 TMath::Sqrt(
+					 TMath::Power(x[0],2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*jdInstrument->GetWobbleDistance())->Eval(x[0]));
+		}
+		else
+		{
+		 return ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0]))/
+					 TMath::Sqrt(
+					 TMath::Power(x[0],2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(x[0])))
+				 /
+				 ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0]))/
+					 TMath::Sqrt(
+					 TMath::Power(par[0],2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(par[0])));
+		}
 	}
 }
 
@@ -297,24 +401,50 @@ Double_t JDOptimization::EvaluateQ12FactorVsTheta(Double_t* x, Double_t* par)
 // par[0] 	= theta of normalization	[deg]
 Double_t JDOptimization::EvaluateQ13FactorVsTheta(Double_t* x, Double_t* par)
 {
-	if(par[0]<0. || par[1]<0.)
+	if (GetIsJFactorOnLessOff())
 	{
-		return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(x[0]))/
-				 TMath::Sqrt(
-				 TMath::Power(x[0]*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(x[0]),2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(x[0]));
+		if(par[0]<0. || par[1]<0.)
+		{
+
+			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0])
+					-jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]))
+					/x[0]*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]);
+		}
+
+		else
+		{
+			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0])
+					-jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]))
+					/x[0]*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0])
+					/
+					(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(par[0])
+					-jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(par[0]))
+					/par[0]*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(par[0]);
+		}
 	}
+
 	else
 	{
-	 return ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(x[0]))/
-			 	 TMath::Sqrt(
-				 TMath::Power(x[0]*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(x[0]),2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0]))*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(x[0]))
-	 	 	 /
-			 ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(par[0]))/
-			 	 TMath::Sqrt(
-				 TMath::Power(par[0]*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(par[0]),2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*par[1])->Eval(par[0]))*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(par[0]));
+
+		if(par[0]<0. || par[1]<0.)
+		{
+			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]))/
+					 TMath::Sqrt(
+					 TMath::Power(x[0]*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]),2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]));
+		}
+		else
+		{
+		 return ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]))/
+					 TMath::Sqrt(
+					 TMath::Power(x[0]*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]),2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(x[0]))*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]))
+				 /
+				 ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(par[0]))/
+					 TMath::Sqrt(
+					 TMath::Power(par[0]*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(par[0]),2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(par[0]))*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(par[0]));
+		}
 	}
 }
 
@@ -327,12 +457,14 @@ Double_t JDOptimization::EvaluateQ23FactorVsTheta(Double_t* x, Double_t* par)
 {
 	if(par[0]<0.)
 		{
-			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(x[0])/x[0]);
+			return (jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0])/x[0]);
 		}
 		else
 		{
-			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(x[0])/x[0])
-				 /(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(par[0])/par[0]);
+			return (jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0])/x[0])
+					/
+					(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])/par[0]);
+//				 /(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(par[0])/par[0]);
 		}
 }
 
@@ -343,27 +475,75 @@ Double_t JDOptimization::EvaluateQ23FactorVsTheta(Double_t* x, Double_t* par)
 // par[0] 	= theta of normalization	[deg]
 Double_t JDOptimization::EvaluateQ123FactorVsTheta(Double_t* x, Double_t* par)
 {
-	if(par[0]<0. || par[1]<0.)
+	if (GetIsJFactorOnLessOff())
 	{
-		return (jdDarkMatter->GetTF1JFactorFromLOSVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(x[0]))/
-				 TMath::Sqrt(
-				 TMath::Power(x[0]*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(x[0]),2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(x[0]));
+		if(par[0]<0. || par[1]<0.)
+			{
+
+				return (jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0])
+						-jdDarkMatter->GetTF1JFactor_m1OffFromLOSVsTheta(2*GetWobbleDistance())->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]))
+						/x[0]*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]);
+			}
+
+			else
+			{
+				return (jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0])
+						-jdDarkMatter->GetTF1JFactor_m1OffFromLOSVsTheta(2*GetWobbleDistance())->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]))
+						/x[0]*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0])
+						/
+						(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])/par[0]);
+
+//						/
+//						(jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(par[0])
+//						-jdDarkMatter->GetTF1JFactor_m1OffFromLOSVsTheta(2*GetWobbleDistance())->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(par[0]))
+//						/par[0]*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(par[0]);
+			}
 	}
+
 	else
 	{
-	 return ((jdDarkMatter->GetTF1JFactorFromLOSVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(x[0]))/
-			 	 TMath::Sqrt(
-				 TMath::Power(x[0]*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(x[0]),2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0]))*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(x[0]))
-	 	 	 /
-			 ((jdDarkMatter->GetTF1JFactorFromLOSVsTheta()->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(par[0]))/
-			 	 TMath::Sqrt(
-				 TMath::Power(par[0]*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(par[0]),2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*par[1])->Eval(par[0]))*jdInstrument->GetTF1EfficiencyVsTheta()->Eval(par[0]));
+
+		if(par[0]<0. || par[1]<0.)
+		{
+			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]))/
+					 TMath::Sqrt(
+					 TMath::Power(x[0]*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]),2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]));
+		}
+		else
+		{
+		 return ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]))/
+					 TMath::Sqrt(
+					 TMath::Power(x[0]*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]),2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(x[0]))*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(x[0]))
+				 /
+				 ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(par[0]))/
+					 TMath::Sqrt(
+					 TMath::Power(par[0]*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(par[0]),2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*GetWobbleDistance())->Eval(par[0]))*jdInstrument->GetTF1EfficiencyVsTheta(GetWobbleDistance())->Eval(par[0]));
+		}
 	}
 }
 
+//----------------------------------------------------
+//	It evaluates the QFactor normalized at a chosen point of normalization
+//	Q0 = (JFactor_on/Sqrt{Theta^2+J_off}) vs Theta
+// x[0] 	= theta							[deg]
+// x[1] 	= wobble dist					[deg]
+// par[0] 	= theta of normalization		[deg]
+// par[1] 	= wobble dist of normalization	[deg]
+Double_t JDOptimization::EvaluateQ0FactorVsThetaWobble(Double_t* x, Double_t* par)
+{
+	if(par[0]<0. || par[1]<0.)
+	{
+		return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])/x[0]);
+	}
+	else
+	{
+		return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])/x[0])
+			 /(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])/par[0]);
+	}
+}
 
 //----------------------------------------------------
 //	It evaluates the QFactor normalized at a chosen point of normalization
@@ -374,25 +554,48 @@ Double_t JDOptimization::EvaluateQ123FactorVsTheta(Double_t* x, Double_t* par)
 // par[1] 	= wobble dist of normalization	[deg]
 Double_t JDOptimization::EvaluateQ1FactorVsThetaWobble(Double_t* x, Double_t* par)
 {
-	if(par[0]<0. || par[1]<0.)
+
+	if (GetIsJFactorOnLessOff())
 	{
-		return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0]))/
-				 TMath::Sqrt(
-				 TMath::Power(x[0],2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0]));
+		if (par[0]<0.)
+			{
+				return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])
+						-jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0]))/x[0];
+			}
+			else
+			{
+			 return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])
+					 -jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0]))/x[0]
+					 /
+					 (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])
+					 -jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*par[1])->Eval(par[0]))/par[0];
+			}
 	}
+
+	// NORMALLY NOT USED
 	else
 	{
-	 return ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0]))/
-			 	 TMath::Sqrt(
-				 TMath::Power(x[0],2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0])))
-	 	 	 /
-			 ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0]))/
-			 	 TMath::Sqrt(
-				 TMath::Power(par[0],2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*par[1])->Eval(par[0])));
+		if(par[0]<0. || par[1]<0.)
+		{
+			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0]))/
+					 TMath::Sqrt(
+					 TMath::Power(x[0],2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0]));
+		}
+		else
+		{
+		 return ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0]))/
+				 	 TMath::Sqrt(
+					 TMath::Power(x[0],2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0])))
+		 	 	 /
+				 ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0]))/
+				 	 TMath::Sqrt(
+					 TMath::Power(par[0],2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*par[1])->Eval(par[0])));
+		}
 	}
+
 }
 
 //----------------------------------------------------
@@ -407,24 +610,217 @@ Double_t JDOptimization::EvaluateQ2FactorVsThetaWobble(Double_t* x, Double_t* pa
 	//NO ES CORRESPON AMB LA FUNCIO, HE FET COPIAR PEGAR DE L'ANTERIOR PER RESSOLDRE UN PROBLEMA
 	if(par[0]<0. || par[1]<0.)
 	{
-		return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0]))/
-				 TMath::Sqrt(
-				 TMath::Power(x[0],2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0]));
+		return (jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(x[0])/x[0]);
 	}
 	else
 	{
-	 return ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0]))/
-			 	 TMath::Sqrt(
-				 TMath::Power(x[0],2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0])))
-	 	 	 /
-			 ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0]))/
-			 	 TMath::Sqrt(
-				 TMath::Power(par[0],2)+
-				 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*par[1])->Eval(par[0])));
+		return (jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(x[0])/x[0])
+			 /(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])/par[0]);
 	}
 }
+
+////////////////////////////////////////////////////////////////////////////////////
+//**********************************************************************************
+// WARNING: REPASSAR GETTF1EFFICIENCY PER COMPROVAR 100% QUE AGAFA TOTS ELS VALORS DE WOBBLE DISTANCE (X[1]) I NO NOMÉS UN.
+//**********************************************************************************
+////////////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------
+//	It evaluates the QFactor normalized at a chosen point of normalization
+//	Q3 = (JFactor_eff/Theta_eff) vs Theta
+// x[0] 	= theta	[deg]
+// par[0] 	= theta of normalization	[deg]
+Double_t JDOptimization::EvaluateQ3FactorVsThetaWobble(Double_t* x, Double_t* par)
+{
+	if(par[0]<0. || par[1]<0.)
+	{
+		return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])/x[0])*(TMath::Power(jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]),0.5));
+	}
+	else
+	{
+		return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])/x[0])*(TMath::Power(jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]),0.5))
+			 /(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])/par[0])*(TMath::Power(jdInstrument->GetTF1EfficiencyVsTheta(par[1])->Eval(par[0]),0.5));
+	}
+}
+
+
+//----------------------------------------------------
+//	It evaluates the QFactor normalized at a chosen point of normalization
+//	Q12 = (JFactor_on_1sm/Sqrt{Theta^2 + JFactor_off_1sm}) vs Theta
+// x[0] 	= theta	[deg]
+// par[0] 	= theta of normalization	[deg]
+Double_t JDOptimization::EvaluateQ12FactorVsThetaWobble(Double_t* x, Double_t* par)
+{
+	if (GetIsJFactorOnLessOff())
+	{
+		if(par[0]<0.)
+		{
+			return (jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(x[0])
+					-jdDarkMatter->GetTF1JFactor_m1OffFromLOSVsTheta(2*x[1])->Eval(x[0]))/x[0];
+		}
+		else
+		{
+			return (jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(x[0])
+					-jdDarkMatter->GetTF1JFactor_m1OffFromLOSVsTheta(2*x[1])->Eval(x[0]))/x[0]
+					/(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])/par[0]);
+
+//					/
+//					(jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(par[0])
+//					-jdDarkMatter->GetTF1JFactor_m1OffFromLOSVsTheta(2*par[1])->Eval(par[0]))/par[0];
+		}
+	}
+
+	// NORMALLY NOT USED
+	else
+	{
+		if(par[0]<0.)
+		{
+			return (jdDarkMatter->GetTF1JFactorFromLOSVsTheta()->Eval(x[0]))/
+					 TMath::Sqrt(
+					 TMath::Power(x[0],2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0]));
+		}
+		else
+		{
+		 return ((jdDarkMatter->GetTF1JFactorFromLOSVsTheta()->Eval(x[0]))/
+				 	 TMath::Sqrt(
+					 TMath::Power(x[0],2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0])))
+		 	 	 /
+				 ((jdDarkMatter->GetTF1JFactorFromLOSVsTheta()->Eval(par[0]))/
+				 	 TMath::Sqrt(
+					 TMath::Power(par[0],2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*par[1])->Eval(par[0])));
+		}
+	}
+
+}
+
+//----------------------------------------------------
+//	It evaluates the QFactor normalized at a chosen point of normalization
+//	Q13 = (JFactor_on_eff/Sqrt{(Theta_eff)^2+JFactor_off}) vs Theta
+// x[0] 	= theta	[deg]
+// par[0] 	= theta of normalization	[deg]
+Double_t JDOptimization::EvaluateQ13FactorVsThetaWobble(Double_t* x, Double_t* par)
+{
+	if (GetIsJFactorOnLessOff())
+	{
+		if(par[0]<0. || par[1]<0.)
+		{
+			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0])
+					-jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]))
+					/x[0]*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]);
+		}
+
+		else
+		{
+			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0])
+					-jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(x[1])->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]))
+					/x[0]*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0])
+					 /
+					(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(par[0])
+					-jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(par[1])->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(par[0]))
+					/par[0]*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(par[0]);
+		}
+	}
+
+	// NORMALLY NOT USED
+	else
+	{
+		if(par[0]<0. || par[1]<0.)
+		{
+			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]))/
+					 TMath::Sqrt(
+					 TMath::Power(x[0]*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]),2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]));
+		}
+		else
+		{
+		 return ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]))/
+				 	 TMath::Sqrt(
+					 TMath::Power(x[0]*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]),2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0]))*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]))
+		 	 	 /
+				 ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta(par[1])->Eval(par[0]))/
+				 	 TMath::Sqrt(
+					 TMath::Power(par[0]*jdInstrument->GetTF1EfficiencyVsTheta(par[1])->Eval(par[0]),2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*par[1])->Eval(par[0]))*jdInstrument->GetTF1EfficiencyVsTheta(par[1])->Eval(par[0]));
+		}
+	}
+}
+
+//----------------------------------------------------
+//	It evaluates the QFactor normalized at a chosen point of normalization
+//	Q23 = (JFactor_1m_eff/Theta_eff) vs Theta
+// x[0] 	= theta	[deg]
+// par[0] 	= theta of normalization	[deg]
+Double_t JDOptimization::EvaluateQ23FactorVsThetaWobble(Double_t* x, Double_t* par)
+{
+	if(par[0]<0.)
+		{
+			return (jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0])/x[0]);
+		}
+		else
+		{
+			return (jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0])/x[0])
+					 /(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])/par[0]);
+//				 /(jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(par[0])/par[0]);
+		}
+}
+
+//----------------------------------------------------
+// It evaluates the QFactor normalized at a chosen point of normalization
+// Q123 = (JFactor_on_1m_eff/Sqrt{(Theta_eff)^2+JFactor_off_1m_eff}) vs Theta
+// x[0] 	= theta	[deg]
+// par[0] 	= theta of normalization	[deg]
+Double_t JDOptimization::EvaluateQ123FactorVsThetaWobble(Double_t* x, Double_t* par)
+{
+	if (GetIsJFactorOnLessOff())
+	{
+		if(par[0]<0. || par[1]<0.)
+		{
+
+			return (jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0])
+					-jdDarkMatter->GetTF1JFactor_m1OffFromLOSVsTheta(2*x[1])->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]))
+					/x[0]*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]);
+		}
+
+		else
+		{
+			return (jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0])
+					-jdDarkMatter->GetTF1JFactor_m1OffFromLOSVsTheta(2*x[1])->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]))
+					/x[0]*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0])
+					 /(jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])/par[0]);
+//					/
+//					(jdDarkMatter->GetTF1JFactor_m1VsTheta()->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(par[0])
+//					-jdDarkMatter->GetTF1JFactor_m1OffFromLOSVsTheta(2*par[1])->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(par[0]))
+//					/par[0]*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(par[0]);
+		}
+	}
+	// NORMALLY NOT USED
+	else
+	{
+		if(par[0]<0. || par[1]<0.)
+		{
+			return (jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]))/
+					 TMath::Sqrt(
+					 TMath::Power(x[0]*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]),2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]));
+		}
+		else
+		{
+		 return ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(x[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]))/
+				 	 TMath::Sqrt(
+					 TMath::Power(x[0]*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]),2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*x[1])->Eval(x[0]))*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(x[0]))
+		 	 	 /
+				 ((jdDarkMatter->GetTF1JFactorVsTheta()->Eval(par[0])*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(par[0]))/
+				 	 TMath::Sqrt(
+					 TMath::Power(par[0]*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(par[0]),2)+
+					 jdDarkMatter->GetTF1JFactorOffFromLOSVsTheta(2*par[1])->Eval(par[0]))*jdInstrument->GetTF1EfficiencyVsTheta(x[1])->Eval(par[0]));
+		}
+	}
+}
+
 
 void JDOptimization::GetListOfQFactors()
 {
