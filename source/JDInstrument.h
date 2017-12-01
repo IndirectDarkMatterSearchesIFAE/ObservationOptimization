@@ -1,13 +1,24 @@
 /*
- * Instrument.h
+ * JDInstrument.h
  *
  *  Created on: 03/07/2017
+ *  Last revision: 01/12/2017
+ *
  *  Authors: David Navarro Gironés 	<<david.navarrogir@e-campus.uab.cat>>
  *  		 Joaquim Palacio 		<<jpalacio@ifae.es>>
  *
- *  		 ADD A GENERAL DESCRIPTION ON THE CLASS, THE MAIN FUNCTIONS, THE VARIABLES
- *  		 AND MENTION THE "runExample#.C" THAT SHOWS HOW TO USE IT
+ *
+ *			 THIS CLASS IS THE ONE RELATED WITH THE INSTRUMENT DATA.
+ *			 WITH THIS CLASS YOU CAN EVALUATE THE EPSILON (ACCEPTANCE) VS THETA, THE EPSILON VS THETA AND PHI, THE EPSILON VS X AND Y,
+ *			 THE EPSILON MULTIPLIED BY THETA VERSUS THETA AND PHI AND THE EFFICIENCY VS THETA.
+ *			 VARIABLES:
+ *  		 	THETA 	[DEG]
+ *  		 	DCC		[DEG]    DISTANCE TO THE CENTER OF THE CAMERA
+ *  		 	PHI	  	[RAD]
+ *  		 	OFFSET	[DEG]
+ *  		 The macro "exampleJDInstrument.cxx" shows how to use this class.
  */
+
 
 #ifndef INSTRUMENT_H_
 #define INSTRUMENT_H_
@@ -48,14 +59,13 @@ public:
 	Int_t GetNumPointsCameraAcceptanceGraph()	{return iNumPointsCameraAcceptanceGraph;}
 
 	Double_t GetDistCameraCenterMax()	{return dDistCenterCameraMax;}
-//	Double_t GetThetaMax()				{return dThetaMax;}
 	Double_t GetWobbleDistance()		{return dWobbleDist;}
 
 
-	TF1* GetTF1EpsilonVsTheta()
+	TF1* GetTF1EpsilonVsDcc()
 	{
 		if(!GetIsCameraAcceptance()) GetWarning();
-		return fEvaluateEpsilonVsTheta;
+		return fEvaluateEpsilonVsDcc;
 	}
 
 	TF1* GetTF1EfficiencyVsTheta(Double_t WobbleDistance)
@@ -112,7 +122,7 @@ protected:
 	//OTHERS********
 	void CreateFunctionsInstrument();
 
-	Double_t EvaluateEpsilonVsTheta(Double_t* x, Double_t* par);
+	Double_t EvaluateEpsilonVsDcc(Double_t* x, Double_t* par);
 	Double_t EvaluateEpsilonVsThetaAndPhi(Double_t* x, Double_t* par);
 	Double_t EvaluateEpsilonVsXAndY(Double_t* x, Double_t* par);
 	Double_t EvaluateEpsilonThetaVsThetaAndPhi(Double_t* x, Double_t* par);
@@ -125,43 +135,35 @@ private:
 	///////////////////////////////////////////////////////
 	//TString
 	///////////////////////////////////////////////////////
-
 	TString sInstrumentName;
 	TString sInstrumentPath;
 
 	///////////////////////////////////////////////////////
 	//TString
 	///////////////////////////////////////////////////////
-
 	Int_t iNumPointsCameraAcceptanceGraph;
 
 	///////////////////////////////////////////////////////
 	//Double_t
 	///////////////////////////////////////////////////////
-
 	Double_t dDistCenterCameraMax;
 	Double_t dWobbleDist;
-//	Double_t dThetaMax;
 	Double_t dDeg2Rad;
-
 
 	///////////////////////////////////////////////////////
 	//TGraph
 	///////////////////////////////////////////////////////
-
 	TGraph* gCameraAcceptance;
 
 	///////////////////////////////////////////////////////
 	//TF1
 	///////////////////////////////////////////////////////
-
-	TF1* fEvaluateEpsilonVsTheta;
+	TF1* fEvaluateEpsilonVsDcc;
 	TF1* fEvaluateEfficiencyVsTheta;
 
 	///////////////////////////////////////////////////////
 	//TF2
 	///////////////////////////////////////////////////////
-
 	TF2* fEvaluateEpsilonVsThetaAndPhi;
 	TF2* fEvaluateEpsilonVsXAndY;
 	TF2* fEvaluateEpsilonThetaVsThetaAndPhi;

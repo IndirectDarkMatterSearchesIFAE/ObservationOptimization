@@ -1,12 +1,23 @@
 /*
- * Optimization.h
+ * JDOptimization.h
  *
  *  Created on: 03/07/2017
+ *  Last revision: 01/12/2017
+ *
  *  Authors: David Navarro Gironés 	<<david.navarrogir@e-campus.uab.cat>>
  *  		 Joaquim Palacio 		<<jpalacio@ifae.es>>
  *
  *  		 ADD A GENERAL DESCRIPTION ON THE CLASS, THE MAIN FUNCTIONS, THE VARIABLES
- *  		 AND MENTION THE "runExample#.C" THAT SHOWS HOW TO USE IT
+ *
+ *
+ *  		 THIS CLASS IS THE ONE RELATED WITH THE OPTIMIZATION OF THE INSTRUMENT.
+ *  		 WITH THIS CLASS YOU CAN OBTAIN THE OPTIMAL THETA AND WOBBLE DISTANCE FOR EACH SOURCE AND FOR EACH INSTRUMENT.
+ *			 YOU CAN EVALUATE QFACTOR VS THETA AND THE QFACTOR VS THETA AND PHI
+ *  		 VARIABLES:
+ *  		 	THETA 	[DEG]
+ *  		 	PHI	  	[RAD]
+ *  		 	OFFSET	[DEG]
+ *  		 The macro "exampleJDoptimization.cxx" shows how to use this class.
  */
 
 #ifndef JDOptimization_H_
@@ -24,59 +35,59 @@ public:
 
 	void GetListOfQFactors();
 
-
-
-//	TF1* GetTF1EffectiveJFactorFromLOSVsTheta()
-//	{
-//		if(!GetIsJFactor()) GetWarning();
-//		return fIntegrateEffectiveJFactorFromLOSVsTheta;
-//	}
-
+	//	IDEAL: 									Q0 = J_on/theta
+	//	LEAKAGE EFFECT: 						Q1 = J_on-J_off/theta
+	//  UNCERTAINTY EFFECT: 					Q2 = J_1sm/theta
+	// 	ACCEPTANCE EFFECT:						Q3 = J_eff/theta_eff
+	//  LEAKAGE + UNCERTAINTY:  				Q12 = J_on_1sm-J_off_1sm/theta
+	//  LEAKAGE + ACCEPTANCE:   				Q13 = J_on_eff-J_off_eff/theta_eff
+	//  UNCERTAINTY + ACCEPTANCE:   			Q23 = J_1sm_eff/theta_eff
+	//  LEAKAGE + UNCERTAINTY + ACCEPTANCE: 	Q123 = J_on_1sm_eff-J_off_1sm_eff/theta_eff
 
 	TF1* GetTF1QFactorVsTheta(Int_t type=0, Double_t thetaNorm=0.4)
 	{
-		if(type==0)	// J_on/theta
+		if(type==0)
 		{
 			fEvaluateQ0FactorVsTheta->SetParameter(0, thetaNorm);
 			return fEvaluateQ0FactorVsTheta;
 		}
-		else if(type==1)	// J_on/Sqrt{theta^2+J_off}
+		else if(type==1)
 		{
 			fEvaluateQ1FactorVsTheta->SetParameter(0, thetaNorm);
 			return fEvaluateQ1FactorVsTheta;
 		}
 
-		else if(type==2)	//J_1sm/theta
+		else if(type==2)
 		{
 			fEvaluateQ2FactorVsTheta->SetParameter(0, thetaNorm);
 			return fEvaluateQ2FactorVsTheta;
 		}
 
-		else if (type==3)	//J_eff/theta_eff
+		else if (type==3)
 		{
 			fEvaluateQ3FactorVsTheta->SetParameter(0, thetaNorm);
 			return fEvaluateQ3FactorVsTheta;
 		}
 
-		else if (type==12 || type==21)	//J_on_1sm/Sqrt{theta^2 + J_off_1sm}
+		else if (type==12 || type==21)
 		{
 			fEvaluateQ12FactorVsTheta->SetParameter(0, thetaNorm);
 			return fEvaluateQ12FactorVsTheta;
 		}
 
-		else if (type==13 || type==31)	//J_on_eff/Sqrt{(theta_eff)^2 + J_off_eff}
+		else if (type==13 || type==31)
 		{
 			fEvaluateQ13FactorVsTheta->SetParameter(0, thetaNorm);
 			return fEvaluateQ13FactorVsTheta;
 		}
 
-		else if (type==23 || type==32)	//J_1sm_eff/theta_eff
+		else if (type==23 || type==32)
 		{
 			fEvaluateQ23FactorVsTheta->SetParameter(0, thetaNorm);
 			return fEvaluateQ23FactorVsTheta;
 		}
 
-		else if (type==123 || type==132 || type==213 || type==231 || type==312 || type==321)	//J_on_1sm_eff/Sqrt{(theta_eff)^2 + J_off_1sm_eff}
+		else if (type==123 || type==132 || type==213 || type==231 || type==312 || type==321)
 		{
 			fEvaluateQ123FactorVsTheta->SetParameter(0, thetaNorm);
 			return fEvaluateQ123FactorVsTheta;
@@ -94,14 +105,20 @@ public:
 		}
 	}
 
-//	TH2D* GetTH2DQFactorVsThetaWobble()
-//	void* GetOptimalThetaAndWobble(Double_t &theta, Double_t &wobble)
+	///////////////////////////////////////////////////////////////////////////////////////
+	// ************************************************************************************
+	//WARNING  THE GetOptimalThetaAndWobble() AND THE GetTH2QFactorVsThetaWobble() SHOULD BE ON THE SOURCE CODE
+	// ************************************************************************************
+	///////////////////////////////////////////////////////////////////////////////////////
 
 	///////////////////////////////////////////////////////////////////////////////////////
 	// ************************************************************************************
 	//WARNING  THE TYPE IS THE ONLY VALUE AS AN INPUT
 	// ************************************************************************************
 	///////////////////////////////////////////////////////////////////////////////////////
+
+	///////////////////////////////////////////////////////////////////////////////////////
+	// This function gives a value and a range around this value of the theta optimal and the wobble optimal
 	void GetOptimalThetaAndWobble(Double_t &thetaOpt, Double_t &thetaOptRangMin, Double_t &thetaOptRangMax, Double_t &wobbleOpt, Double_t &wobbleOptRangMin, Double_t &wobbleOptRangMax, Int_t type=0)
 	{
 		TH2D* h2 = GetTH2QFactorVsThetaWobble(type);
@@ -193,6 +210,8 @@ public:
 		return;
 	}
 
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	// This TH2 is filled with the content of the TF2 corresponding to GetTF2QFactorvsThetaAndWobble
 	TH2D* GetTH2QFactorVsThetaWobble(Int_t type=0, Double_t thetaNorm=0.4, Double_t wobbleNorm=0.4)
 	{
 		TF2* qFactor=GetTF2QFactorVsThetaWobble(type, thetaNorm, wobbleNorm);
@@ -206,12 +225,8 @@ public:
 		TH2D* h2 = new TH2D("h2","",numBinsX,0.,thetaMax,numBinsY,0.,wobbleMax);
 		for(Int_t i=1; i<numBinsX+1; i++)
 		{
-//			cout << i << " " << numBinsX << endl;
 			for(Int_t j=1; j<numBinsY+1; j++)
 				{
-//					cout << j << " " << numBinsY << endl;
-//				cout<<h2->ProjectionX()->GetBinCenter(i)<<" ";
-//				cout<<h2->ProjectionY()->GetBinCenter(j)<<endl;
 
 				h2->SetBinContent(i,j,qFactor->Eval(h2->ProjectionX()->GetBinCenter(i),h2->ProjectionY()->GetBinCenter(j)));
 				}
@@ -223,13 +238,13 @@ public:
 
 	TF2* GetTF2QFactorVsThetaWobble(Int_t type=0, Double_t thetaNorm=0.4, Double_t wobbleNorm=0.4)
 	{
-		if(type==0)	// J_on/theta
+		if(type==0)
 		{
 			fEvaluateQ0FactorVsThetaWobble->SetParameter(0, thetaNorm);
 			fEvaluateQ0FactorVsThetaWobble->SetParameter(1, wobbleNorm);
 			return fEvaluateQ0FactorVsThetaWobble;
 		}
-		else if(type==1)	// J_on/theta
+		else if(type==1)
 		{
 			fEvaluateQ1FactorVsThetaWobble->SetParameter(0, thetaNorm);
 			fEvaluateQ1FactorVsThetaWobble->SetParameter(1, wobbleNorm);
@@ -291,9 +306,6 @@ public:
 		}
 	}
 
-
-	// POSAR AQUESTS GETTERS COM ELS GETTERS QUE HI HA ABAIX, EN PRINCIPI LA FUNCIO OPTIMIZATION NOMÉS HAURIA DE DONAR LES Q FACTOR
-
 	/**************************************************/
 
 	//***** JDDarkMatter Getters
@@ -310,7 +322,9 @@ public:
 
 	Double_t GetThetaMax()					{return jdDarkMatter->GetThetaMax();}
 	Double_t GetJFactorMax()				{return jdDarkMatter->GetJFactorMax();}
+	Double_t GetJFactor_m1Max()				{return jdDarkMatter->GetJFactor_m1Max();}
 	Double_t GetJFactorMin()				{return jdDarkMatter->GetJFactorMin();}
+	Double_t GetJFactor_m1Min()				{return jdDarkMatter->GetJFactor_m1Min();}
 
 
 	TF1* GetTF1JFactorVsTheta()				{return jdDarkMatter->GetTF1JFactorVsTheta();}
@@ -325,8 +339,8 @@ public:
 	TF1* GetTF1NormLOS_m1VsTheta()			{return jdDarkMatter->GetTF1NormLOS_m1VsTheta(1.0);}
 	TF2* GetTF2LOSThetaVSThetaPhi()			{return jdDarkMatter->GetTF2LOSThetaVSThetaPhi();}
 	TF2* GetTF2LOS_m1ThetaVSThetaPhi()		{return jdDarkMatter->GetTF2LOS_m1ThetaVSThetaPhi();}
-	TF2* GetTF2LOSOffThetaVSThetaPhi()		{return jdDarkMatter->GetTF2LOSOffThetaVSThetaPhi();}
-	TF2* GetTF2LOS_m1OffThetaVSThetaPhi()	{return jdDarkMatter->GetTF2LOS_m1OffThetaVSThetaPhi();}
+	TF2* GetTF2LOSOffThetaVSThetaPhi()		{return jdDarkMatter->GetTF2LOSOffThetaVSThetaPhi(2*jdInstrument->GetWobbleDistance());}
+	TF2* GetTF2LOS_m1OffThetaVSThetaPhi()	{return jdDarkMatter->GetTF2LOS_m1OffThetaVSThetaPhi(2*jdInstrument->GetWobbleDistance());}
 
 	//***** JDDarkMatter Setters
 	void SetCandidate(TString candidate)							{jdDarkMatter->SetCandidate(candidate);}
@@ -337,7 +351,7 @@ public:
 	Bool_t GetIsIdeal()						{return jdInstrument->GetIsIdeal();}
 	Bool_t GetIsJFactorOnLessOff() 			{return bIsJFactorOnLessOff;}
 
-	TF1* GetTF1EpsilonVsTheta()				{return jdInstrument->GetTF1EpsilonVsTheta();}
+	TF1* GetTF1EpsilonVsDcc()				{return jdInstrument->GetTF1EpsilonVsDcc();}
 	TF1* GetTF1EfficiencyVsTheta()			{return jdInstrument->GetTF1EfficiencyVsTheta(jdInstrument->GetWobbleDistance());}
 
 	TF2* GetTF2EpsilonVsThetaAndPhi()		{return jdInstrument->GetTF2EpsilonVsThetaAndPhi();}
@@ -349,7 +363,6 @@ public:
 
 	Double_t GetDistCameraCenterMax()		{return jdInstrument->GetDistCameraCenterMax();}
 	Double_t GetWobbleDistance()			{return jdInstrument->GetWobbleDistance();}
-	//***** JDInstrument Setters
 
 
 
@@ -361,47 +374,47 @@ protected:
 
 	void CreateFunctions();
 
-	Double_t EvaluateQ0FactorVsTheta(Double_t* x, Double_t* par);			// J_on/theta
-	Double_t EvaluateQ1FactorVsTheta(Double_t* x, Double_t* par);			// J_on/Sqrt{theta^2+J_off}
-	Double_t EvaluateQ2FactorVsTheta(Double_t* x, Double_t* par);			// J_1sm/theta
-	Double_t EvaluateQ3FactorVsTheta(Double_t* x, Double_t* par);			// J_eff/theta_eff
+	Double_t EvaluateQ0FactorVsTheta(Double_t* x, Double_t* par);
+	Double_t EvaluateQ1FactorVsTheta(Double_t* x, Double_t* par);
+	Double_t EvaluateQ2FactorVsTheta(Double_t* x, Double_t* par);
+	Double_t EvaluateQ3FactorVsTheta(Double_t* x, Double_t* par);
 
-	Double_t EvaluateQ12FactorVsTheta(Double_t* x, Double_t* par);			// J_eff/theta_eff
-	Double_t EvaluateQ13FactorVsTheta(Double_t* x, Double_t* par);			// J_eff/theta_eff
-	Double_t EvaluateQ23FactorVsTheta(Double_t* x, Double_t* par);			// J_eff/theta_eff
-	Double_t EvaluateQ123FactorVsTheta(Double_t* x, Double_t* par);			// J_eff/theta_eff
+	Double_t EvaluateQ12FactorVsTheta(Double_t* x, Double_t* par);
+	Double_t EvaluateQ13FactorVsTheta(Double_t* x, Double_t* par);
+	Double_t EvaluateQ23FactorVsTheta(Double_t* x, Double_t* par);
+	Double_t EvaluateQ123FactorVsTheta(Double_t* x, Double_t* par);
 
-	Double_t EvaluateQ0FactorVsThetaWobble(Double_t* x, Double_t* par);		// J_on/theta
-	Double_t EvaluateQ1FactorVsThetaWobble(Double_t* x, Double_t* par);		// J_on/Sqrt{theta^2+J_off}
-	Double_t EvaluateQ2FactorVsThetaWobble(Double_t* x, Double_t* par);		// J_eff/theta_eff
-	Double_t EvaluateQ3FactorVsThetaWobble(Double_t* x, Double_t* par);		// J_eff/theta_eff
-	Double_t EvaluateQ12FactorVsThetaWobble(Double_t* x, Double_t* par);		// J_eff/theta_eff
-	Double_t EvaluateQ13FactorVsThetaWobble(Double_t* x, Double_t* par);		// J_eff/theta_eff
-	Double_t EvaluateQ23FactorVsThetaWobble(Double_t* x, Double_t* par);		// J_eff/theta_eff
-	Double_t EvaluateQ123FactorVsThetaWobble(Double_t* x, Double_t* par);		// J_eff/theta_eff
+	Double_t EvaluateQ0FactorVsThetaWobble(Double_t* x, Double_t* par);
+	Double_t EvaluateQ1FactorVsThetaWobble(Double_t* x, Double_t* par);
+	Double_t EvaluateQ2FactorVsThetaWobble(Double_t* x, Double_t* par);
+	Double_t EvaluateQ3FactorVsThetaWobble(Double_t* x, Double_t* par);
+	Double_t EvaluateQ12FactorVsThetaWobble(Double_t* x, Double_t* par);
+	Double_t EvaluateQ13FactorVsThetaWobble(Double_t* x, Double_t* par);
+	Double_t EvaluateQ23FactorVsThetaWobble(Double_t* x, Double_t* par);
+	Double_t EvaluateQ123FactorVsThetaWobble(Double_t* x, Double_t* par);
 
 	void SetIsJFactorOnLessOff(Bool_t IsJFactorOnLessOff) 			{bIsJFactorOnLessOff=IsJFactorOnLessOff;}
 
 private:
 
-	TF1* fEvaluateQ0FactorVsTheta;							// J_on/theta
-	TF1* fEvaluateQ1FactorVsTheta;							// J_on/Sqrt{theta^2+J_off}
-	TF1* fEvaluateQ2FactorVsTheta;							// J_1sm/theta
-	TF1* fEvaluateQ3FactorVsTheta;							// J_eff/theta_eff
+	TF1* fEvaluateQ0FactorVsTheta;
+	TF1* fEvaluateQ1FactorVsTheta;
+	TF1* fEvaluateQ2FactorVsTheta;
+	TF1* fEvaluateQ3FactorVsTheta;
 
-	TF1* fEvaluateQ12FactorVsTheta;							// J_on_1sm/Sqrt{theta^2 + J_off_1sm}
-	TF1* fEvaluateQ13FactorVsTheta;							// J_on_eff/Sqrt{(theta_eff)^2 + J_off_eff}
-	TF1* fEvaluateQ23FactorVsTheta;							// J_1sm_eff/theta_eff
-	TF1* fEvaluateQ123FactorVsTheta;						// J_on_1sm_eff/Sqrt{(theta_eff)^2 + J_off_1sm_eff}
+	TF1* fEvaluateQ12FactorVsTheta;
+	TF1* fEvaluateQ13FactorVsTheta;
+	TF1* fEvaluateQ23FactorVsTheta;
+	TF1* fEvaluateQ123FactorVsTheta;
 
-	TF2* fEvaluateQ0FactorVsThetaWobble;					// J_on/theta
-	TF2* fEvaluateQ1FactorVsThetaWobble;					// J_on/Sqrt{theta^2+J_off}
-	TF2* fEvaluateQ2FactorVsThetaWobble;					// J_1sm/theta
-	TF2* fEvaluateQ3FactorVsThetaWobble;					// J_eff/theta_eff
-	TF2* fEvaluateQ12FactorVsThetaWobble;					// J_on_1sm/Sqrt{theta^2 + J_off_1sm}
-	TF2* fEvaluateQ13FactorVsThetaWobble;					// J_on_eff/Sqrt{(theta_eff)^2 + J_off_eff}
-	TF2* fEvaluateQ23FactorVsThetaWobble;					// J_1sm_eff/theta_eff
-	TF2* fEvaluateQ123FactorVsThetaWobble;					// J_on_1sm_eff/Sqrt{(theta_eff)^2 + J_off_1sm_eff}
+	TF2* fEvaluateQ0FactorVsThetaWobble;
+	TF2* fEvaluateQ1FactorVsThetaWobble;
+	TF2* fEvaluateQ2FactorVsThetaWobble;
+	TF2* fEvaluateQ3FactorVsThetaWobble;
+	TF2* fEvaluateQ12FactorVsThetaWobble;
+	TF2* fEvaluateQ13FactorVsThetaWobble;
+	TF2* fEvaluateQ23FactorVsThetaWobble;
+	TF2* fEvaluateQ123FactorVsThetaWobble;
 
 
 	Double_t dDeg2Rad;

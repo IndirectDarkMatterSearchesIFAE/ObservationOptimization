@@ -1,12 +1,19 @@
 /*
- * DM.h
+ * JDDarkMatter.h
  *
  *  Created on: 03/07/2017
+ *  Last revision: 01/12/2017
+ *
  *  Authors: David Navarro Gironés 	<<david.navarro.girones@gmail.com>>
  *  		 Joaquim Palacio 		<<jpalacio@ifae.es>>
  *
- *  		 ADD A GENERAL DESCRIPTION ON THE CLASS, THE MAIN FUNCTIONS, THE VARIABLES
- *  		 AND MENTION THE "runExample#.C" THAT SHOWS HOW TO USE IT
+ *			 THIS CLASS IS THE ONE RELATED WITH THE DARK MATTER DATA.
+ *			 WITH THIS CLASS YOU CAN EVALUATE THE JFACTOR VS THETA, THE LOS VS THETA AND PHI, THE JFACTOR OBTAINED BY INTEGRATING THE LOS.
+ *  		 VARIABLES:
+ *  		 	THETA 	[DEG]
+ *  		 	PHI	  	[RAD]
+ *  		 	OFFSET	[DEG]
+ *  		 The macro "exampleJDDarkMatter.cxx" shows how to use this class.
  */
 
 #ifndef JDDarkMatter_H_
@@ -30,11 +37,10 @@ public:
 
 	//Setters********
 
-	void SetSourcePath(TString sourcePath) 				{sMySourcePath=sourcePath;}
-	void SetSourceName(TString sourceName) 				{sSource=sourceName;}
-	void SetCandidate(TString candidate) 				{sCandidate=candidate;}
-	void SetAuthor(TString author) 						{sAuthor=author;}
-	void SetThetaMax(Double_t thetaMax) 				{dThetaMax=thetaMax;}
+	void SetSourcePath(TString sourcePath) 										{sMySourcePath=sourcePath;}
+	void SetSourceName(TString sourceName) 										{sSource=sourceName;}
+	void SetCandidate(TString candidate) 										{sCandidate=candidate;}
+	void SetAuthor(TString author) 												{sAuthor=author;}
 	void SetIsSphericalCoordinates(Bool_t isSphericalCoordinates)				{bIsSphericalCoordinates=isSphericalCoordinates;}
 
 	Bool_t SetJFactorFromTGraph(TGraph* jfactor, Bool_t verbose=0);//, Bool_t verbose);
@@ -51,6 +57,7 @@ public:
 	void GetListOfConstructors();
 	void GetUnits();
 	void GetWarning();
+
 	///////////////////////////////////////////////////////
 	//Int
 	///////////////////////////////////////////////////////
@@ -59,7 +66,6 @@ public:
 	///////////////////////////////////////////////////////
 	//TF1
 	///////////////////////////////////////////////////////
-
 	TF1* GetTF1JFactorVsTheta()
 	{
 		if(!GetIsJFactor()) GetWarning();
@@ -128,7 +134,6 @@ public:
 	///////////////////////////////////////////////////////
 	//TF2
 	///////////////////////////////////////////////////////
-
 	TF2* GetTF2LOSThetaVSThetaPhi()
 	{
 		if(!GetIsJFactor()) GetWarning();
@@ -141,15 +146,17 @@ public:
 		return fEvaluateLOS_m1ThetaVsThetaPhi;
 	}
 
-	TF2* GetTF2LOSOffThetaVSThetaPhi()
+	TF2* GetTF2LOSOffThetaVSThetaPhi(Double_t offset=20)
 	{
 		if(!GetIsJFactor()) GetWarning();
+		fEvaluateLOSOffThetaVsThetaPhi->SetParameter(0,offset);
 		return fEvaluateLOSOffThetaVsThetaPhi;
 	}
 
-	TF2* GetTF2LOS_m1OffThetaVSThetaPhi()
+	TF2* GetTF2LOS_m1OffThetaVSThetaPhi(Double_t offset=20)
 	{
 		if(!GetIsJFactor()) GetWarning();
+		fEvaluateLOS_m1OffThetaVsThetaPhi->SetParameter(0,offset);
 		return fEvaluateLOS_m1OffThetaVsThetaPhi;
 	}
 
@@ -158,16 +165,16 @@ public:
 	///////////////////////////////////////////////////////
 	//Double_t
 	///////////////////////////////////////////////////////
-
-	Double_t GetThetaMax() 		{return dThetaMax;}			// [deg]
-	Double_t GetJFactorMax() 	{return dJFactorMax;}		// [~GeV,~cm]
-	Double_t GetJFactorMin() 	{return dJFactorMin;}		// [~GeV,~cm]
+	Double_t GetThetaMax() 			{return dThetaMax;}			// [deg]
+	Double_t GetJFactorMax() 		{return dJFactorMax;}		// [~GeV,~cm]
+	Double_t GetJFactor_m1Max() 	{return dJFactor_m1Max;}	// [~GeV,~cm]
+	Double_t GetJFactorMin() 		{return dJFactorMin;}		// [~GeV,~cm]
+	Double_t GetJFactor_m1Min() 	{return dJFactor_m1Min;}	// [~GeV,~cm]
 
 
 	///////////////////////////////////////////////////////
 	//TString
 	///////////////////////////////////////////////////////
-
 	TString GetAuthor()			{return sAuthor;}
 	TString GetCandidate()		{return sCandidate;}
 	TString GetSourcePath() 	{return sMySourcePath;}
@@ -176,7 +183,6 @@ public:
 	///////////////////////////////////////////////////////
 	//Bool_t
 	///////////////////////////////////////////////////////
-
 	Bool_t GetIsBonnivard() 					{return bIsBonnivard;}
 	Bool_t GetIsGeringer() 						{return bIsGeringer;}
 	Bool_t GetIsJFactor()						{return bIsJFactor;}
@@ -190,38 +196,32 @@ protected:
 	void SetIsJFactor(Bool_t isJFactor)					{bIsJFactor=isJFactor;}
 	void SetNumPointsJFactorGraph(Int_t numPoints) 		{iNumPointsJFactorGraph=numPoints;}
 
-	void SetJFactorMax(Double_t jFactorMax) 			{dJFactorMax=jFactorMax;}
-	void SetJFactorMin(Double_t jFactorMin) 			{dJFactorMin=jFactorMin;}
+	void SetThetaMax(Double_t thetaMax) 					{dThetaMax=thetaMax;}
+	void SetJFactorMax(Double_t jFactorMax) 				{dJFactorMax=jFactorMax;}
+	void SetJFactor_m1Max(Double_t jFactor_m1Max) 			{dJFactor_m1Max=jFactor_m1Max;}
+	void SetJFactorMin(Double_t jFactorMin) 				{dJFactorMin=jFactorMin;}
+	void SetJFactor_m1Min(Double_t jFactor_m1Min) 			{dJFactor_m1Min=jFactor_m1Min;}
+
 
 	Bool_t SetJFactorFromReferences(Bool_t verbose=0);
 
 	//OTHERS********
-
 	void CreateFunctionsDM();
-	void ReadJFactorBonnivard(Bool_t verbose=0); //is_m1=0 -> JFactor; is_m1=1 -> JFactor_m1
+	void ReadJFactorBonnivard(Bool_t verbose=0);
 	void ReadJFactorGeringer(Bool_t verbose=0);
 
 	Double_t TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par);
 	Double_t TGraphEvaluateJFactor_m1VsTheta(Double_t* x, Double_t* par);
-
 	Double_t IntegrateJFactorFromLOSVsTheta(Double_t* x, Double_t* par);
 	Double_t IntegrateJFactor_m1FromLOSVsTheta(Double_t* x, Double_t* par);
-
 	Double_t IntegrateJFactorOffFromLOSVsTheta(Double_t* x, Double_t* par);
 	Double_t IntegrateJFactor_m1OffFromLOSVsTheta(Double_t* x, Double_t* par);
-
 	Double_t EvaluateLOSVsTheta(Double_t* x, Double_t* par);
 	Double_t EvaluateLOS_m1VsTheta(Double_t* x, Double_t* par);
-
 	Double_t EvaluateNormLOSVsTheta(Double_t* x, Double_t* par);
 	Double_t EvaluateNormLOS_m1VsTheta(Double_t* x, Double_t* par);
-
-	Double_t EvaluateQFactorVsTheta(Double_t* x, Double_t* par);
-
-
 	Double_t EvaluateLOSThetaVsThetaPhi(Double_t* x, Double_t* par);
 	Double_t EvaluateLOS_m1ThetaVsThetaPhi(Double_t* x, Double_t* par);
-
 	Double_t EvaluateLOSOffThetaVsThetaPhi(Double_t* x, Double_t* par);
 	Double_t EvaluateLOS_m1OffThetaVsThetaPhi(Double_t* x, Double_t* par);
 
@@ -230,7 +230,6 @@ private:
 	///////////////////////////////////////////////////////
 	//TString
 	///////////////////////////////////////////////////////
-
 	TString sAuthor;
 	TString sSource;
 	TString sCandidate;
@@ -239,69 +238,54 @@ private:
 	///////////////////////////////////////////////////////
 	//Int_t
 	///////////////////////////////////////////////////////
-
 	Int_t iNumPointsJFactorGraph;
 
 	///////////////////////////////////////////////////////
 	//Double_t
 	///////////////////////////////////////////////////////
-
 	Double_t dThetaMax;
 	Double_t dJFactorMax;
+	Double_t dJFactor_m1Max;
 	Double_t dJFactorMin;
+	Double_t dJFactor_m1Min;
 
 	Double_t dDeg2Rad;
 
 	///////////////////////////////////////////////////////
 	//TGraph
 	///////////////////////////////////////////////////////
-
-	// (QUIM) you can specify here how this JFactor is going to be filled,
-	// make explicit that the same TGraph is used for Bon/Ger & Ann/Dec
 	TGraph* gJFactor;
 	TGraph* gJFactor_m1;
 
 	///////////////////////////////////////////////////////
 	//TF1
 	///////////////////////////////////////////////////////
-
 	TF1* fEvaluateJFactorVsTheta;
 	TF1* fEvaluateJFactor_m1VsTheta;
-
 	TF1* fEvaluateLOSVsTheta;
 	TF1* fEvaluateLOS_m1VsTheta;
-
 	TF1* fEvaluateNormLOSVsTheta;
 	TF1* fEvaluateNormLOS_m1VsTheta;
-
 	TF1* fIntegrateJFactorFromLOSVsTheta;
 	TF1* fIntegrateJFactor_m1FromLOSVsTheta;
-
 	TF1* fIntegrateJFactorOffFromLOSVsTheta;
 	TF1* fIntegrateJFactor_m1OffFromLOSVsTheta;
-
-	TF1* fEvaluateQFactorVsTheta;
 
 	///////////////////////////////////////////////////////
 	//TF2
 	///////////////////////////////////////////////////////
-
 	TF2* fEvaluateLOSThetaVsThetaPhi;
 	TF2* fEvaluateLOS_m1ThetaVsThetaPhi;
-
 	TF2* fEvaluateLOSOffThetaVsThetaPhi;
 	TF2* fEvaluateLOS_m1OffThetaVsThetaPhi;
 
 	///////////////////////////////////////////////////////
 	//Bool_t
 	///////////////////////////////////////////////////////
-
 	Bool_t bIsBonnivard;
 	Bool_t bIsGeringer;
 	Bool_t bIsJFactor;
 	Bool_t bIsSphericalCoordinates;
 };
-
-
 
 #endif /* JDDarkMatter_H_ */

@@ -2,11 +2,21 @@
  * JDInstrument.cc
  *
  *  Created on: 03/07/2017
+ *  Last revision: 01/12/2017
+ *
  *  Authors: David Navarro Gironés 	<<david.navarrogir@e-campus.uab.cat>>
  *  		 Joaquim Palacio 		<<jpalacio@ifae.es>>
  *
- *  		 ADD A GENERAL DESCRIPTION ON THE CLASS, THE MAIN FUNCTIONS, THE VARIABLES
- *  		 AND MENTION THE "runExample#.C" THAT SHOWS HOW TO USE IT
+ *
+ *			 THIS CLASS IS THE ONE RELATED WITH THE INSTRUMENT DATA.
+ *			 WITH THIS CLASS YOU CAN EVALUATE THE EPSILON (ACCEPTANCE) VS DCC, THE EPSILON VS THETA AND PHI, THE EPSILON VS X AND Y,
+ *			 THE EPSILON MULTIPLIED BY THETA VERSUS THETA AND PHI AND THE EFFICIENCY VS THETA.
+ *			 VARIABLES:
+ *  		 	THETA 	[DEG]
+ *  		 	DCC		[DEG]    DISTANCE TO THE CENTER OF THE CAMERA
+ *  		 	PHI	  	[RAD]
+ *  		 	OFFSET	[DEG]
+ *  		 The macro "exampleJDInstrument.cxx" shows how to use this class.
  */
 
 #include "JDInstrument.h"
@@ -36,7 +46,7 @@ using namespace std;
 //
 //	This is the constructor used to show the possibilities that offers the JDInstrument class
 JDInstrument::JDInstrument():
-		gCameraAcceptance(NULL), fEvaluateEpsilonVsTheta(NULL), fEvaluateEfficiencyVsTheta(NULL),
+		gCameraAcceptance(NULL), fEvaluateEpsilonVsDcc(NULL), fEvaluateEfficiencyVsTheta(NULL),
 		fEvaluateEpsilonVsThetaAndPhi(NULL), fEvaluateEpsilonVsXAndY(NULL), fEvaluateEpsilonThetaVsThetaAndPhi(NULL),
 		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0), bIsSphericalCoordinates(1),
 		dDeg2Rad(TMath::Pi()/180.)
@@ -54,12 +64,13 @@ JDInstrument::JDInstrument():
 //-----------------------------------------------
 //
 //	This is the constructor used to set an ideal camera acceptance
-//	There are two values that have to be given:
+//	There are three values that have to be given:
 //		distanceCameraCenterMax: Radius of the camera [deg]
-//		wobbleDist: Distance from the centre of the camera where the object of interest is placed [deg]
+//		wobbleDist: Distance from the object of interest to the centre of the field of view [deg]
+//		instrumentName: Name of the instrument we are using
 JDInstrument::JDInstrument(Double_t distanceCameraCenterMax,Double_t wobbleDist, TString instrumentName):
 		dWobbleDist(wobbleDist), sInstrumentName(instrumentName),
-		gCameraAcceptance(NULL), fEvaluateEpsilonVsTheta(NULL), fEvaluateEfficiencyVsTheta(NULL),
+		gCameraAcceptance(NULL), fEvaluateEpsilonVsDcc(NULL), fEvaluateEfficiencyVsTheta(NULL),
 		fEvaluateEpsilonVsThetaAndPhi(NULL), fEvaluateEpsilonVsXAndY(NULL), fEvaluateEpsilonThetaVsThetaAndPhi(NULL),
 		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0), bIsSphericalCoordinates(1),
 		dDeg2Rad(TMath::Pi()/180.)
@@ -87,10 +98,10 @@ JDInstrument::JDInstrument(Double_t distanceCameraCenterMax,Double_t wobbleDist,
 //	This is the constructor used to set a camera acceptance using data of a TGraph
 //	There are two values that have to be given:
 //		cameraAcceptance: Information of the acceptance of the camera [%]
-//		wobbleDist: Distance from the centre of the camera where the object of interest is placed [deg]
+//		wobbleDist: Distance from the object of interest to the centre of the field of view [deg]
 JDInstrument::JDInstrument(TGraph* cameraAcceptance, Double_t wobbleDist):
 		dWobbleDist(wobbleDist),
-		gCameraAcceptance(NULL), fEvaluateEpsilonVsTheta(NULL), fEvaluateEfficiencyVsTheta(NULL),
+		gCameraAcceptance(NULL), fEvaluateEpsilonVsDcc(NULL), fEvaluateEfficiencyVsTheta(NULL),
 		fEvaluateEpsilonVsThetaAndPhi(NULL), fEvaluateEpsilonVsXAndY(NULL), fEvaluateEpsilonThetaVsThetaAndPhi(NULL),
 		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0),  bIsSphericalCoordinates(1),
 		dDeg2Rad(TMath::Pi()/180.)
@@ -116,9 +127,10 @@ JDInstrument::JDInstrument(TGraph* cameraAcceptance, Double_t wobbleDist):
 //-----------------------------------------------
 //
 //	This is the constructor used when the data is given by a txtFile
+//		wobbleDist: Distance from the object of interest to the centre of the field of view [deg]
 JDInstrument::JDInstrument(TString txtFile, Double_t wobbleDist):
 		dWobbleDist(wobbleDist),
-		gCameraAcceptance(NULL), fEvaluateEpsilonVsTheta(NULL), fEvaluateEfficiencyVsTheta(NULL),
+		gCameraAcceptance(NULL), fEvaluateEpsilonVsDcc(NULL), fEvaluateEfficiencyVsTheta(NULL),
 		fEvaluateEpsilonVsThetaAndPhi(NULL), fEvaluateEpsilonVsXAndY(NULL), fEvaluateEpsilonThetaVsThetaAndPhi(NULL),
 		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0),  bIsSphericalCoordinates(1),
 		dDeg2Rad(TMath::Pi()/180.)
@@ -144,7 +156,7 @@ JDInstrument::JDInstrument(TString txtFile, Double_t wobbleDist):
 
 //-----------------------------------------------
 //
-//	This is the constructor.
+//	This is the constructor used when we are using the data from the references.
 //
 //	Possible variables are:
 // 	sInstrumentName 	= (TString) name of the telescope
@@ -152,7 +164,7 @@ JDInstrument::JDInstrument(TString txtFile, Double_t wobbleDist):
 //	sMyInstrumentPath	= (TString) name of the instrument path
 JDInstrument::JDInstrument(TString instrumentName, Double_t wobble, TString instrumentPath):
 		sInstrumentName(instrumentName), dWobbleDist(wobble), sInstrumentPath(instrumentPath),
-		gCameraAcceptance(NULL), fEvaluateEpsilonVsTheta(NULL), fEvaluateEfficiencyVsTheta(NULL),
+		gCameraAcceptance(NULL), fEvaluateEpsilonVsDcc(NULL), fEvaluateEfficiencyVsTheta(NULL),
 		fEvaluateEpsilonVsThetaAndPhi(NULL), fEvaluateEpsilonVsXAndY(NULL), fEvaluateEpsilonThetaVsThetaAndPhi(NULL),
 		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0),  bIsSphericalCoordinates(1),
 		dDeg2Rad(TMath::Pi()/180.)
@@ -182,7 +194,7 @@ JDInstrument::~JDInstrument()
 {
 
 	if (gCameraAcceptance)								delete gCameraAcceptance;
-	if (fEvaluateEpsilonVsTheta)						delete fEvaluateEpsilonVsTheta;
+	if (fEvaluateEpsilonVsDcc)							delete fEvaluateEpsilonVsDcc;
 	if (fEvaluateEfficiencyVsTheta)						delete fEvaluateEfficiencyVsTheta;
 	if (fEvaluateEpsilonVsThetaAndPhi)					delete fEvaluateEpsilonVsThetaAndPhi;
 	if (fEvaluateEpsilonVsXAndY)						delete fEvaluateEpsilonVsXAndY;
@@ -199,10 +211,7 @@ JDInstrument::~JDInstrument()
 //-----------------------------------------------
 // This function calls the important functions of this class
 //
-// WARNING:ISSUE
-// dThetaMax (Double_t) is used in Efficiency and EpsilonPerTheta so as to stop the function as soon as the evaluation gets out of the camera
-//
-// fEvaluateEpsilonVsTheta -> TF1 that evaluates the Epsilon vs Theta. The Epsilon is a short way to call the camera acceptance; Epsilon [%] theta [deg]
+// fEvaluateEpsilonVsDcc -> TF1 that evaluates the Epsilon vs Dcc. The Epsilon is a short way to call the camera acceptance; Epsilon [%] theta [deg]
 // fEvaluateEfficiencyVsTheta -> TF1 that evaluates the Efficiency vs Theta. The Efficieny is defined as the integral of epsilon multiplied by theta and divided by the area integrated; Efficiency [%] theta [deg]
 // fEvaluateEpsilonVsThetaAndPhi-> TF2 that evaluates the Epsilon vs theta and phi; Epsilon [%] theta[deg] phi[rad]
 // fEvaluateEpsilonVsXAndY-> TF2 that evaluates the Epsilon vs x and y; Epsilon [%] x[deg] y[deg]
@@ -210,7 +219,7 @@ JDInstrument::~JDInstrument()
 void JDInstrument::CreateFunctionsInstrument()
 {
 
-	fEvaluateEpsilonVsTheta = new TF1("fEvaluateEpsilonVsTheta", this, &JDInstrument::EvaluateEpsilonVsTheta, 0., GetDistCameraCenterMax(), 0, "JDInstrument", "EvaluateEpsilonVsTheta");
+	fEvaluateEpsilonVsDcc = new TF1("fEvaluateEpsilonVsDcc", this, &JDInstrument::EvaluateEpsilonVsDcc, 0., GetDistCameraCenterMax(), 0, "JDInstrument", "EvaluateEpsilonVsDcc");
 	fEvaluateEfficiencyVsTheta = new TF1("fEvaluateEfficiencyVsTheta", this, &JDInstrument::EvaluateEfficiencyVsTheta, 0., GetDistCameraCenterMax(), 1, "JDInstrument", "EvaluateEfficiencyVsTheta");
 
 	fEvaluateEpsilonVsThetaAndPhi = new TF2("fEvaluateEpsilonVsThetaAndPhi", this, &JDInstrument::EvaluateEpsilonVsThetaAndPhi, 0., GetDistCameraCenterMax(), 0., 2*TMath::Pi(), 1, "JDInstrument", "EvaluateEpsilonVsThetaAndPhi");
@@ -276,6 +285,12 @@ Bool_t JDInstrument::SetCameraAcceptanceFromTGraph(TGraph* cameraAcceptance,Bool
 	return 1;
 }
 
+//-----------------------------------------------
+//
+//	This boolean is TRUE(1) if the camera acceptance from a txt file can be read and FALSE(0) if the camera acceptance of a txt file can not be read
+//	It fills a TGraph with the data given by the user with a txt file
+//	It sets the maximum distance to the center of the camera
+//	If the process is correct, the boolean SetIsCameraAcceptance is TRUE(1)
 Bool_t JDInstrument::SetCameraAcceptanceFromTxtFile(TString txtFile, Bool_t verbose)
 {
 	Double_t DistCenterCamera, Epsilon;
@@ -290,7 +305,6 @@ Bool_t JDInstrument::SetCameraAcceptanceFromTxtFile(TString txtFile, Bool_t verb
 		if (verbose==1)	cout << DistCenterCamera << " " << Epsilon << endl;
 
 		gCameraAcceptance->SetPoint(contador,DistCenterCamera,Epsilon);
-
 		contador ++;
 	}
 
@@ -391,11 +405,11 @@ Bool_t JDInstrument::SetCameraAcceptanceFromInstrument(Bool_t verbose)
 
 	else if(GetInstrumentName()=="Sensitivity")
 	{
-		ifstream file (GetInstrumentPath()+"/references/IACTPerformance/MAGICPointLike/Sensitivity.txt");
+		ifstream file (GetInstrumentPath()+"/references/IACTPerformance/MAGICPointLike/Sensitivity3rdPoint.txt");
 
 		cout << "   "<< endl;
 		cout << "   Reading camera acceptance from: "<< endl;
-		cout << "   CTA   "<< endl;
+		cout << "   Sensitivity   "<< endl;
 		cout << "   "<< endl;
 		SetIsCTA(1);
 
@@ -416,16 +430,14 @@ Bool_t JDInstrument::SetCameraAcceptanceFromInstrument(Bool_t verbose)
 		if(contador>0) return 1;
 	}
 
-	//CTA north 50-80 Gev, 50-80 TeV. Epsilon ~ 1/(sensitivitat²)
-
 	return 0;
 }
 
 //-----------------------------------------------
-// It evaluates the Epsilon [%] vs Theta [deg] as long as Theta is smaller than the maximum distance to the center of the camera
+// It evaluates the Epsilon [%] vs Dcc [deg]
 //
-// x[0] 	= dTheta [deg]
-Double_t JDInstrument::EvaluateEpsilonVsTheta(Double_t* x, Double_t* par)
+// x[0] 	= Dcc [deg]
+Double_t JDInstrument::EvaluateEpsilonVsDcc(Double_t* x, Double_t* par)
 {
 
 	if (x[0]<=GetDistCameraCenterMax()) {  return gCameraAcceptance->Eval(x[0]);}
@@ -456,10 +468,6 @@ Double_t JDInstrument::EvaluateEpsilonVsXAndY(Double_t* x, Double_t* par)
 //  par[0] = wobble [deg]
 Double_t JDInstrument::EvaluateEpsilonVsThetaAndPhi(Double_t* x, Double_t* par)
 {
-	//(QUIM) - La formula es xx+yy-2xy·cos(); el motiu per posar un signe més es perque en realitat es phi'=180-phi?
-	//		(see triangle slide-2)
-	// ISSUE: I think the reason why is +, is what you have said.
-	//		 - Power(a,0.50) =? Sqrt()
 	Double_t dccR = TMath::Power(TMath::Power(par[0],2)+TMath::Power(x[0],2)-2*par[0]*x[0]*TMath::Cos(x[1]+(TMath::Pi()/2)),0.50);
 
 	if (dccR<=GetDistCameraCenterMax()) {  return gCameraAcceptance->Eval(dccR);}
@@ -480,6 +488,8 @@ Double_t JDInstrument::EvaluateEpsilonThetaVsThetaAndPhi(Double_t* x, Double_t* 
 	Double_t X0rad =x[0]*dDeg2Rad;
 	fEvaluateEpsilonVsThetaAndPhi->SetParameter(0,par[0]);
 
+	//WARNING: We should decide whether we use spherical coordinates in both epsilon and LOS.
+
 //	if (GetIsSphericalCoordinates()==1)
 //	{
 //		return fEvaluateEpsilonVsThetaAndPhi->Eval(x[0], x[1])*TMath::Sin(X0rad);
@@ -493,7 +503,6 @@ Double_t JDInstrument::EvaluateEpsilonThetaVsThetaAndPhi(Double_t* x, Double_t* 
 
 //-----------------------------------------------
 //	It evaluates the Efficiency [%] vs theta [deg]
-//	(QUIM) what is efficiency, see slide 3
 //
 //	x[0] = theta [deg]
 Double_t JDInstrument::EvaluateEfficiencyVsTheta(Double_t* x, Double_t* par)
@@ -502,10 +511,9 @@ Double_t JDInstrument::EvaluateEfficiencyVsTheta(Double_t* x, Double_t* par)
 	fEvaluateEpsilonThetaVsThetaAndPhi->SetParameter(0,par[0]);
 
 	return fEvaluateEpsilonThetaVsThetaAndPhi->Integral(0., x[0], 0., 2*TMath::Pi(), 1.e-2)/(TMath::Pi()*TMath::Power(x[0],2));
-//	return fEvaluateEpsilonThetaVsThetaAndPhi->Integral(0., x[0], 0., 2*TMath::Pi(), 1.e-6)/((1-TMath::Cos(X0rad))*2*TMath::Pi());
-//	return fEvaluateEpsilonThetaVsThetaAndPhi->Integral(0., X0rad, 0., 2*TMath::Pi(), 1.e-6);
 }
 
+// It shows the list of instruments available
 void JDInstrument::GetListOfInstruments()
 {
 	cout << " " << endl;
@@ -516,6 +524,7 @@ void JDInstrument::GetListOfInstruments()
 
 }
 
+//It shows the list of units used
 void JDInstrument::GetUnits()
 {
 	cout << " " << endl;
@@ -526,6 +535,7 @@ void JDInstrument::GetUnits()
 	cout << " " << endl;
 }
 
+//It shoows the list of constructors available
 void JDInstrument::GetListOfConstructors()
 {
 	cout << " " << endl;
@@ -538,6 +548,7 @@ void JDInstrument::GetListOfConstructors()
 	cout << " " << endl;
 }
 
+//It shows a warning message if anything is wrong
 void JDInstrument::GetWarning()
 {
 	cout << "  *****************************" << endl;
