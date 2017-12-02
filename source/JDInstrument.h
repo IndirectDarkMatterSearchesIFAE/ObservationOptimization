@@ -68,7 +68,7 @@ public:
 		return fEvaluateEpsilonVsDcc;
 	}
 
-	TF1* GetTF1EfficiencyVsTheta(Double_t WobbleDistance)
+	TF1* GetTF1EfficiencyVsTheta(Double_t WobbleDistance=0.4)
 	{
 		if(!GetIsCameraAcceptance()) GetWarning();
 		fEvaluateEfficiencyVsTheta->SetParameter(0, WobbleDistance);

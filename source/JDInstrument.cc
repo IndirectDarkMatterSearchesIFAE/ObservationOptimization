@@ -222,7 +222,7 @@ void JDInstrument::CreateFunctionsInstrument()
 	fEvaluateEpsilonVsDcc = new TF1("fEvaluateEpsilonVsDcc", this, &JDInstrument::EvaluateEpsilonVsDcc, 0., GetDistCameraCenterMax(), 0, "JDInstrument", "EvaluateEpsilonVsDcc");
 	fEvaluateEfficiencyVsTheta = new TF1("fEvaluateEfficiencyVsTheta", this, &JDInstrument::EvaluateEfficiencyVsTheta, 0., GetDistCameraCenterMax(), 1, "JDInstrument", "EvaluateEfficiencyVsTheta");
 
-	fEvaluateEpsilonVsThetaAndPhi = new TF2("fEvaluateEpsilonVsThetaAndPhi", this, &JDInstrument::EvaluateEpsilonVsThetaAndPhi, 0., GetDistCameraCenterMax(), 0., 2*TMath::Pi(), 1, "JDInstrument", "EvaluateEpsilonVsThetaAndPhi");
+	fEvaluateEpsilonVsThetaAndPhi = new TF2("fEvaluateEpsilonVsThetaAndPhi", this, &JDInstrument::EvaluateEpsilonVsThetaAndPhi, 0., GetDistCameraCenterMax(), -TMath::Pi(), TMath::Pi(), 1, "JDInstrument", "EvaluateEpsilonVsThetaAndPhi");
 	fEvaluateEpsilonVsXAndY = new TF2("fEvaluateEpsilonVsXAndY", this, &JDInstrument::EvaluateEpsilonVsXAndY, -GetDistCameraCenterMax(), GetDistCameraCenterMax(), -GetDistCameraCenterMax(), GetDistCameraCenterMax(), 1, "JDInstrument", "EvaluateEpsilonVsXAndY");
 	fEvaluateEpsilonThetaVsThetaAndPhi = new TF2("fEvaluateEpsilonThetaVsThetaAndPhi", this, &JDInstrument::EvaluateEpsilonThetaVsThetaAndPhi, 0., GetDistCameraCenterMax(), 0., 2*TMath::Pi(), 1, "JDInstrument", "EvaluateEpsilonThetaVsThetaAndPhi");
 }
@@ -295,6 +295,7 @@ Bool_t JDInstrument::SetCameraAcceptanceFromTxtFile(TString txtFile, Bool_t verb
 {
 	Double_t DistCenterCamera, Epsilon;
 	Int_t contador=0;
+	Double_t EpsilonCenter;
 
 	gCameraAcceptance = new TGraph();
 
@@ -303,8 +304,9 @@ Bool_t JDInstrument::SetCameraAcceptanceFromTxtFile(TString txtFile, Bool_t verb
 	{
 		// only for Tests
 		if (verbose==1)	cout << DistCenterCamera << " " << Epsilon << endl;
+		if(contador==0)EpsilonCenter=Epsilon;
 
-		gCameraAcceptance->SetPoint(contador,DistCenterCamera,Epsilon);
+		gCameraAcceptance->SetPoint(contador,DistCenterCamera,Epsilon/EpsilonCenter);
 		contador ++;
 	}
 
