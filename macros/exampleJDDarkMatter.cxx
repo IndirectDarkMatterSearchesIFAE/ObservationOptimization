@@ -27,9 +27,12 @@
 #include <TStyle.h>
 
 #include "../source/JDDarkMatter.cc"
+#include "../source/JDAstroProfile.cc"
 
 // General path
-TString mySourcePath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/PointingOptimization/ObservationOptimization";
+//TString mySourcePath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/PointingOptimization/ObservationOptimization";
+TString mySourcePath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization";
+
 
 using namespace std;
 
@@ -112,16 +115,16 @@ void DrawDifferentialJFactorFromReferences()
 	TString candidate = "Annihilation";
 
 	JDDarkMatter* 	JFactor = new JDDarkMatter(author, source, candidate, mySourcePath);
-	TF1* functionLOS = JFactor->GetTF1LOSVsTheta();
-	functionLOS->SetLineColor(2);
-	functionLOS->SetLineStyle(1);
+	TF1* functiondNdOmega = JFactor->GetTF1dNdOmegaVsTheta();
+	functiondNdOmega->SetLineColor(2);
+	functiondNdOmega->SetLineStyle(1);
 
 	TCanvas* canvas1 = new TCanvas("canvas1","",600,550);
 	TH1I* dummy1 = new TH1I("dummy", JFactor->GetAuthor(),1,0.01,JFactor->GetThetaMax());
 	dummy1->SetMaximum(3.e22);
 	dummy1->SetMinimum(1.e17);
 	dummy1->SetStats(0);
-	dummy1->SetXTitle(" #theta "); //(QUIM) specify UNITS!!!
+	dummy1->SetXTitle(" #theta ");
 	if (JFactor->GetCandidate() == "Annihilation")	{dummy1->SetYTitle(" J Factor [GeV^{2}/cm^{5}]");}
 	else if (JFactor->GetCandidate() == "Decay")	{dummy1->SetYTitle(" J Factor [GeV/cm^{2}]");	}
 	dummy1->GetXaxis()->SetTitleOffset(1.3);
@@ -131,14 +134,14 @@ void DrawDifferentialJFactorFromReferences()
 //	gPad->SetLogy();
 	gPad->SetGridy();
 	gPad->SetGridx();
-	functionLOS->Draw("same");
+	functiondNdOmega->Draw("");
 
 	// This is for plotting purposes only
 	TString isBonnivard = (JFactor->GetIsBonnivard()? "arxiv:1504.02048" : "");
 	TString isGeringer = (JFactor->GetIsGeringer()? "arxiv:1408.0002" : "");
 
 	TLegend* leg1=new TLegend(.18,.15,.88,.25);
-	leg1->AddEntry(functionLOS, JFactor->GetSourceName()+" "+JFactor->GetCandidate()+" - "+isBonnivard+isGeringer, "l");
+	leg1->AddEntry(functiondNdOmega, JFactor->GetSourceName()+" "+JFactor->GetCandidate()+" - "+isBonnivard+isGeringer, "l");
 	leg1->SetFillColor(0);
 	leg1->SetLineColor(1);
 	leg1->SetBorderSize(1);
@@ -262,10 +265,10 @@ void DrawDifferentialJFactorFromTGraph()
 	JFactor->SetCandidate("Annihilation");
 	JFactor->SetAuthor("Saturni-Doro");
 	JFactor->SetSourceName("TrigII");
-	TF1* functionLOS = JFactor->GetTF1LOSVsTheta();
-	Double_t Theta = JFactor->GetThetaMax();
-	functionLOS->SetLineColor(2);
-	functionLOS->SetLineStyle(1);
+	TF1* functiondNdOmega = JFactor->GetTF1dNdOmegaVsTheta();
+//	Double_t thetaMax = JFactor->GetThetaMax();
+	functiondNdOmega->SetLineColor(2);
+	functiondNdOmega->SetLineStyle(1);
 
 	TCanvas* canvas1 = new TCanvas("canvas1","",600,550);
 	TH1I* dummy1 = new TH1I("dummy", JFactor->GetAuthor(),1,0.01,JFactor->GetThetaMax());
@@ -282,10 +285,10 @@ void DrawDifferentialJFactorFromTGraph()
 	gPad->SetLogy();
 	gPad->SetGridy();
 	gPad->SetGridx();
-	functionLOS->Draw("same");
+	functiondNdOmega->Draw("same");
 
 	TLegend* leg1=new TLegend(.18,.15,.88,.25);
-	leg1->AddEntry(functionLOS, JFactor->GetSourceName()+" "+JFactor->GetCandidate()+" ("+JFactor->GetAuthor()+")", "l");
+	leg1->AddEntry(functiondNdOmega, JFactor->GetSourceName()+" "+JFactor->GetCandidate()+" ("+JFactor->GetAuthor()+")", "l");
 	leg1->SetFillColor(0);
 	leg1->SetLineColor(1);
 	leg1->SetBorderSize(1);
@@ -311,7 +314,6 @@ void DrawJFactorFromTxtFile()
 
 
 	Double_t thetaMax = JFactor->GetThetaMax();
-	cout<<thetaMax<<endl;
 
 	functionJFactor->SetLineColor(2);
 	functionJFactor->SetLineStyle(1);
@@ -347,14 +349,14 @@ void DrawJFactorFromTxtFile()
 
 void exampleJDDarkMatter()
 {
-	PrintListOfPossibilities();
+//	PrintListOfPossibilities();
 
-	DrawJFactorFromReferences();
-	DrawDifferentialJFactorFromReferences();
+//	DrawJFactorFromReferences();
+//	DrawDifferentialJFactorFromReferences();
 
-	DrawJFactorFromTGraph();
-	DrawDifferentialJFactorFromTGraph();
-
+//	DrawJFactorFromTGraph();
+//	DrawDifferentialJFactorFromTGraph();
+//
 	DrawJFactorFromTxtFile();
 
 }

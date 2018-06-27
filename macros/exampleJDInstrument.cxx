@@ -31,7 +31,7 @@
 using namespace std;
 
 // General path
-TString myInstrumentPath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/PointingOptimization/ObservationOptimization";
+TString myInstrumentPath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization";
 
 
 //-------------------------------------
@@ -442,14 +442,14 @@ void PlotIntegratedFoVAcceptanceFromTxtFile()
 
 void exampleJDInstrument()
 {
-	PrintListOfPossibilities();
+//	PrintListOfPossibilities();
 
-	PlotFoVAcceptanceFromMAGIC();
-	PlotIntegratedFoVAcceptanceFromMAGIC();
+//	PlotFoVAcceptanceFromMAGIC();
+//	PlotIntegratedFoVAcceptanceFromMAGIC();
 
-	PlotFoVAcceptanceFromTGraph();
-	PlotIntegratedFoVAcceptanceFromTGraph();
+//	PlotFoVAcceptanceFromTGraph();
+//	PlotIntegratedFoVAcceptanceFromTGraph();
 
-	PlotFoVAcceptanceFromTxtFile();
+//	PlotFoVAcceptanceFromTxtFile();
 	PlotIntegratedFoVAcceptanceFromTxtFile();
 }

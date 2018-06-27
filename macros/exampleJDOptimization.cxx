@@ -10,6 +10,7 @@
  *  		 This is a tutorial on the main features of the class JDOptimization
  */
 
+#include "../source/JDAstroProfile.cc"
 #include "../source/JDDarkMatter.cc"
 #include "../source/JDInstrument.cc"
 #include "../source/JDOptimization.cc"
@@ -23,8 +24,8 @@
 using namespace std;
 
 // General path
-TString myInstrumentPath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/PointingOptimization/ObservationOptimization";
-TString mySourcePath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/PointingOptimization/ObservationOptimization";
+TString myInstrumentPath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization";
+TString mySourcePath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization";
 
 
 //-------------------------------------
@@ -223,9 +224,9 @@ void PlotQ3Factor()
 	TString author = "Bonnivard";
 	TString source = "uma2";
 	TString candidate = "Decay";
-	TString instrumentName= "MAGICPointLike";
+	TString instrumentName= "IDEAL";
 	Double_t distanceCameraCenterMax=5;	// [deg]
-	Double_t wobbleDist=0.;	// [deg]
+	Double_t wobbleDist=0.4;	// [deg]
 	Double_t normalizationPoint=8.8136e+19;
 
 	JDOptimization* QFactor = new JDOptimization(author, source, candidate, mySourcePath, myInstrumentPath, instrumentName, distanceCameraCenterMax, wobbleDist);
@@ -347,9 +348,9 @@ void PlotQ13Factor()
 	TString author = "Bonnivard";
 	TString source = "uma2";
 	TString candidate = "Decay";
-	TString instrumentName= "MAGICPointLike";
-	Double_t distanceCameraCenterMax=5;	// [deg]
-	Double_t wobbleDist=3.;	// [deg]
+	TString instrumentName= "IDEAL";
+	Double_t distanceCameraCenterMax=10;	// [deg]
+	Double_t wobbleDist=1.;	// [deg]
 	Double_t normalizationPoint=8.8136e+19;
 
 	JDOptimization* QFactor = new JDOptimization(author, source, candidate, mySourcePath, myInstrumentPath, instrumentName, distanceCameraCenterMax, wobbleDist);
@@ -376,8 +377,10 @@ void PlotQ13Factor()
 
 	TCanvas* canvas2 = new TCanvas("canvas2","",600,550);
 	TH1I* dummy1 = new TH1I("dummy1","" ,1,1e-2,thetaMax);
-	dummy1->SetMaximum(3.);
-	dummy1->SetMinimum(0.);
+//	dummy1->SetMaximum(3.);
+//	dummy1->SetMinimum(0.);
+	dummy1->SetMaximum(1.e22);
+	dummy1->SetMinimum(1.e15);
 	dummy1->SetStats(0);
 	dummy1->SetXTitle(" #theta [deg]");
 	if(QFactor->GetCandidate()=="Annihilation"){	dummy1->SetYTitle(" QFactor_{Ann} ");}
@@ -385,11 +388,11 @@ void PlotQ13Factor()
 	dummy1->GetXaxis()->SetTitleOffset(1.3);
 	dummy1->GetYaxis()->SetTitleOffset(1.5);
 	dummy1->DrawCopy();
-//	gPad->SetLogx();
-//	gPad->SetLogy();
+	gPad->SetLogx();
+	gPad->SetLogy();
 	gPad->SetGridy();
 	gPad->SetGridx();
-	functionQFactorVsTheta->Draw("same");
+	functionQFactorVsTheta->Draw("");
 	leg->Draw();
 	gPad->Modified();
 	gPad->Update();
@@ -524,13 +527,13 @@ void PlotQ123Factor()
 void exampleJDOptimization()
 {
 
-	PlotQ0Factor();		// 	J/theta
-	PlotQ1Factor();		//	J_on/Sqrt{theta^2+J_off}
-	PlotQ2Factor();		//  J_1sm/theta
-	PlotQ3Factor();		//  J_eff/theta_eff
-
-	PlotQ12Factor();	//	J_on_1sm/Sqrt{theta^2 + J_off_1sm}
+//	PlotQ0Factor();		// 	J/theta
+//	PlotQ1Factor();		//	J_on-J_off/theta
+//	PlotQ2Factor();		//  J_1sm/theta
+//	PlotQ3Factor();		//  J_eff/theta_eff
+//
+//	PlotQ12Factor();	//	J_on_1sm/Sqrt{theta^2 + J_off_1sm}
 	PlotQ13Factor();	//	J_on_eff/Sqrt{(theta_eff)^2 + J_off_eff}
-	PlotQ23Factor();	//	J_1sm_eff/theta_eff
-	PlotQ123Factor();	//	J_on_1sm_eff/Sqrt{(theta_eff)^2 + J_off_1sm_eff}
+//	PlotQ23Factor();	//	J_1sm_eff/theta_eff
+//	PlotQ123Factor();	//	J_on_1sm_eff/Sqrt{(theta_eff)^2 + J_off_1sm_eff}
 }

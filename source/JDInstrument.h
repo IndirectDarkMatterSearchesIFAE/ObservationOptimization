@@ -65,35 +65,35 @@ public:
 	TF1* GetTF1EpsilonVsDcc()
 	{
 		if(!GetIsCameraAcceptance()) GetWarning();
-		return fEvaluateEpsilonVsDcc;
+		return fEpsilonVsDcc;
 	}
 
 	TF1* GetTF1EfficiencyVsTheta(Double_t WobbleDistance=0.4)
 	{
 		if(!GetIsCameraAcceptance()) GetWarning();
-		fEvaluateEfficiencyVsTheta->SetParameter(0, WobbleDistance);
-		return fEvaluateEfficiencyVsTheta;
+		fEfficiencyVsTheta->SetParameter(0, WobbleDistance);
+		return fEfficiencyVsTheta;
 	}
 
-	TF2* GetTF2EpsilonVsThetaAndPhi()
+	TF2* GetTF2EpsilonVsThetaPhi()
 	{
 		if(!GetIsCameraAcceptance()) GetWarning();
-		fEvaluateEpsilonVsThetaAndPhi->SetParameter(0,GetWobbleDistance());
-		return fEvaluateEpsilonVsThetaAndPhi;
+		fEpsilonVsThetaPhi->SetParameter(0,GetWobbleDistance());
+		return fEpsilonVsThetaPhi;
 	}
 
-	TF2* GetTF2EpsilonThetaVsThetaAndPhi()
+	TF2* GetTF2EpsilonThetaVsThetaPhi()
 	{
 		if(!GetIsCameraAcceptance()) GetWarning();
-		fEvaluateEpsilonThetaVsThetaAndPhi->SetParameter(0,GetWobbleDistance());
-		return fEvaluateEpsilonThetaVsThetaAndPhi;
+		fEpsilonThetaVsThetaPhi->SetParameter(0,GetWobbleDistance());
+		return fEpsilonThetaVsThetaPhi;
 	}
 
 	TF2* GetTF2EpsilonVsXAndY()
 	{
 		if(!GetIsCameraAcceptance()) GetWarning();
-		fEvaluateEpsilonVsXAndY->SetParameter(0,GetWobbleDistance());
-		return fEvaluateEpsilonVsXAndY;
+		fEpsilonVsXAndY->SetParameter(0,GetWobbleDistance());
+		return fEpsilonVsXAndY;
 	}
 
 	//Setters********
@@ -122,13 +122,23 @@ protected:
 	//OTHERS********
 	void CreateFunctionsInstrument();
 
-	Double_t EvaluateEpsilonVsDcc(Double_t* x, Double_t* par);
-	Double_t EvaluateEpsilonVsThetaAndPhi(Double_t* x, Double_t* par);
-	Double_t EvaluateEpsilonVsXAndY(Double_t* x, Double_t* par);
-	Double_t EvaluateEpsilonThetaVsThetaAndPhi(Double_t* x, Double_t* par);
-	Double_t EvaluateEfficiencyVsTheta(Double_t* x, Double_t* par);
+	Double_t EpsilonVsDcc(Double_t* x, Double_t* par);
+	Double_t EpsilonVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t EpsilonVsXAndY(Double_t* x, Double_t* par);
+	Double_t EpsilonThetaVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t EfficiencyVsTheta(Double_t* x, Double_t* par);
 
+	Double_t IntegrateEpsilonThetaVsTheta(Double_t* x, Double_t* par);
 
+	///////////////////////////////////////////////////////
+	//TF1
+	///////////////////////////////////////////////////////
+	TF1* fIntegrateEpsilonThetaVsTheta;
+
+	///////////////////////////////////////////////////////
+	//TF2
+	///////////////////////////////////////////////////////
+	TF2* fEpsilonThetaVsThetaPhi;
 
 private:
 
@@ -149,6 +159,7 @@ private:
 	Double_t dDistCenterCameraMax;
 	Double_t dWobbleDist;
 	Double_t dDeg2Rad;
+	Double_t dBinResolution;
 
 	///////////////////////////////////////////////////////
 	//TGraph
@@ -158,15 +169,14 @@ private:
 	///////////////////////////////////////////////////////
 	//TF1
 	///////////////////////////////////////////////////////
-	TF1* fEvaluateEpsilonVsDcc;
-	TF1* fEvaluateEfficiencyVsTheta;
+	TF1* fEpsilonVsDcc;
+	TF1* fEfficiencyVsTheta;
 
 	///////////////////////////////////////////////////////
 	//TF2
 	///////////////////////////////////////////////////////
-	TF2* fEvaluateEpsilonVsThetaAndPhi;
-	TF2* fEvaluateEpsilonVsXAndY;
-	TF2* fEvaluateEpsilonThetaVsThetaAndPhi;
+	TF2* fEpsilonVsThetaPhi;
+	TF2* fEpsilonVsXAndY;
 
 	///////////////////////////////////////////////////////
 	//Bool_T
