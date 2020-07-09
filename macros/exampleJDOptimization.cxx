@@ -8,6 +8,7 @@
  *
  *
  *  		 This is a tutorial on the main features of the class JDOptimization
+  * --> ADD DESCRIPTION OF WHAT SCRIPT DOES
  */
 
 #include "../source/JDAstroProfile.cc"
@@ -24,8 +25,8 @@
 using namespace std;
 
 // General path
-TString myInstrumentPath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization";
-TString mySourcePath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization";
+TString myInstrumentPath = "./";
+TString mySourcePath = "./";
 
 
 //-------------------------------------
