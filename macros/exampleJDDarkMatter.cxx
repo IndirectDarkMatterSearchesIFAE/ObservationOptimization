@@ -30,8 +30,7 @@
 #include "../source/JDAstroProfile.cc"
 
 // General path
-//TString mySourcePath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/PointingOptimization/ObservationOptimization";
-TString mySourcePath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization";
+TString mySourcePath = "../";
 
 
 using namespace std;
