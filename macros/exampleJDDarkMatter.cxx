@@ -26,12 +26,11 @@
 #include <iostream>
 #include <TStyle.h>
 
-#include "../source/JDDarkMatter.cc"
-#include "../source/JDAstroProfile.cc"
+#include "/Users/mdoro/Soft/ObservationOptimization/source/JDDarkMatter.cc"
+//#include "/Users/mdoro/Soft/ObservationOptimization/source/JDAstroProfile.cc"
 
 // General path
-//TString mySourcePath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/PointingOptimization/ObservationOptimization";
-TString mySourcePath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization";
+TString mySourcePath = "/Users/mdoro/Soft/ObservationOptimization/ObservationOptimization";
 
 
 using namespace std;
@@ -349,14 +348,14 @@ void DrawJFactorFromTxtFile()
 
 void exampleJDDarkMatter()
 {
-//	PrintListOfPossibilities();
+	PrintListOfPossibilities();
 
-//	DrawJFactorFromReferences();
+	DrawJFactorFromReferences();
 //	DrawDifferentialJFactorFromReferences();
 
 //	DrawJFactorFromTGraph();
 //	DrawDifferentialJFactorFromTGraph();
 //
-	DrawJFactorFromTxtFile();
+//	DrawJFactorFromTxtFile();
 
 }
