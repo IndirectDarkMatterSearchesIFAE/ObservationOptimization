@@ -82,7 +82,7 @@ public:
 		return fEpsilonVsThetaPhi;
 	}
 
-	TF2* GetTF2EpsilonThetaVsThetaPhi()
+	TF2* GetTF2EpsilonVsThetaAndPhi()
 	{
 		if(!GetIsCameraAcceptance()) GetWarning();
 		fEpsilonThetaVsThetaPhi->SetParameter(0,GetWobbleDistance());
