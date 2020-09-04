@@ -19,7 +19,7 @@
 #ifndef JDDarkMatter_H_
 #define JDDarkMatter_H_
 
-#include <JDAstroProfile.h>
+#include "/Users/mdoro/Soft/ObservationOptimization/source/JDAstroProfile.h"
 
 #include <TF1.h>
 #include <TGraph.h>
