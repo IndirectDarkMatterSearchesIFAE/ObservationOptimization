@@ -167,7 +167,7 @@ JDDarkMatter::JDDarkMatter(TString txtFile):
 JDDarkMatter::JDDarkMatter(TString author, TString source, TString candidate, TString mySourcePath):
 		sAuthor(author), sSource(source), sCandidate(candidate), sMySourcePath (mySourcePath),
 		gJFactor(NULL), fEvaluateJFactorVsTheta(NULL),
-		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0), bIsSphericalCoordinates(1),
+		bIsBonnivard(0),bIsGeringer(0),bIsJFactor(0), 
 		dDeg2Rad(TMath::Pi()/180.), dBinResolution(0.05)
 {
 	cout << endl;
