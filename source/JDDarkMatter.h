@@ -19,7 +19,7 @@
 #ifndef JDDarkMatter_H_
 #define JDDarkMatter_H_
 
-#include <JDAstroProfile.h>
+//#include "JDAstroProfile.h"
 
 #include <TF1.h>
 #include <TGraph.h>
@@ -27,7 +27,7 @@
 
 using namespace std;
 
-class JDDarkMatter : public JDAstroProfile {
+class JDDarkMatter {
 public:
 
 	JDDarkMatter();
@@ -43,6 +43,10 @@ public:
 	void SetSourceName(TString sourceName) 										{sSource=sourceName;}
 	void SetCandidate(TString candidate) 										{sCandidate=candidate;}
 	void SetAuthor(TString author) 												{sAuthor=author;}
+	// Michele
+	void SetIsSphericalCoordinates(Bool_t isSphericalCoordinates)				{bIsSphericalCoordinates=isSphericalCoordinates;}
+
+
 
 	Bool_t SetJFactorFromTGraph(TGraph* jfactor, Bool_t verbose=0);//, Bool_t verbose);
 	Bool_t SetJFactorFromTxtFile(TString txtFile, Bool_t verbose=0);//, Bool_t verbose);
@@ -78,11 +82,101 @@ public:
 		if(!GetIsJFactor()) GetWarning();
 		return fEvaluateJFactorSigma1VsTheta;
 	}
+	// Michele
+	TF1* GetTF1dNdOmegaVsTheta()
+	{
+		if(!GetIsdNdOmega()) GetWarning();
+		return fdNdOmegaVsTheta;
+	}
 
+	TF1* GetTF1dNdOmegaSigma1VsTheta()
+	{
+		if(!GetIsdNdOmega()) GetWarning();
+		return fdNdOmegaSigma1VsTheta;
+	}
+
+	TF1* GetTF1NormdNdOmegaVsTheta(Double_t normTheta)
+	{
+		if(!GetIsdNdOmega()) GetWarning();
+		fNormdNdOmegaVsTheta->SetParameter(0,normTheta);
+		return fNormdNdOmegaVsTheta;
+	}
+
+	TF1* GetTF1NormdNdOmegaSigma1VsTheta(Double_t normTheta)
+	{
+		if(!GetIsdNdOmega()) GetWarning();
+		fNormdNdOmegaSigma1VsTheta->SetParameter(0,normTheta);
+		return fNormdNdOmegaSigma1VsTheta;
+	}
+
+	//QUIM NEW
+//	TF1* GetTF1IntegratedNdOmegaVsTheta()
+//	{
+//		if(!GetIsdNdOmega()) GetWarning();
+//		return fIntegratedNdOmegaVsTheta;
+//	}
+
+	TF1* GetTF1IntegratedNdOmegaThetaVsTheta()
+	{
+		if(!GetIsdNdOmega()) GetWarning();
+		return fIntegratedNdOmegaThetaVsTheta;
+	}
+
+	TF1* GetTF1IntegratedNdOmegaOffThetaVsTheta(Double_t offsetDistance)
+	{
+		if(!GetIsdNdOmega()) GetWarning();
+		fIntegratedNdOmegaOffThetaVsTheta->SetParameter(0,offsetDistance);
+		return fIntegratedNdOmegaOffThetaVsTheta;
+	}
+
+	TF1* GetTF1IntegratedNdOmegaSigma1ThetaVsTheta()
+	{
+		if(!GetIsdNdOmega()) GetWarning();
+		return fIntegratedNdOmegaSigma1ThetaVsTheta;
+	}
+
+	TF1* GetTF1IntegratedNdOmegaSigma1OffThetaVsTheta()
+	{
+		if(!GetIsdNdOmega()) GetWarning();
+		return fIntegratedNdOmegaSigma1OffThetaVsTheta;
+	}
 
 	///////////////////////////////////////////////////////
 	//TF2
 	///////////////////////////////////////////////////////
+	//Michele
+	TF2* GetTF2dNdOmegaThetaVSThetaPhi()
+	{
+		if(!GetIsdNdOmega()) GetWarning();
+		return fdNdOmegaThetaVsThetaPhi;
+	}
+
+	TF2* GetTF2dNdOmegaSigma1ThetaVSThetaPhi()
+	{
+		if(!GetIsdNdOmega()) GetWarning();
+		return fdNdOmegaSigma1ThetaVsThetaPhi;
+	}
+
+	TF2* GetTF2dNdOmegaOffVSThetaPhi(Double_t offset=20)
+	{
+		if(!GetIsdNdOmega()) GetWarning();
+		fdNdOmegaOffVsThetaPhi->SetParameter(0,offset);
+		return fdNdOmegaOffVsThetaPhi;
+	}
+
+	TF2* GetTF2dNdOmegaOffThetaVSThetaPhi(Double_t offset=20)
+	{
+		if(!GetIsdNdOmega()) GetWarning();
+		fdNdOmegaOffThetaVsThetaPhi->SetParameter(0,offset);
+		return fdNdOmegaOffThetaVsThetaPhi;
+	}
+
+	TF2* GetTF2dNdOmegaSigma1OffThetaVSThetaPhi(Double_t offset=20)
+	{
+		if(!GetIsdNdOmega()) GetWarning();
+		fdNdOmegaSigma1OffThetaVsThetaPhi->SetParameter(0,offset);
+		return fdNdOmegaSigma1OffThetaVsThetaPhi;
+	}
 
 
 	///////////////////////////////////////////////////////
@@ -92,6 +186,9 @@ public:
 	Double_t GetJFactorSigma1Max() 	{return dJFactorSigma1Max;}	// [~GeV,~cm]
 	Double_t GetJFactorMin() 		{return dJFactorMin;}		// [~GeV,~cm]
 	Double_t GetJFactorSigma1Min() 	{return dJFactorSigma1Min;}	// [~GeV,~cm]
+	// Michele
+	Double_t GetThetaMax() 			{return dThetaMax;}			// [deg]
+	Double_t GetThetaMin() 			{return dThetaMin;}			// [deg]
 
 
 	///////////////////////////////////////////////////////
@@ -109,6 +206,10 @@ public:
 	Bool_t GetIsGeringer() 						{return bIsGeringer;}
 	Bool_t GetIsJFactor()						{return bIsJFactor;}
 	Bool_t GetIsJFactorSigma1()					{return bIsJFactorSigma1;}
+	// Michele
+	Bool_t GetIsdNdOmega()						{return bIsdNdOmega;}
+	Bool_t GetIsdNdOmegaSigma1()				{return bIsdNdOmegaSigma1;}
+	Bool_t GetIsSphericalCoordinates()			{return bIsSphericalCoordinates;}
 
 protected:
 
@@ -128,13 +229,46 @@ protected:
 
 	Bool_t SetJFactorFromReferences(Bool_t verbose=0);
 
+	//Michele
+	void SetThetaMax(Double_t thetaMax) 					{dThetaMax=thetaMax;}
+	void SetThetaMin(Double_t thetaMin) 					{dThetaMin=thetaMin;}
+
+	void SetIsdNdOmega(Bool_t isdNdOmega)					{bIsdNdOmega=isdNdOmega;}
+	void SetIsdNdOmegaSigma1(Bool_t isdNdOmegaSigma1)				{bIsdNdOmegaSigma1=isdNdOmegaSigma1;}
+
+
+
 	//OTHERS********
 	void CreateFunctionsDM();
+	//Michele
+	void CreateFunctionsAP();
+
 	void ReadJFactorBonnivard(Bool_t verbose=0);
 	void ReadJFactorGeringer(Bool_t verbose=0);
 
 	Double_t TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par);
 	Double_t TGraphEvaluateJFactorSigma1VsTheta(Double_t* x, Double_t* par);
+	//Michele
+	Double_t TGraphdNdOmegaVsTheta(Double_t* x, Double_t* par);
+	Double_t TGraphdNdOmegaSigma1VsTheta(Double_t* x, Double_t* par);
+
+	Double_t NormdNdOmegaVsTheta(Double_t* x, Double_t* par);
+	Double_t NormdNdOmegaSigma1VsTheta(Double_t* x, Double_t* par);
+
+	Double_t IntegratedNdOmegaThetaVsTheta(Double_t* x, Double_t* par);
+	Double_t IntegratedNdOmegaSigma1ThetaVsTheta(Double_t* x, Double_t* par);
+	Double_t IntegratedNdOmegaOffThetaVsTheta(Double_t* x, Double_t* par);
+	Double_t IntegratedNdOmegaSigma1OffThetaVsTheta(Double_t* x, Double_t* par);
+
+	Double_t dNdOmegaVsTheta(Double_t* x, Double_t* par);
+	Double_t dNdOmegaSigma1VsTheta(Double_t* x, Double_t* par);
+	Double_t dNdOmegaOffVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t dNdOmegaSigma1OffVsThetaPhi(Double_t* x, Double_t* par);
+
+	Double_t dNdOmegaThetaVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t dNdOmegaSigma1ThetaVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t dNdOmegaOffThetaVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t dNdOmegaSigma1OffThetaVsThetaPhi(Double_t* x, Double_t* par);
 
 private:
 
@@ -162,23 +296,46 @@ private:
 	Double_t dDeg2Rad;
 	Double_t dBinResolution;
 
+	//Michele
+	Double_t dThetaMax;
+	Double_t dThetaMin;
+
 	///////////////////////////////////////////////////////
 	//TGraph
 	///////////////////////////////////////////////////////
 	TGraph* gJFactor;
 	TGraph* gJFactorSigma1;
+	TGraph* gdNdOmega;
+	TGraph* gdNdOmegaSigma1;
 
 	///////////////////////////////////////////////////////
 	//TF1
 	///////////////////////////////////////////////////////
 	TF1* fEvaluateJFactorVsTheta;
 	TF1* fEvaluateJFactorSigma1VsTheta;
+	//Michele
+	TF1* fIntegratedNdOmegaThetaVsTheta;
+	TF1* fIntegratedNdOmegaSigma1ThetaVsTheta;
 
+	TF1* fIntegratedNdOmegaOffThetaVsTheta;
+	TF1* fIntegratedNdOmegaSigma1OffThetaVsTheta;
+	TF1* fdNdOmegaVsTheta;
+	TF1* fdNdOmegaSigma1VsTheta;
+	//To delete
+	TF1* fNormdNdOmegaVsTheta;
+	TF1* fNormdNdOmegaSigma1VsTheta;
 
 	///////////////////////////////////////////////////////
 	//TF2
 	///////////////////////////////////////////////////////
-
+	//Michele
+	TF2* fdNdOmegaSigma1OffVsThetaPhi;
+	TF2* fdNdOmegaOffVsThetaPhi;
+	//Michele
+	TF2* fdNdOmegaThetaVsThetaPhi;
+	TF2* fdNdOmegaSigma1ThetaVsThetaPhi;
+	TF2* fdNdOmegaOffThetaVsThetaPhi;
+	TF2* fdNdOmegaSigma1OffThetaVsThetaPhi;
 
 	///////////////////////////////////////////////////////
 	//Bool_t
@@ -187,6 +344,10 @@ private:
 	Bool_t bIsGeringer;
 	Bool_t bIsJFactor;
 	Bool_t bIsJFactorSigma1;
+	//Michele
+	Bool_t bIsdNdOmega;
+	Bool_t bIsdNdOmegaSigma1;
+	Bool_t bIsSphericalCoordinates;
 };
 
 #endif /* JDDarkMatter_H_ */

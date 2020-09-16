@@ -53,13 +53,13 @@ public:
 	Bool_t GetIsCameraAcceptance()			{return bIsCameraAcceptance;}
 	Bool_t GetIsSphericalCoordinates()		{return bIsSphericalCoordinates;}
 
-	TString GetInstrumentName()			{return sInstrumentName;}
-	TString GetInstrumentPath()			{return sInstrumentPath;}
+	TString GetInstrumentName()				{return sInstrumentName;}
+	TString GetInstrumentPath()				{return sInstrumentPath;}
 
 	Int_t GetNumPointsCameraAcceptanceGraph()	{return iNumPointsCameraAcceptanceGraph;}
 
-	Double_t GetDistCameraCenterMax()	{return dDistCenterCameraMax;}
-	Double_t GetWobbleDistance()		{return dWobbleDist;}
+	Double_t GetDistCameraCenterMax()		{return dDistCenterCameraMax;}
+	Double_t GetWobbleDistance()			{return dWobbleDist;}
 
 
 	TF1* GetTF1EpsilonVsDcc()
@@ -75,6 +75,13 @@ public:
 		return fEfficiencyVsTheta;
 	}
 
+	TF1* GetTF1IntegratedEpsilonThetaVsTheta(Double_t WobbleDistance=0.4)
+	{
+		if(!GetIsCameraAcceptance()) GetWarning();
+		fIntegratedEpsilonThetaVsTheta->SetParameter(0, WobbleDistance);
+		return fIntegratedEpsilonThetaVsTheta;
+	}
+
 	TF2* GetTF2EpsilonVsThetaPhi()
 	{
 		if(!GetIsCameraAcceptance()) GetWarning();
@@ -82,7 +89,7 @@ public:
 		return fEpsilonVsThetaPhi;
 	}
 
-	TF2* GetTF2EpsilonVsThetaAndPhi()
+	TF2* GetTF2EpsilonThetaVsThetaPhi()
 	{
 		if(!GetIsCameraAcceptance()) GetWarning();
 		fEpsilonThetaVsThetaPhi->SetParameter(0,GetWobbleDistance());
@@ -128,12 +135,12 @@ protected:
 	Double_t EpsilonThetaVsThetaPhi(Double_t* x, Double_t* par);
 	Double_t EfficiencyVsTheta(Double_t* x, Double_t* par);
 
-	Double_t IntegrateEpsilonThetaVsTheta(Double_t* x, Double_t* par);
+	Double_t IntegratedEpsilonThetaVsTheta(Double_t* x, Double_t* par);
 
 	///////////////////////////////////////////////////////
 	//TF1
 	///////////////////////////////////////////////////////
-	TF1* fIntegrateEpsilonThetaVsTheta;
+	TF1* fIntegratedEpsilonThetaVsTheta;
 
 	///////////////////////////////////////////////////////
 	//TF2

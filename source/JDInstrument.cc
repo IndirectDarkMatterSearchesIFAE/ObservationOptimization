@@ -48,7 +48,7 @@ using namespace std;
 JDInstrument::JDInstrument():
 		gCameraAcceptance(NULL), fEpsilonVsDcc(NULL), fEfficiencyVsTheta(NULL),
 		fEpsilonVsThetaPhi(NULL), fEpsilonVsXAndY(NULL), fEpsilonThetaVsThetaPhi(NULL),
-		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0), bIsSphericalCoordinates(1),
+		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0), bIsSphericalCoordinates(0),
 		dDeg2Rad(TMath::Pi()/180.), dBinResolution(0.05)
 {
 	    cout << endl;
@@ -72,7 +72,7 @@ JDInstrument::JDInstrument(Double_t distanceCameraCenterMax,Double_t wobbleDist,
 		dWobbleDist(wobbleDist), sInstrumentName(instrumentName),
 		gCameraAcceptance(NULL), fEpsilonVsDcc(NULL), fEfficiencyVsTheta(NULL),
 		fEpsilonVsThetaPhi(NULL), fEpsilonVsXAndY(NULL), fEpsilonThetaVsThetaPhi(NULL),
-		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0), bIsSphericalCoordinates(1),
+		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0), bIsSphericalCoordinates(0),
 		dDeg2Rad(TMath::Pi()/180.), dBinResolution(0.05)
 {
 	    cout << endl;
@@ -103,7 +103,7 @@ JDInstrument::JDInstrument(TGraph* cameraAcceptance, Double_t wobbleDist):
 		dWobbleDist(wobbleDist),
 		gCameraAcceptance(NULL), fEpsilonVsDcc(NULL), fEfficiencyVsTheta(NULL),
 		fEpsilonVsThetaPhi(NULL), fEpsilonVsXAndY(NULL), fEpsilonThetaVsThetaPhi(NULL),
-		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0),  bIsSphericalCoordinates(1),
+		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0),  bIsSphericalCoordinates(0),
 		dDeg2Rad(TMath::Pi()/180.), dBinResolution(0.05)
 {
 	    cout << endl;
@@ -132,7 +132,7 @@ JDInstrument::JDInstrument(TString txtFile, Double_t wobbleDist):
 		dWobbleDist(wobbleDist),
 		gCameraAcceptance(NULL), fEpsilonVsDcc(NULL), fEfficiencyVsTheta(NULL),
 		fEpsilonVsThetaPhi(NULL), fEpsilonVsXAndY(NULL), fEpsilonThetaVsThetaPhi(NULL),
-		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0),  bIsSphericalCoordinates(1),
+		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0),  bIsSphericalCoordinates(0),
 		dDeg2Rad(TMath::Pi()/180.), dBinResolution(0.05)
 {
 	cout << endl;
@@ -166,7 +166,7 @@ JDInstrument::JDInstrument(TString instrumentName, Double_t wobble, TString inst
 		sInstrumentName(instrumentName), dWobbleDist(wobble), sInstrumentPath(instrumentPath),
 		gCameraAcceptance(NULL), fEpsilonVsDcc(NULL), fEfficiencyVsTheta(NULL),
 		fEpsilonVsThetaPhi(NULL), fEpsilonVsXAndY(NULL), fEpsilonThetaVsThetaPhi(NULL),
-		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0),  bIsSphericalCoordinates(1),
+		bIsIdeal(0), bIsMagic(0), bIsCTA(0), bIsCameraAcceptance(0),  bIsSphericalCoordinates(0),
 		dDeg2Rad(TMath::Pi()/180.), dBinResolution(0.05)
 {
 	    cout << endl;
@@ -212,7 +212,7 @@ JDInstrument::~JDInstrument()
 // This function calls the important functions of this class
 //
 // fEpsilonVsDcc -> TF1 that evaluates the Epsilon vs Dcc. The Epsilon is a short way to call the camera acceptance; Epsilon [%] theta [deg]
-// fEfficiencyVsTheta -> TF1 that evaluates the Efficiency vs Theta. The Efficieny is defined as the integral of epsilon multiplied by theta and divided by the area integrated; Efficiency [%] theta [deg]
+// fEfficiencyVsTheta -> TF1 that evaluates the Efficiency vs Theta. The Efficieny is defined as the integral of epsilon multiplied by theta and divided by the area Integrated; Efficiency [%] theta [deg]
 // fEpsilonVsThetaPhi-> TF2 that evaluates the Epsilon vs theta and phi; Epsilon [%] theta[deg] phi[rad]
 // fEpsilonVsXAndY-> TF2 that evaluates the Epsilon vs x and y; Epsilon [%] x[deg] y[deg]
 // fEpsilonPerThetaVsThetaPhi-> TF2 that evaluates the Epsilon multiplied by theta vs theta and phi; Epsilon [%] theta[deg] phi[rad]
@@ -226,7 +226,7 @@ void JDInstrument::CreateFunctionsInstrument()
 	fEpsilonVsXAndY = new TF2("fEpsilonVsXAndY", this, &JDInstrument::EpsilonVsXAndY, -GetDistCameraCenterMax(), GetDistCameraCenterMax(), -GetDistCameraCenterMax(), GetDistCameraCenterMax(), 1, "JDInstrument", "EpsilonVsXAndY");
 	fEpsilonThetaVsThetaPhi = new TF2("fEpsilonThetaVsThetaPhi", this, &JDInstrument::EpsilonThetaVsThetaPhi, 0., GetDistCameraCenterMax(), 0., 2*TMath::Pi(), 1, "JDInstrument", "EpsilonThetaVsThetaPhi");
 
-	fIntegrateEpsilonThetaVsTheta = new TF1("fIntegrateEpsilonThetaVsTheta",this,&JDInstrument::IntegrateEpsilonThetaVsTheta,0.,GetDistCameraCenterMax(),1,"JDInstrument","IntegrateEpsilonThetaVsTheta");
+	fIntegratedEpsilonThetaVsTheta = new TF1("fIntegratedEpsilonThetaVsTheta",this,&JDInstrument::IntegratedEpsilonThetaVsTheta,0.,GetDistCameraCenterMax(),1,"JDInstrument","IntegratedEpsilonThetaVsTheta");
 
 }
 
@@ -493,6 +493,7 @@ Double_t JDInstrument::EpsilonThetaVsThetaPhi(Double_t* x, Double_t* par)
 
 	if (GetIsSphericalCoordinates()==1)
 	{
+		// This calculations does not work... Please check!
 		return fEpsilonVsThetaPhi->Eval(x[0], x[1])*TMath::Sin(X0rad);
 	}
 
@@ -515,10 +516,10 @@ Double_t JDInstrument::EfficiencyVsTheta(Double_t* x, Double_t* par)
 }
 
 //-----------------------------------------------
-// It integrates ...
+// It Integrateds ...
 //
 // x[0] 	= dTheta [deg]
-Double_t JDInstrument::IntegrateEpsilonThetaVsTheta(Double_t* x, Double_t* par)
+Double_t JDInstrument::IntegratedEpsilonThetaVsTheta(Double_t* x, Double_t* par)
 {
 	return fEpsilonThetaVsThetaPhi->Integral(0.,x[0],0.,2*TMath::Pi(),1e-2);
 }
