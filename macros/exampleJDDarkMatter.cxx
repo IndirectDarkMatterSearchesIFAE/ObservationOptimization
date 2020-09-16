@@ -27,14 +27,13 @@
 #include <TStyle.h>
 
 #include "../source/JDDarkMatter.cc"
-#include "../source/JDAstroProfile.cc"
+//#include "../source/JDAstroProfile.cc"
+
+using namespace std;
 
 // General path
 //TString mySourcePath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/PointingOptimization/ObservationOptimization";
-TString mySourcePath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization";
-
-
-using namespace std;
+TString mySourcePath = "/Users/palacio/Work/Software/ObservationOptimization/ObservationOptimization";
 
 //-------------------------------------
 //  Printout on the main functions and available profiles
@@ -63,6 +62,8 @@ void DrawJFactorFromReferences()
 	TString author = "Bonnivard";
 	TString source = "uma2";
 	TString candidate = "Annihilation";
+	// there is a problem with defining this variable as a general variable...
+	TString mySourcePath = "/Users/palacio/Work/Software/ObservationOptimization/ObservationOptimization";
 
 	JDDarkMatter* 	JFactor = new JDDarkMatter(author, source, candidate, mySourcePath);
 	TF1* functionJFactor = JFactor->GetTF1JFactorVsTheta();
@@ -113,6 +114,8 @@ void DrawDifferentialJFactorFromReferences()
 	TString author = "Bonnivard";
 	TString source = "uma2";
 	TString candidate = "Annihilation";
+	// there is a problem with defining this variable as a general variable...
+	TString mySourcePath = "/Users/palacio/Work/Software/ObservationOptimization/ObservationOptimization";
 
 	JDDarkMatter* 	JFactor = new JDDarkMatter(author, source, candidate, mySourcePath);
 	TF1* functiondNdOmega = JFactor->GetTF1dNdOmegaVsTheta();
@@ -352,11 +355,11 @@ void exampleJDDarkMatter()
 //	PrintListOfPossibilities();
 
 //	DrawJFactorFromReferences();
-//	DrawDifferentialJFactorFromReferences();
+	DrawDifferentialJFactorFromReferences();
 
 //	DrawJFactorFromTGraph();
 //	DrawDifferentialJFactorFromTGraph();
 //
-	DrawJFactorFromTxtFile();
+//	DrawJFactorFromTxtFile();
 
 }

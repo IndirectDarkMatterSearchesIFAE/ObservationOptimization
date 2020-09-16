@@ -31,7 +31,8 @@
 using namespace std;
 
 // General path
-TString myInstrumentPath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization";
+//TString myInstrumentPath = "/home/jpalacio/Work/eclipse/workspace/pic/DarkMatter/ObservationOptimization";
+TString myInstrumentPath = "/Users/palacio/Work/Software/ObservationOptimization/ObservationOptimization";
 
 
 //-------------------------------------
@@ -52,7 +53,6 @@ void PrintListOfPossibilities()
 //  Double_t wobble			-> Wobble distance [deg]
 void PlotFoVAcceptanceFromMAGIC()
 {
-
 	TString instrumentName= "MAGICPointLike";
 	Double_t wobble=0.4;	// [deg]
 
@@ -87,7 +87,7 @@ void PlotFoVAcceptanceFromMAGIC()
 	gPad->Modified();
 	gPad->Update();
 
-	TF2* functionCameraAcceptanceVsThetaAndPhi = Epsilon->GetTF2EpsilonVsThetaAndPhi();
+	TF2* functionCameraAcceptanceVsThetaAndPhi = Epsilon->GetTF2EpsilonVsThetaPhi();
 	// This is for plotting purposes only
 
 	TCanvas* canvas1 = new TCanvas("canvas1","",600,550);
@@ -223,7 +223,7 @@ void PlotFoVAcceptanceFromTGraph()
 	gPad->Modified();
 	gPad->Update();
 
-	TF2* functionCameraAcceptanceVsThetaAndPhi = Epsilon->GetTF2EpsilonVsThetaAndPhi();
+	TF2* functionCameraAcceptanceVsThetaAndPhi = Epsilon->GetTF2EpsilonVsThetaPhi();
 
 	TCanvas* canvas1 = new TCanvas("canvas1","",600,550);
 	TH2I* dummy1 = new TH2I("dummy1", "Camera Acceptance",1,0.,distCamCenterMax, 1, -TMath::Pi(), TMath::Pi());
@@ -356,7 +356,7 @@ void PlotFoVAcceptanceFromTxtFile()
 	gPad->Modified();
 	gPad->Update();
 
-	TF2* functionCameraAcceptanceVsThetaAndPhi = Epsilon->GetTF2EpsilonVsThetaAndPhi();
+	TF2* functionCameraAcceptanceVsThetaAndPhi = Epsilon->GetTF2EpsilonVsThetaPhi();
 
 	TCanvas* canvas1 = new TCanvas("canvas1","",600,550);
 	TH2I* dummy1 = new TH2I("dummy1", "Camera Acceptance",1,0.,distCamCenterMax, 1, -TMath::Pi(), TMath::Pi());
@@ -442,14 +442,14 @@ void PlotIntegratedFoVAcceptanceFromTxtFile()
 
 void exampleJDInstrument()
 {
-//	PrintListOfPossibilities();
+//	PrintListOfPossibilities(); // -> OK
 
-//	PlotFoVAcceptanceFromMAGIC();
-//	PlotIntegratedFoVAcceptanceFromMAGIC();
+//	PlotFoVAcceptanceFromMAGIC(); // -> OK
+	PlotIntegratedFoVAcceptanceFromMAGIC(); // -> Only works if Spherical Coordinates are OFF (checK!)
 
-//	PlotFoVAcceptanceFromTGraph();
-//	PlotIntegratedFoVAcceptanceFromTGraph();
+//	PlotFoVAcceptanceFromTGraph(); // -> OK
+//	PlotIntegratedFoVAcceptanceFromTGraph(); // -> Only works if Spherical Coordinates are OFF (checK!)
 
-//	PlotFoVAcceptanceFromTxtFile();
-	PlotIntegratedFoVAcceptanceFromTxtFile();
+//	PlotFoVAcceptanceFromTxtFile(); // -> OK
+//	PlotIntegratedFoVAcceptanceFromTxtFile(); // -> Only works if Spherical Coordinates are OFF (checK!)
 }
