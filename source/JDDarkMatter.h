@@ -157,7 +157,7 @@ public:
 		return fdNdOmegaSigma1ThetaVsThetaPhi;
 	}
 
-	TF2* GetTF2dNdOmegaOffVSThetaPhi(Double_t offset=20)
+	TF2* GetTF2dNdOmegaOffVsThetaPhi(Double_t offset=20)
 	{
 		if(!GetIsdNdOmega()) GetWarning();
 		fdNdOmegaOffVsThetaPhi->SetParameter(0,offset);
@@ -177,7 +177,6 @@ public:
 		fdNdOmegaSigma1OffThetaVsThetaPhi->SetParameter(0,offset);
 		return fdNdOmegaSigma1OffThetaVsThetaPhi;
 	}
-
 
 	///////////////////////////////////////////////////////
 	//Double_t
@@ -216,6 +215,7 @@ protected:
 	//Setters********
 	void SetIsBonnivard(Bool_t isBonnivard) 			{bIsBonnivard=isBonnivard;}
 	void SetIsGeringer(Bool_t isGeringer) 				{bIsGeringer=isGeringer;}
+	void SetIsJFactorFromUser(Bool_t isJFactorFromUser) {bIsJFactorFromUser=isJFactorFromUser;}
 	void SetIsJFactor(Bool_t isJFactor)					{bIsJFactor=isJFactor;}
 	void SetIsJFactorSigma1(Bool_t isJFactorSigma1)			{bIsJFactorSigma1=isJFactorSigma1;}
 	void SetNumPointsJFactorGraph(Int_t numPoints) 		{iNumPointsJFactorGraph=numPoints;}
@@ -245,6 +245,7 @@ protected:
 
 	void ReadJFactorBonnivard(Bool_t verbose=0);
 	void ReadJFactorGeringer(Bool_t verbose=0);
+	void ReadJFactorFromUser(Bool_t verbose=0);
 
 	Double_t TGraphEvaluateJFactorVsTheta(Double_t* x, Double_t* par);
 	Double_t TGraphEvaluateJFactorSigma1VsTheta(Double_t* x, Double_t* par);
@@ -342,6 +343,7 @@ private:
 	///////////////////////////////////////////////////////
 	Bool_t bIsBonnivard;
 	Bool_t bIsGeringer;
+	Bool_t bIsJFactorFromUser;
 	Bool_t bIsJFactor;
 	Bool_t bIsJFactorSigma1;
 	//Michele

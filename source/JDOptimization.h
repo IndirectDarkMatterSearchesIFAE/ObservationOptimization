@@ -55,7 +55,9 @@ public:
 	Bool_t GetIsSphericalCoordinates() 			{return jdDarkMatter->GetIsSphericalCoordinates();}
 //
 	Double_t GetBinResolution()					{return dBinResolution;}
-//
+
+	Double_t GetMyInstrument68Containment()		{return dMyInstrument68Containment;}
+
 	TF1* GetTF1QFactorVsTheta(Int_t type=0, Double_t thetaNorm=0.4)
 	{
 		if(type==0)
@@ -231,6 +233,7 @@ void GetOptimalThetaAndWobble(Double_t &thetaOpt, Double_t &thetaOptRangMin, Dou
 	}
 	else
 	{
+
 		cout << "   **************************************************" << endl;
 		cout << "   ***                                            ***" << endl;
 		cout << "   ***  WARNING:                                  ***" << endl;
@@ -388,6 +391,9 @@ TF2* GetTF2QFactorVsThetaWobble(Int_t type=0)
 
 	/**************************************************/
 
+	//	//***** JDOptimization Getters
+	void SetMyInstrument68Containment(Double_t myInstrument68Containment){dMyInstrument68Containment = myInstrument68Containment;}
+
 //	//***** JDDarkMatter Getters
 	void GetWarning()						{return jdDarkMatter->GetWarning();}
 //
@@ -486,7 +492,7 @@ protected:
 	void SetdNdOmegaSigma1Smeared();
 	void SetIsdNdOmegaSmeared(Bool_t isdNdOmegaSmeared)					{bIsdNdOmegaSmeared = isdNdOmegaSmeared;}
 	void SetIsdNdOmegaSigma1Smeared(Bool_t isdNdOmegaSigma1Smeared)		{bIsdNdOmegaSigma1Smeared = isdNdOmegaSigma1Smeared;}
-//
+
 //
 	Double_t Q0FactorVsTheta(Double_t* x, Double_t* par);
 	Double_t Q1FactorVsTheta(Double_t* x, Double_t* par);
@@ -518,7 +524,9 @@ protected:
 //	// ...VsTheta
 //	Double_t dNdOmegaEpsilonVsTheta(Double_t* x, Double_t* par);
 	Double_t dNdOmegaSmearedVsTheta(Double_t* x, Double_t* par);
-//	Double_t dNdOmegaSigma1SmearedVsTheta(Double_t* x, Double_t* par);
+
+	Double_t dNdOmegaSigma1SmearedVsTheta(Double_t* x, Double_t* par);
+
 //
 //	// ...VsThetaPhi
 //	Double_t dNdOmegaSmearedVsThetaPhi(Double_t* x, Double_t* par);
@@ -531,7 +539,9 @@ protected:
 //	Double_t dNdOmegaSigma1EpsilonVsThetaPhi(Double_t* x, Double_t* par);
 //	Double_t dNdOmegaSigma1OffEpsilonVsThetaPhi(Double_t* x, Double_t* par);
 	Double_t dNdOmegaSigma1SmearedOffVsThetaPhi(Double_t* x, Double_t* par);
-//	Double_t dNdOmegaOffEpsilonVsThetaPhi(Double_t* x, Double_t* par);
+
+	Double_t dNdOmegaOffEpsilonVsThetaPhi(Double_t* x, Double_t* par);
+
 //
 //	// ...ThetaVsThetaPhi
 	Double_t dNdOmegaSmearedThetaVsThetaPhi(Double_t* x, Double_t* par);
@@ -541,25 +551,25 @@ protected:
 	Double_t dNdOmegaSigma1SmearedEpsilonThetaVsThetaPhi(Double_t* x, Double_t* par);
 	Double_t dNdOmegaSmearedEpsilonOffThetaVsThetaPhi(Double_t* x, Double_t* par);
 	Double_t dNdOmegaSigma1SmearedEpsilonOffThetaVsThetaPhi(Double_t* x, Double_t* par);
-//	Double_t dNdOmegaOffEpsilonThetaVsThetaPhi(Double_t* x, Double_t* par);
-//	Double_t dNdOmegaSigma1SmearedThetaVsThetaPhi(Double_t* x, Double_t* par);
-//	Double_t dNdOmegaSigma1EpsilonThetaVsThetaPhi(Double_t* x, Double_t* par);
-//	Double_t dNdOmegaSigma1OffEpsilonThetaVsThetaPhi(Double_t* x, Double_t* par);
-//	Double_t dNdOmegaSigma1SmearedOffThetaVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t dNdOmegaOffEpsilonThetaVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t dNdOmegaSigma1SmearedThetaVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t dNdOmegaSigma1EpsilonThetaVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t dNdOmegaSigma1OffEpsilonThetaVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t dNdOmegaSigma1SmearedOffThetaVsThetaPhi(Double_t* x, Double_t* par);
 //
 //	// Integrated...ThetaVsTheta
-//	Double_t IntegratedNdOmegaEpsilonThetaVsTheta(Double_t* x, Double_t* par);
+	Double_t IntegratedNdOmegaEpsilonThetaVsTheta(Double_t* x, Double_t* par);
 	Double_t IntegratedNdOmegaSmearedThetaVsTheta(Double_t* x, Double_t* par);
 	Double_t IntegratedNdOmegaSmearedEpsilonThetaVsTheta(Double_t* x, Double_t* par);
 	Double_t IntegratedNdOmegaSigma1SmearedEpsilonThetaVsTheta(Double_t* x, Double_t* par);
 	Double_t IntegratedNdOmegaSmearedEpsilonOffThetaVsTheta(Double_t* x, Double_t* par);
 	Double_t IntegratedNdOmegaSigma1SmearedEpsilonOffThetaVsTheta(Double_t* x, Double_t* par);
-//	Double_t IntegratedNdOmegaSmearedOffThetaVsTheta(Double_t* x, Double_t* par);
-//	Double_t IntegratedNdOmegaSigma1EpsilonThetaVsTheta(Double_t* x, Double_t* par);
-//	Double_t IntegratedNdOmegaOffEpsilonThetaVsTheta(Double_t* x, Double_t* par);
-//	Double_t IntegratedNdOmegaSigma1OffEpsilonThetaVsTheta(Double_t* x, Double_t* par);
-//	Double_t IntegratedNdOmegaSigma1SmearedThetaVsTheta(Double_t* x, Double_t* par);
-//	Double_t IntegratedNdOmegaSigma1SmearedOffThetaVsTheta(Double_t* x, Double_t* par);
+	Double_t IntegratedNdOmegaSmearedOffThetaVsTheta(Double_t* x, Double_t* par);
+	Double_t IntegratedNdOmegaSigma1EpsilonThetaVsTheta(Double_t* x, Double_t* par);
+	Double_t IntegratedNdOmegaOffEpsilonThetaVsTheta(Double_t* x, Double_t* par);
+	Double_t IntegratedNdOmegaSigma1OffEpsilonThetaVsTheta(Double_t* x, Double_t* par);
+	Double_t IntegratedNdOmegaSigma1SmearedThetaVsTheta(Double_t* x, Double_t* par);
+	Double_t IntegratedNdOmegaSigma1SmearedOffThetaVsTheta(Double_t* x, Double_t* par);
 //
 //	void SetIsJFactorOnLessOff(Bool_t IsJFactorOnLessOff) 			{bIsJFactorOnLessOff=IsJFactorOnLessOff;}
 
@@ -604,16 +614,16 @@ private:
 	TF1* fIntegratedNdOmegaSigma1SmearedEpsilonThetaVsTheta;
 	TF1* fIntegratedNdOmegaSmearedEpsilonOffThetaVsTheta;
 	TF1* fIntegratedNdOmegaSigma1SmearedEpsilonOffThetaVsTheta;
-//	TF1* fIntegratedNdOmegaSmearedOffThetaVsTheta;
-//	TF1* fIntegratedNdOmegaSigma1EpsilonThetaVsTheta;
-//	TF1* fIntegratedNdOmegaOffEpsilonThetaVsTheta;
-//	TF1* fIntegratedNdOmegaSigma1OffEpsilonThetaVsTheta;
-//	TF1* fIntegratedNdOmegaSigma1SmearedThetaVsTheta;
-//	TF1* fIntegratedNdOmegaSigma1SmearedOffThetaVsTheta;
+	TF1* fIntegratedNdOmegaSmearedOffThetaVsTheta;
+	TF1* fIntegratedNdOmegaSigma1EpsilonThetaVsTheta;
+	TF1* fIntegratedNdOmegaOffEpsilonThetaVsTheta;
+	TF1* fIntegratedNdOmegaSigma1OffEpsilonThetaVsTheta;
+	TF1* fIntegratedNdOmegaSigma1SmearedThetaVsTheta;
+	TF1* fIntegratedNdOmegaSigma1SmearedOffThetaVsTheta;
 //
 //	// ...VsTheta
 	TF1* fdNdOmegaSmearedVsTheta;
-//	TF1* fdNdOmegaSigma1SmearedVsTheta;
+	TF1* fdNdOmegaSigma1SmearedVsTheta;
 //
 //	// ...VsThetaPhi
 	TF2* fdNdOmegaSmearedOffVsThetaPhi;
@@ -636,11 +646,12 @@ private:
 	TF2* fdNdOmegaSigma1SmearedEpsilonThetaVsThetaPhi;
 	TF2* fdNdOmegaSmearedEpsilonOffThetaVsThetaPhi;
 	TF2* fdNdOmegaSigma1SmearedEpsilonOffThetaVsThetaPhi;
-//	TF2* fdNdOmegaOffEpsilonThetaVsThetaPhi;
-//	TF2* fdNdOmegaSigma1EpsilonThetaVsThetaPhi;
-//	TF2* fdNdOmegaSigma1OffEpsilonThetaVsThetaPhi;
-//	TF2* fdNdOmegaSigma1SmearedThetaVsThetaPhi;
-//	TF2* fdNdOmegaSigma1SmearedOffThetaVsThetaPhi;
+	TF2* fdNdOmegaOffEpsilonThetaVsThetaPhi;
+	TF2* fdNdOmegaSigma1EpsilonThetaVsThetaPhi;
+	TF2* fdNdOmegaSigma1OffEpsilonThetaVsThetaPhi;
+	TF2* fdNdOmegaSigma1SmearedThetaVsThetaPhi;
+	TF2* fdNdOmegaSigma1SmearedOffThetaVsThetaPhi;
+
 //
 //
 	TGraph* gdNdOmegaSmeared;
@@ -648,7 +659,8 @@ private:
 //
 	Double_t dDeg2Rad;
 	Double_t dBinResolution;
-//
+	Double_t dMyInstrument68Containment;
+
 	Bool_t bIsJFactorOnLessOff;
 	Bool_t bIsdNdOmegaSmeared;
 	Bool_t bIsdNdOmegaSigma1Smeared;

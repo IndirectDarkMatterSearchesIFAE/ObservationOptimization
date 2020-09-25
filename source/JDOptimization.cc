@@ -45,6 +45,7 @@ using namespace std;
 
 const static Double_t binResolution = 0.01; // [degrees]]
 
+
 //-----------------------------------------------
 //
 //	Empty constructor, not needed right now...
@@ -126,11 +127,12 @@ JDOptimization::	JDOptimization()
 //  distCameraCenter = (Double_t) distance to the center of the camera
 //	wobble			= (Double_t) wobble distance
 JDOptimization::JDOptimization(TString author, TString source, TString candidate, TString mySourcePath, TString myInstrumentPath, TString instrumentName, Double_t distCameraCenter, Double_t wobble):
-//fQ0FactorVsTheta(NULL), fQ1FactorVsTheta(NULL), fQ2FactorVsTheta(NULL), fQ3FactorVsTheta(NULL),
+fQ0FactorVsTheta(NULL), fQ1FactorVsTheta(NULL), fQ2FactorVsTheta(NULL), fQ3FactorVsTheta(NULL),
 //fQ12FactorVsTheta(NULL), fQ13FactorVsTheta(NULL), fQ23FactorVsTheta(NULL), fQ123FactorVsTheta(NULL),
-//fQ0FactorVsThetaWobble(NULL),fQ1FactorVsThetaWobble(NULL),fQ2FactorVsThetaWobble(NULL), fQ3FactorVsThetaWobble(NULL),
-//fQ12FactorVsThetaWobble(NULL), fQ13FactorVsThetaWobble(NULL), fQ23FactorVsThetaWobble(NULL),
-//fQ123FactorVsThetaWobble(NULL),bIsJFactorOnLessOff(1),
+fQ0FactorVsThetaWobble(NULL),fQ1FactorVsThetaWobble(NULL),fQ2FactorVsThetaWobble(NULL), fQ3FactorVsThetaWobble(NULL),
+fQ12FactorVsThetaWobble(NULL), fQ13FactorVsThetaWobble(NULL), fQ23FactorVsThetaWobble(NULL),
+fQ123FactorVsThetaWobble(NULL),bIsJFactorOnLessOff(1),
+
 dDeg2Rad(TMath::Pi()/180.), dBinResolution(binResolution),
 bIsdNdOmegaSmeared(0), bIsdNdOmegaSigma1Smeared(0)
 {
@@ -140,31 +142,29 @@ bIsdNdOmegaSmeared(0), bIsdNdOmegaSigma1Smeared(0)
 		cout << endl;
 		cout << endl;
 
-
-		if (instrumentName == "IDEAL")
+		if ((instrumentName == "IDEAL")
+				and
+				(author == "Bonnivard" or author == "Geringer" ))
 		{
 			jdDarkMatter= new JDDarkMatter(author, source, candidate, mySourcePath);
 			jdInstrument= new JDInstrument(distCameraCenter, wobble, instrumentName);
 		}
 
-		else if (instrumentName == "MAGICPointLike")
+		else if ((instrumentName == "MAGICPointLike" or instrumentName == "Sensitivity" or instrumentName == "CTANorth50To80GeV")
+				and
+				(author == "Bonnivard" or author == "Geringer" ))
 		{
 			jdDarkMatter= new JDDarkMatter(author, source, candidate, mySourcePath);
 			jdInstrument= new JDInstrument(instrumentName, wobble, myInstrumentPath);
 		}
-
-		else if (instrumentName == "Sensitivity")
+		// This is a test for CTA Paper
+		else if ((instrumentName == "MyInstrument")
+				and
+				(author == "MyJFactor"))
 		{
 			jdDarkMatter= new JDDarkMatter(author, source, candidate, mySourcePath);
 			jdInstrument= new JDInstrument(instrumentName, wobble, myInstrumentPath);
 		}
-
-		else if (instrumentName == "CTANorth50To80GeV")
-		{
-			jdDarkMatter= new JDDarkMatter(author, source, candidate, mySourcePath);
-			jdInstrument= new JDInstrument(instrumentName, wobble, myInstrumentPath);
-		}
-
 		else
 		{
 			cout << "   "<< endl;
@@ -190,16 +190,26 @@ JDOptimization::~JDOptimization()
 //	if (fQ12FactorVsTheta)						delete fQ12FactorVsTheta;
 //	if (fQ13FactorVsTheta)						delete fQ13FactorVsTheta;
 //	if (fQ23FactorVsTheta)						delete fQ23FactorVsTheta;
+//	if (fQ24FactorVsTheta)						delete fQ24FactorVsTheta;
 //	if (fQ123FactorVsTheta)						delete fQ123FactorVsTheta;
-//
-//	if (fQ0FactorVsThetaWobble)					delete fQ0FactorVsThetaWobble;
-//	if (fQ1FactorVsThetaWobble)					delete fQ1FactorVsThetaWobble;
-//	if (fQ2FactorVsThetaWobble)					delete fQ2FactorVsThetaWobble;
-//	if (fQ3FactorVsThetaWobble)					delete fQ3FactorVsThetaWobble;
-//	if (fQ12FactorVsThetaWobble)				delete fQ12FactorVsThetaWobble;
-//	if (fQ13FactorVsThetaWobble)				delete fQ13FactorVsThetaWobble;
-//	if (fQ23FactorVsThetaWobble)				delete fQ23FactorVsThetaWobble;
-//	if (fQ123FactorVsThetaWobble)				delete fQ123FactorVsThetaWobble;
+//	if (fQ124FactorVsTheta)						delete fQ124FactorVsTheta;
+//	if (fQ134FactorVsTheta)						delete fQ134FactorVsTheta;
+	if (fQ1234FactorVsTheta)					delete fQ1234FactorVsTheta;
+
+
+	if (fQ0FactorVsThetaWobble)					delete fQ0FactorVsThetaWobble;
+	if (fQ1FactorVsThetaWobble)					delete fQ1FactorVsThetaWobble;
+	if (fQ2FactorVsThetaWobble)					delete fQ2FactorVsThetaWobble;
+	if (fQ3FactorVsThetaWobble)					delete fQ3FactorVsThetaWobble;
+	if (fQ12FactorVsThetaWobble)				delete fQ12FactorVsThetaWobble;
+	if (fQ13FactorVsThetaWobble)				delete fQ13FactorVsThetaWobble;
+	if (fQ23FactorVsThetaWobble)				delete fQ23FactorVsThetaWobble;
+	if (fQ24FactorVsThetaWobble)				delete fQ24FactorVsThetaWobble;
+	if (fQ123FactorVsThetaWobble)				delete fQ123FactorVsThetaWobble;
+	if (fQ124FactorVsThetaWobble)				delete fQ124FactorVsThetaWobble;
+	if (fQ134FactorVsThetaWobble)				delete fQ134FactorVsThetaWobble;
+	if (fQ1234FactorVsThetaWobble)				delete fQ1234FactorVsThetaWobble;
+
 
 	cout << endl;
 	cout << endl;
@@ -250,41 +260,45 @@ void JDOptimization::CreateFunctions()
 //		fQ123FactorVsThetaWobble = new TF2("fQ123FactorVsThetaWobble", this, &JDOptimization::Q123FactorVsThetaWobble, 1e-3, GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "Q123FactorVsThetaWobble");
 //		fQ124FactorVsThetaWobble = new TF2("fQ124FactorVsThetaWobble", this, &JDOptimization::Q124FactorVsThetaWobble, 1e-3, GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "Q124FactorVsThetaWobble");
 		fQ134FactorVsThetaWobble = new TF2("fQ134FactorVsThetaWobble", this, &JDOptimization::Q134FactorVsThetaWobble, 1e-3, GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "Q134FactorVsThetaWobble");
-//		fQ234FactorVsThetaWobble = new TF2("fQ234FactorVsThetaWobble", this, &JDOptimization::Q234FactorVsThetaWobble, 1e-3, GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "Q234FactorVsThetaWobble");
-		fQ1234FactorVsThetaWobble = new TF2("f1Q234FactorVsThetaWobble", this, &JDOptimization::Q1234FactorVsThetaWobble, 1e-3, GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "Q1234FactorVsThetaWobble");
+
+		fQ234FactorVsThetaWobble = new TF2("fQ234FactorVsThetaWobble", this, &JDOptimization::Q234FactorVsThetaWobble, 1e-3, GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "Q234FactorVsThetaWobble");
+		fQ1234FactorVsThetaWobble = new TF2("fQ1234FactorVsThetaWobble", this, &JDOptimization::Q1234FactorVsThetaWobble, 1e-3, GetThetaMax(), 0., GetDistCameraCenterMax(),2, "JDOptimization", "Q1234FactorVsThetaWobble");
 //
 //
 //		// Integrated...ThetaVsThetaPhi
-//		fIntegratedNdOmegaEpsilonThetaVsTheta = new TF1("fIntegratedNdOmegaEpsilonThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaEpsilonThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaEpsilonThetaVsTheta");
+		fIntegratedNdOmegaEpsilonThetaVsTheta = new TF1("fIntegratedNdOmegaEpsilonThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaEpsilonThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaEpsilonThetaVsTheta");
 		fIntegratedNdOmegaSmearedThetaVsTheta = new TF1("fIntegratedNdOmegaSmearedThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaSmearedThetaVsTheta,0.,GetThetaMax(),0,"JDOptimization","IntegratedNdOmegaSmearedThetaVsTheta");
 		fIntegratedNdOmegaSmearedEpsilonThetaVsTheta = new TF1("fIntegratedNdOmegaSmearedEpsilonThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaSmearedEpsilonThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaSmearedEpsilonThetaVsTheta");
 		fIntegratedNdOmegaSigma1SmearedEpsilonThetaVsTheta = new TF1("fIntegratedNdOmegaSigma1SmearedEpsilonThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaSigma1SmearedEpsilonThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaSigma1SmearedEpsilonThetaVsTheta");
 		fIntegratedNdOmegaSmearedEpsilonOffThetaVsTheta = new TF1("fIntegratedNdOmegaSmearedEpsilonOffThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaSmearedEpsilonOffThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaSmearedEpsilonOffThetaVsTheta");
 		fIntegratedNdOmegaSigma1SmearedEpsilonOffThetaVsTheta = new TF1("fIntegratedNdOmegaSigma1SmearedEpsilonOffThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaSigma1SmearedEpsilonOffThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaSigma1SmearedEpsilonOffThetaVsTheta");
-//		fIntegratedNdOmegaSmearedOffThetaVsTheta = new TF1("fIntegratedNdOmegaSmearedOffThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaSmearedOffThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaSmearedOffThetaVsTheta");
-//		fIntegratedNdOmegaSigma1EpsilonThetaVsTheta = new TF1("fIntegratedNdOmegaSigma1EpsilonThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaSigma1EpsilonThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaSigma1EpsilonThetaVsTheta");
-//		fIntegratedNdOmegaOffEpsilonThetaVsTheta = new TF1("fIntegratedNdOmegaOffEpsilonThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaOffEpsilonThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaOffEpsilonThetaVsTheta");
-//		fIntegratedNdOmegaSigma1OffEpsilonThetaVsTheta = new TF1("fIntegratedNdOmegaSigmaOff1EpsilonThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaSigma1OffEpsilonThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaSigma1OffEpsilonThetaVsTheta");
-//		fIntegratedNdOmegaSigma1SmearedThetaVsTheta = new TF1("fIntegratedNdOmegaSigma1SmearedThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaSigma1SmearedThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaSigma1SmearedThetaVsTheta");
-//		fIntegratedNdOmegaSigma1SmearedOffThetaVsTheta = new TF1("fIntegratedNdOmegaSigma1SmearedOffThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaSigma1SmearedOffThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaSigma1SmearedOffThetaVsTheta");
+
+		fIntegratedNdOmegaSmearedOffThetaVsTheta = new TF1("fIntegratedNdOmegaSmearedOffThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaSmearedOffThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaSmearedOffThetaVsTheta");
+		fIntegratedNdOmegaSigma1EpsilonThetaVsTheta = new TF1("fIntegratedNdOmegaSigma1EpsilonThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaSigma1EpsilonThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaSigma1EpsilonThetaVsTheta");
+		fIntegratedNdOmegaOffEpsilonThetaVsTheta = new TF1("fIntegratedNdOmegaOffEpsilonThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaOffEpsilonThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaOffEpsilonThetaVsTheta");
+		fIntegratedNdOmegaSigma1OffEpsilonThetaVsTheta = new TF1("fIntegratedNdOmegaSigmaOff1EpsilonThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaSigma1OffEpsilonThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaSigma1OffEpsilonThetaVsTheta");
+		fIntegratedNdOmegaSigma1SmearedThetaVsTheta = new TF1("fIntegratedNdOmegaSigma1SmearedThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaSigma1SmearedThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaSigma1SmearedThetaVsTheta");
+		fIntegratedNdOmegaSigma1SmearedOffThetaVsTheta = new TF1("fIntegratedNdOmegaSigma1SmearedOffThetaVsTheta",this,&JDOptimization::IntegratedNdOmegaSigma1SmearedOffThetaVsTheta,0.,GetThetaMax(),1,"JDOptimization","IntegratedNdOmegaSigma1SmearedOffThetaVsTheta");
 //
 //		// ...ThetaVsThetaPhi
 		fdNdOmegaSmearedThetaVsThetaPhi = new TF2("fdNdOmegaSmearedThetaVsThetaPhi", this, &JDOptimization::dNdOmegaSmearedThetaVsThetaPhi,1e-3,GetThetaMax(),0.,2*TMath::Pi(),0, "JDOptimization", "dNdOmegaSmearedThetaVsThetaPhi");
-//		fdNdOmegaSmearedOffThetaVsThetaPhi = new TF2("fdNdOmegaSmearedOffThetaVsThetaPhi", this, &JDOptimization::dNdOmegaSmearedOffThetaVsThetaPhi,1e-3,GetThetaMax(),0.,2*TMath::Pi(),1, "JDOptimization", "dNdOmegaSmearedOffThetaVsThetaPhi");
+		fdNdOmegaSmearedOffThetaVsThetaPhi = new TF2("fdNdOmegaSmearedOffThetaVsThetaPhi", this, &JDOptimization::dNdOmegaSmearedOffThetaVsThetaPhi,1e-3,GetThetaMax(),0.,2*TMath::Pi(),1, "JDOptimization", "dNdOmegaSmearedOffThetaVsThetaPhi");
+
 		fdNdOmegaEpsilonThetaVsThetaPhi = new TF2("fdNdOmegaEpsilonThetaVsThetaPhi", this, &JDOptimization::dNdOmegaEpsilonThetaVsThetaPhi,1e-3,GetThetaMax(),0.,2*TMath::Pi(),1, "JDOptimization", "dNdOmegaEpsilonThetaVsThetaPhi");
 		fdNdOmegaSmearedEpsilonThetaVsThetaPhi = new TF2("fdNdOmegaSmearedEpsilonThetaVsThetaPhi", this, &JDOptimization::dNdOmegaSmearedEpsilonThetaVsThetaPhi,1e-3,GetThetaMax(),0.,2*TMath::Pi(),1, "JDOptimization", "dNdOmegaSmearedEpsilonThetaVsThetaPhi");
 		fdNdOmegaSigma1SmearedEpsilonThetaVsThetaPhi = new TF2("fdNdOmegaSigma1SmearedEpsilonThetaVsThetaPhi", this, &JDOptimization::dNdOmegaSigma1SmearedEpsilonThetaVsThetaPhi,1e-3,GetThetaMax(),0.,2*TMath::Pi(),1, "JDOptimization", "dNdOmegaSigma1SmearedEpsilonThetaVsThetaPhi");
 		fdNdOmegaSmearedEpsilonOffThetaVsThetaPhi = new TF2("fdNdOmegaSmearedEpsilonThetaVsThetaPhi", this, &JDOptimization::dNdOmegaSmearedEpsilonOffThetaVsThetaPhi,1e-3,GetThetaMax(),0.,2*TMath::Pi(),1, "JDOptimization", "dNdOmegaSmearedEpsilonOffThetaVsThetaPhi");
 		fdNdOmegaSigma1SmearedEpsilonOffThetaVsThetaPhi = new TF2("fdNdOmegaSigma1SmearedEpsilonOffThetaVsThetaPhi", this, &JDOptimization::dNdOmegaSigma1SmearedEpsilonOffThetaVsThetaPhi,1e-3,GetThetaMax(),0.,2*TMath::Pi(),1, "JDOptimization", "dNdOmegaSigma1SmearedEpsilonOffThetaVsThetaPhi");
-//		fdNdOmegaOffEpsilonThetaVsThetaPhi = new TF2("fdNdOmegaOffEpsilonThetaVsThetaPhi", this, &JDOptimization::dNdOmegaOffEpsilonThetaVsThetaPhi, 1e-3, GetThetaMax(), 0., 2*TMath::Pi(),1, "JDOptimization", "dNdOmegaOffEpsilonThetaVsThetaPhi");
-//		fdNdOmegaSigma1EpsilonThetaVsThetaPhi = new TF2("fdNdOmegaSigma1EpsilonThetaVsThetaPhi", this, &JDOptimization::dNdOmegaSigma1EpsilonThetaVsThetaPhi, 1e-3, GetThetaMax(), 0., 2*TMath::Pi(),1, "JDOptimization", "dNdOmegaSigma1EpsilonThetaVsThetaPhi");
-//		fdNdOmegaSigma1OffEpsilonThetaVsThetaPhi = new TF2("fdNdOmegaSigma1OffEpsilonThetaVsThetaPhi", this, &JDOptimization::dNdOmegaSigma1OffEpsilonThetaVsThetaPhi, 1e-3, GetThetaMax(), 0., 2*TMath::Pi(),1, "JDOptimization", "dNdOmegaSigma1OffEpsilonThetaVsThetaPhi");
-//		fdNdOmegaSigma1SmearedThetaVsThetaPhi = new TF2("fdNdOmegaSigma1SmearedThetaVsThetaPhi", this, &JDOptimization::dNdOmegaSigma1SmearedThetaVsThetaPhi, 1e-3, GetThetaMax(), 0., 2*TMath::Pi(),1, "JDOptimization", "dNdOmegaSigma1SmearedThetaVsThetaPhi");
-//		fdNdOmegaSigma1SmearedOffThetaVsThetaPhi = new TF2("fdNdOmegaSigma1SmearedOffThetaVsThetaPhi", this, &JDOptimization::dNdOmegaSigma1SmearedOffThetaVsThetaPhi, 1e-3, GetThetaMax(), 0., 2*TMath::Pi(),1, "JDOptimization", "dNdOmegaSigma1SmearedOffThetaVsThetaPhi");
+		fdNdOmegaOffEpsilonThetaVsThetaPhi = new TF2("fdNdOmegaOffEpsilonThetaVsThetaPhi", this, &JDOptimization::dNdOmegaOffEpsilonThetaVsThetaPhi, 1e-3, GetThetaMax(), 0., 2*TMath::Pi(),1, "JDOptimization", "dNdOmegaOffEpsilonThetaVsThetaPhi");
+		fdNdOmegaSigma1EpsilonThetaVsThetaPhi = new TF2("fdNdOmegaSigma1EpsilonThetaVsThetaPhi", this, &JDOptimization::dNdOmegaSigma1EpsilonThetaVsThetaPhi, 1e-3, GetThetaMax(), 0., 2*TMath::Pi(),1, "JDOptimization", "dNdOmegaSigma1EpsilonThetaVsThetaPhi");
+		fdNdOmegaSigma1OffEpsilonThetaVsThetaPhi = new TF2("fdNdOmegaSigma1OffEpsilonThetaVsThetaPhi", this, &JDOptimization::dNdOmegaSigma1OffEpsilonThetaVsThetaPhi, 1e-3, GetThetaMax(), 0., 2*TMath::Pi(),1, "JDOptimization", "dNdOmegaSigma1OffEpsilonThetaVsThetaPhi");
+		fdNdOmegaSigma1SmearedThetaVsThetaPhi = new TF2("fdNdOmegaSigma1SmearedThetaVsThetaPhi", this, &JDOptimization::dNdOmegaSigma1SmearedThetaVsThetaPhi, 1e-3, GetThetaMax(), 0., 2*TMath::Pi(),1, "JDOptimization", "dNdOmegaSigma1SmearedThetaVsThetaPhi");
+		fdNdOmegaSigma1SmearedOffThetaVsThetaPhi = new TF2("fdNdOmegaSigma1SmearedOffThetaVsThetaPhi", this, &JDOptimization::dNdOmegaSigma1SmearedOffThetaVsThetaPhi, 1e-3, GetThetaMax(), 0., 2*TMath::Pi(),1, "JDOptimization", "dNdOmegaSigma1SmearedOffThetaVsThetaPhi");
 //
 //		// ...VsThetaPhi
 		fdNdOmegaSmearedVsTheta = new TF1("fdNdOmegaSmearedVsTheta", this, &JDOptimization::dNdOmegaSmearedVsTheta, 1e-3, GetThetaMax(),0, "JDOptimization", "dNdOmegaSmearedVsTheta");
-//		fdNdOmegaSigma1SmearedVsTheta = new TF1("fdNdOmegaSigma1SmearedVsTheta", this, &JDOptimization::dNdOmegaSigma1SmearedVsTheta, 1e-3, GetThetaMax(), 0, "JDOptimization", "dNdOmegaSigma1SmearedVsTheta");
+		fdNdOmegaSigma1SmearedVsTheta = new TF1("fdNdOmegaSigma1SmearedVsTheta", this, &JDOptimization::dNdOmegaSigma1SmearedVsTheta, 1e-3, GetThetaMax(), 0, "JDOptimization", "dNdOmegaSigma1SmearedVsTheta");
+
 //
 		fdNdOmegaSmearedOffVsThetaPhi = new TF2("fdNdOmegaSmearedOffVsThetaPhi", this, &JDOptimization::dNdOmegaSmearedOffVsThetaPhi, 1e-3, GetThetaMax(), 0.,2*TMath::Pi(),1, "JDOptimization", "dNdOmegaSmearedOffVsThetaPhi");
 		fdNdOmegaEpsilonVsThetaPhi = new TF2("fdNdOmegaEpsilonVsThetaPhi", this, &JDOptimization::dNdOmegaEpsilonVsThetaPhi, 1e-3, GetThetaMax(), 0.,2*TMath::Pi(),1, "JDOptimization", "dNdOmegaEpsilonVsThetaPhi");
@@ -703,7 +717,8 @@ Double_t JDOptimization::Q3FactorVsThetaWobble(Double_t* x, Double_t* par)
 	ffIntegratedEpsilonThetaVsTheta->SetParameter(0,x[1]);
 	return fIntegratedNdOmegaEpsilonThetaVsTheta->Eval(x[0])
 			/
-			TMath::Sqrt(ffIntegratedEpsilonThetaVsTheta->Eval(x[0]));
+				TMath::Sqrt(ffIntegratedEpsilonThetaVsTheta->Eval(x[0]));
+
 			//TMath::Sqrt(jdInstrument->fIntegratedEpsilonThetaVsTheta->Eval(x[0]));
 }
 
@@ -727,24 +742,29 @@ Double_t JDOptimization::Q4FactorVsThetaWobble(Double_t* x, Double_t* par)
 //
 //  x[0] 	= theta							[deg]
 //  x[1] 	= wobble dist					[deg]
-//Double_t JDOptimization::Q12FactorVsThetaWobble(Double_t* x, Double_t* par)
-//{
-//	Double_t sqrtEpsilonIdeal = x[0]*TMath::Sqrt(4*TMath::Pi());
-//	jdDarkMatter->fIntegratedNdOmegaSigma1OffThetaVsTheta->SetParameter(0,2*x[1]);
-//
-//	if (GetIsIntegraldNdOmegaOnMinusOFF())
-//	{
-//		return (jdDarkMatter->fIntegratedNdOmegaSigma1ThetaVsTheta->Eval(x[0])-
-//					jdDarkMatter->fIntegratedNdOmegaSigma1OffThetaVsTheta->Eval(x[0]))/sqrtEpsilonIdeal;
-//	}
-//	else	// NOT CORRECT IF YOU DONT DEFINE A & B
-//	{
-//		return 	jdDarkMatter->fIntegratedNdOmegaSigma1ThetaVsTheta->Eval(x[0])
-//				/
-//				TMath::Sqrt( TMath::Power(sqrtEpsilonIdeal,2)+
-//				jdDarkMatter->fIntegratedNdOmegaSigma1OffThetaVsTheta->Eval(x[0]));
-//	}
-//}
+Double_t JDOptimization::Q12FactorVsThetaWobble(Double_t* x, Double_t* par)
+{
+	Double_t sqrtEpsilonIdeal = x[0]*TMath::Sqrt(4*TMath::Pi());
+
+	TF1* ffIntegratedNdOmegaSigma1ThetaVsTheta = jdDarkMatter->GetTF1IntegratedNdOmegaSigma1ThetaVsTheta();
+
+	TF1* ffIntegratedNdOmegaSigma1OffThetaVsTheta = jdDarkMatter->GetTF1IntegratedNdOmegaSigma1OffThetaVsTheta();
+	ffIntegratedNdOmegaSigma1OffThetaVsTheta->SetParameter(0,2*x[1]);
+
+	if (GetIsIntegraldNdOmegaOnMinusOFF())
+	{
+		return (ffIntegratedNdOmegaSigma1ThetaVsTheta->Eval(x[0])-
+					ffIntegratedNdOmegaSigma1OffThetaVsTheta->Eval(x[0]))/sqrtEpsilonIdeal;
+	}
+	else	// NOT CORRECT IF YOU DONT DEFINE A & B
+	{
+		return 	ffIntegratedNdOmegaSigma1ThetaVsTheta->Eval(x[0])
+				/
+				TMath::Sqrt( TMath::Power(sqrtEpsilonIdeal,2)+
+						ffIntegratedNdOmegaSigma1OffThetaVsTheta->Eval(x[0]));
+	}
+}
+
 
 //----------------------------------------------------
 //	It evaluates the Q23Factor vs Theta and Phi normalized at a chosen point of normalization
@@ -753,14 +773,18 @@ Double_t JDOptimization::Q4FactorVsThetaWobble(Double_t* x, Double_t* par)
 //  x[0] 	= theta							[deg]
 //  x[1] 	= wobble dist					[deg]
 //  par[0] 	= theta of normalization		[deg]
-//Double_t JDOptimization::Q23FactorVsThetaWobble(Double_t* x, Double_t* par)
-//{
-//	fIntegratedNdOmegaSigma1EpsilonThetaVsTheta->SetParameter(0,x[1]);
-//	jdInstrument->fIntegratedEpsilonThetaVsTheta->SetParameter(0,x[1]);
-//	return fIntegratedNdOmegaSigma1EpsilonThetaVsTheta->Eval(x[0])
-//			/
-//			TMath::Sqrt(jdInstrument->fIntegratedEpsilonThetaVsTheta->Eval(x[0]));
-//}
+Double_t JDOptimization::Q23FactorVsThetaWobble(Double_t* x, Double_t* par)
+{
+	fIntegratedNdOmegaSigma1EpsilonThetaVsTheta->SetParameter(0,x[1]);
+
+	TF1* ffIntegratedEpsilonThetaVsTheta = jdInstrument->GetTF1IntegratedEpsilonThetaVsTheta();
+	ffIntegratedEpsilonThetaVsTheta->SetParameter(0,x[1]);
+
+	return fIntegratedNdOmegaSigma1EpsilonThetaVsTheta->Eval(x[0])
+			/
+			TMath::Sqrt(ffIntegratedEpsilonThetaVsTheta->Eval(x[0]));
+}
+
 
 //----------------------------------------------------
 //	It evaluates the Q23Factor vs Theta and Phi normalized at a chosen point of normalization
@@ -775,7 +799,7 @@ Double_t JDOptimization::Q4FactorVsThetaWobble(Double_t* x, Double_t* par)
 //}
 
 //----------------------------------------------------
-//	It evaluates the Q23Factor vs Theta and Phi normalized at a chosen point of normalization
+//	It evaluates the Q34Factor vs Theta and Phi normalized at a chosen point of normalization
 //
 //	Q34 =
 Double_t JDOptimization::Q34FactorVsThetaWobble(Double_t* x, Double_t* par)
@@ -801,26 +825,29 @@ Double_t JDOptimization::Q34FactorVsThetaWobble(Double_t* x, Double_t* par)
 //  x[1] 	= wobble dist					[deg]
 //  par[0] 	= theta of normalization		[deg]
 //  par[1]  = wobble of normalization       [deg]
-//Double_t JDOptimization::Q13FactorVsThetaWobble(Double_t* x, Double_t* par)
-//{
-//	fIntegratedNdOmegaEpsilonThetaVsTheta->SetParameter(0,x[1]);
-//	fIntegratedNdOmegaOffEpsilonThetaVsTheta->SetParameter(0,x[1]);
-//	jdInstrument->fIntegratedEpsilonThetaVsTheta->SetParameter(0,x[1]);
-//
-//	if (GetIsIntegraldNdOmegaOnMinusOFF())
-//	{
-//		return (fIntegratedNdOmegaEpsilonThetaVsTheta->Eval(x[0])-
-//				fIntegratedNdOmegaOffEpsilonThetaVsTheta->Eval(x[0]))
-//				/TMath::Sqrt(jdInstrument->fIntegratedEpsilonThetaVsTheta->Eval(x[0]));
-//	}
-//	else	// NOT CORRECT IF YOU DONT DEFINE A & B
-//	{
-//		return 	fIntegratedNdOmegaEpsilonThetaVsTheta->Eval(x[0])
-//				/
-//				(TMath::Sqrt( jdInstrument->fIntegratedEpsilonThetaVsTheta->Eval(x[0])+
-//				fIntegratedNdOmegaOffEpsilonThetaVsTheta->Eval(x[0])));
-//	}
-//}
+Double_t JDOptimization::Q13FactorVsThetaWobble(Double_t* x, Double_t* par)
+{
+	fIntegratedNdOmegaEpsilonThetaVsTheta->SetParameter(0,x[1]);
+	fIntegratedNdOmegaOffEpsilonThetaVsTheta->SetParameter(0,x[1]);
+
+	TF1* ffIntegratedEpsilonThetaVsTheta = jdInstrument->GetTF1IntegratedEpsilonThetaVsTheta();
+	ffIntegratedEpsilonThetaVsTheta->SetParameter(0,x[1]);
+
+	if (GetIsIntegraldNdOmegaOnMinusOFF())
+	{
+		return (fIntegratedNdOmegaEpsilonThetaVsTheta->Eval(x[0])-
+				fIntegratedNdOmegaOffEpsilonThetaVsTheta->Eval(x[0]))
+				/TMath::Sqrt(ffIntegratedEpsilonThetaVsTheta->Eval(x[0]));
+	}
+	else	// NOT CORRECT IF YOU DONT DEFINE A & B
+	{
+		return 	fIntegratedNdOmegaEpsilonThetaVsTheta->Eval(x[0])
+				/
+				(TMath::Sqrt( ffIntegratedEpsilonThetaVsTheta->Eval(x[0])+
+				fIntegratedNdOmegaOffEpsilonThetaVsTheta->Eval(x[0])));
+	}
+}
+
 
 
 //----------------------------------------------------
@@ -829,51 +856,59 @@ Double_t JDOptimization::Q34FactorVsThetaWobble(Double_t* x, Double_t* par)
 //
 //  x[0] 	= theta							[deg]
 //  x[1] 	= wobble dist					[deg]
-//Double_t JDOptimization::Q123FactorVsThetaWobble(Double_t* x, Double_t* par)
-//{
-//	fIntegratedNdOmegaSigma1EpsilonThetaVsTheta->SetParameter(0,x[1]);
-//	fIntegratedNdOmegaSigma1OffEpsilonThetaVsTheta->SetParameter(0,x[1]);
-//	jdInstrument->fIntegratedEpsilonThetaVsTheta->SetParameter(0,x[1]);
-//
-//	if (GetIsIntegraldNdOmegaOnMinusOFF())
-//	{
-//		return (fIntegratedNdOmegaSigma1EpsilonThetaVsTheta->Eval(x[0])-
-//				fIntegratedNdOmegaSigma1OffEpsilonThetaVsTheta->Eval(x[0]))
-//				/TMath::Sqrt(jdInstrument->fIntegratedEpsilonThetaVsTheta->Eval(x[0]));
-//	}
-//	else	// NOT CORRECT IF YOU DONT DEFINE A & B
-//	{
-//		return 	fIntegratedNdOmegaSigma1EpsilonThetaVsTheta->Eval(x[0])
-//				/
-//				(TMath::Sqrt( jdInstrument->fIntegratedEpsilonThetaVsTheta->Eval(x[0])+
-//				fIntegratedNdOmegaSigma1OffEpsilonThetaVsTheta->Eval(x[0])));
-//	}
-//}
+Double_t JDOptimization::Q123FactorVsThetaWobble(Double_t* x, Double_t* par)
+{
+	fIntegratedNdOmegaSigma1EpsilonThetaVsTheta->SetParameter(0,x[1]);
+	fIntegratedNdOmegaSigma1OffEpsilonThetaVsTheta->SetParameter(0,x[1]);
+
+	TF1* ffIntegratedEpsilonThetaVsTheta = jdInstrument->GetTF1IntegratedEpsilonThetaVsTheta();
+	ffIntegratedEpsilonThetaVsTheta->SetParameter(0,x[1]);
+
+
+
+
+	if (GetIsIntegraldNdOmegaOnMinusOFF())
+	{
+		return (fIntegratedNdOmegaSigma1EpsilonThetaVsTheta->Eval(x[0])-
+				fIntegratedNdOmegaSigma1OffEpsilonThetaVsTheta->Eval(x[0]))
+				/TMath::Sqrt(ffIntegratedEpsilonThetaVsTheta->Eval(x[0]));
+	}
+	else	// NOT CORRECT IF YOU DONT DEFINE A & B
+	{
+		return 	fIntegratedNdOmegaSigma1EpsilonThetaVsTheta->Eval(x[0])
+				/
+				(TMath::Sqrt( ffIntegratedEpsilonThetaVsTheta->Eval(x[0])+
+				fIntegratedNdOmegaSigma1OffEpsilonThetaVsTheta->Eval(x[0])));
+	}
+}
 
 //----------------------------------------------------
 //
-//Double_t JDOptimization::Q124FactorVsThetaWobble(Double_t* x, Double_t* par)
-//{
-//	if(!GetIsdNdOmegaSigma1Smeared()) SetdNdOmegaSigma1Smeared();
-//
-//	fIntegratedNdOmegaSigma1SmearedThetaVsTheta->SetParameter(0,x[1]);
-//	fIntegratedNdOmegaSigma1SmearedOffThetaVsTheta->SetParameter(0,x[1]);
-//	jdInstrument->fIntegratedEpsilonThetaVsTheta->SetParameter(0,x[1]);
-//
-//	if (GetIsIntegraldNdOmegaOnMinusOFF())
-//	{
-//		return (fIntegratedNdOmegaSigma1SmearedThetaVsTheta->Eval(x[0])-
-//				fIntegratedNdOmegaSigma1SmearedOffThetaVsTheta->Eval(x[0]))
-//				/TMath::Sqrt(jdInstrument->fIntegratedEpsilonThetaVsTheta->Eval(x[0]));
-//	}
-//	else	// NOT CORRECT IF YOU DONT DEFINE A & B
-//	{
-//		return 	fIntegratedNdOmegaSigma1SmearedThetaVsTheta->Eval(x[0])
-//				/
-//				(TMath::Sqrt( jdInstrument->fIntegratedEpsilonThetaVsTheta->Eval(x[0])+
-//				fIntegratedNdOmegaSigma1SmearedOffThetaVsTheta->Eval(x[0])));
-//	}
-//}
+Double_t JDOptimization::Q124FactorVsThetaWobble(Double_t* x, Double_t* par)
+{
+	if(!GetIsdNdOmegaSigma1Smeared()) SetdNdOmegaSigma1Smeared();
+
+	fIntegratedNdOmegaSigma1SmearedThetaVsTheta->SetParameter(0,x[1]);
+	fIntegratedNdOmegaSigma1SmearedOffThetaVsTheta->SetParameter(0,x[1]);
+
+	TF1* ffIntegratedEpsilonThetaVsTheta = jdInstrument->GetTF1IntegratedEpsilonThetaVsTheta();
+	ffIntegratedEpsilonThetaVsTheta->SetParameter(0,x[1]);
+
+	if (GetIsIntegraldNdOmegaOnMinusOFF())
+	{
+		return (fIntegratedNdOmegaSigma1SmearedThetaVsTheta->Eval(x[0])-
+				fIntegratedNdOmegaSigma1SmearedOffThetaVsTheta->Eval(x[0]))
+				/TMath::Sqrt(ffIntegratedEpsilonThetaVsTheta->Eval(x[0]));
+	}
+	else	// NOT CORRECT IF YOU DONT DEFINE A & B
+	{
+		return 	fIntegratedNdOmegaSigma1SmearedThetaVsTheta->Eval(x[0])
+				/
+				(TMath::Sqrt( ffIntegratedEpsilonThetaVsTheta->Eval(x[0])+
+				fIntegratedNdOmegaSigma1SmearedOffThetaVsTheta->Eval(x[0])));
+	}
+}
+
 
 //----------------------------------------------------
 // bla bla blab bla
@@ -910,25 +945,28 @@ Double_t JDOptimization::Q134FactorVsThetaWobble(Double_t* x, Double_t* par)
 
 //----------------------------------------------------
 //
-//Double_t JDOptimization::Q234FactorVsThetaWobble(Double_t* x, Double_t* par)
-//{
-//	if(!GetIsdNdOmegaSigma1Smeared()) SetdNdOmegaSigma1Smeared();
-//
-//	fIntegratedNdOmegaSigma1SmearedEpsilonThetaVsTheta->SetParameter(0,x[1]);
-//	jdInstrument->fIntegratedEpsilonThetaVsTheta->SetParameter(0,x[1]);
-//
-//	if (GetIsIntegraldNdOmegaOnMinusOFF())
-//	{
-//		return (fIntegratedNdOmegaSigma1SmearedEpsilonThetaVsTheta->Eval(x[0]))
-//				/TMath::Sqrt(jdInstrument->fIntegratedEpsilonThetaVsTheta->Eval(x[0]));
-//	}
-//	else	// NOT CORRECT IF YOU DONT DEFINE A & B
-//	{
-//		return 	fIntegratedNdOmegaSigma1SmearedEpsilonThetaVsTheta->Eval(x[0])
-//				/
-//				TMath::Sqrt( jdInstrument->fIntegratedEpsilonThetaVsTheta->Eval(x[0]));
-//	}
-//}
+Double_t JDOptimization::Q234FactorVsThetaWobble(Double_t* x, Double_t* par)
+{
+	if(!GetIsdNdOmegaSigma1Smeared()) SetdNdOmegaSigma1Smeared();
+
+	fIntegratedNdOmegaSigma1SmearedEpsilonThetaVsTheta->SetParameter(0,x[1]);
+
+	TF1* ffIntegratedEpsilonThetaVsTheta = jdInstrument->GetTF1IntegratedEpsilonThetaVsTheta();
+	ffIntegratedEpsilonThetaVsTheta->SetParameter(0,x[1]);
+
+	if (GetIsIntegraldNdOmegaOnMinusOFF())
+	{
+		return (fIntegratedNdOmegaSigma1SmearedEpsilonThetaVsTheta->Eval(x[0]))
+				/TMath::Sqrt(ffIntegratedEpsilonThetaVsTheta->Eval(x[0]));
+	}
+	else	// NOT CORRECT IF YOU DONT DEFINE A & B
+	{
+		return 	fIntegratedNdOmegaSigma1SmearedEpsilonThetaVsTheta->Eval(x[0])
+				/
+				TMath::Sqrt( ffIntegratedEpsilonThetaVsTheta->Eval(x[0]));
+	}
+}
+
 
 //----------------------------------------------------
 //
@@ -1115,7 +1153,8 @@ Double_t JDOptimization::dNdOmegaEpsilonVsThetaPhi(Double_t* x, Double_t* par)
 	Double_t dccR = TMath::Sqrt(TMath::Power(par[0],2)+TMath::Power(x[0],2)-2*par[0]*x[0]*TMath::Cos(x[1]+(TMath::Pi()/2)));
 
 	TF1* ffdNdOmegaVsTheta = GetTF1dNdOmegaVsTheta();
-	TF1* ffEpsilonVsDcc = GetTF1dNdOmegaVsTheta();
+
+	TF1* ffEpsilonVsDcc = GetTF1EpsilonVsDcc();
 
 	return ffdNdOmegaVsTheta->Eval(x[0])*ffEpsilonVsDcc->Eval(dccR);
 
@@ -1135,11 +1174,15 @@ Double_t JDOptimization::dNdOmegaSmearedEpsilonVsThetaPhi(Double_t* x, Double_t*
 
 //----------------------------------------------------
 //
-//Double_t JDOptimization::dNdOmegaSigma1SmearedEpsilonVsThetaPhi(Double_t* x, Double_t* par)
-//{
-//	Double_t dccR = TMath::Sqrt(TMath::Power(par[0],2)+TMath::Power(x[0],2)-2*par[0]*x[0]*TMath::Cos(x[1]+(TMath::Pi()/2)));
-//	return fdNdOmegaSigma1SmearedVsTheta->Eval(x[0])*jdInstrument->fEpsilonVsDcc->Eval(dccR);
-//}
+Double_t JDOptimization::dNdOmegaSigma1SmearedEpsilonVsThetaPhi(Double_t* x, Double_t* par)
+{
+	Double_t dccR = TMath::Sqrt(TMath::Power(par[0],2)+TMath::Power(x[0],2)-2*par[0]*x[0]*TMath::Cos(x[1]+(TMath::Pi()/2)));
+
+	TF1* ffEpsilonVsDcc = jdInstrument->GetTF1EpsilonVsDcc();
+
+	return fdNdOmegaSigma1SmearedVsTheta->Eval(x[0])*ffEpsilonVsDcc->Eval(dccR);
+}
+
 
 //----------------------------------------------------
 //
@@ -1253,11 +1296,17 @@ Double_t JDOptimization::dNdOmegaSmearedThetaVsThetaPhi(Double_t* x, Double_t* p
 // x[1] = phi 	[rad]
 //  par[0] = wobble [deg]
 // dccR [deg] distance to fov center
-//Double_t JDOptimization::dNdOmegaSigma1EpsilonVsThetaPhi(Double_t* x, Double_t* par)
-//{
-//	Double_t dccR = TMath::Sqrt(TMath::Power(par[0],2)+TMath::Power(x[0],2)-2*par[0]*x[0]*TMath::Cos(x[1]+(TMath::Pi()/2)));
-//	return jdDarkMatter->fdNdOmegaSigma1VsTheta->Eval(x[0])*jdInstrument->fEpsilonVsDcc->Eval(dccR);
-//}
+Double_t JDOptimization::dNdOmegaSigma1EpsilonVsThetaPhi(Double_t* x, Double_t* par)
+{
+	Double_t dccR = TMath::Sqrt(TMath::Power(par[0],2)+TMath::Power(x[0],2)-2*par[0]*x[0]*TMath::Cos(x[1]+(TMath::Pi()/2)));
+
+	TF1* ffdNdOmegaSigma1VsTheta = jdDarkMatter->GetTF1dNdOmegaSigma1VsTheta();
+
+	TF1* ffEpsilonVsDcc = jdInstrument->GetTF1EpsilonVsDcc();
+
+	return ffdNdOmegaSigma1VsTheta->Eval(x[0])*ffEpsilonVsDcc->Eval(dccR);
+}
+
 
 //----------------------------------------------------
 //	dN/dOmega_off_Sigma1 * Epsilon
@@ -1266,12 +1315,18 @@ Double_t JDOptimization::dNdOmegaSmearedThetaVsThetaPhi(Double_t* x, Double_t* p
 // x[1] = phi 	[rad]
 //  par[0] = wobble [deg]
 // dccR [deg] distance to fov center
-//Double_t JDOptimization::dNdOmegaSigma1OffEpsilonVsThetaPhi(Double_t* x, Double_t* par)
-//{
-//	Double_t dccR = TMath::Sqrt(TMath::Power(par[0],2)+TMath::Power(x[0],2)-2*par[0]*x[0]*TMath::Cos(x[1]+(TMath::Pi()/2)));
-//	jdDarkMatter->fdNdOmegaSigma1OffVsThetaPhi->SetParameter(0,2*par[0]);
-//	return jdDarkMatter->fdNdOmegaSigma1OffVsThetaPhi->Eval(x[0],x[1])*jdInstrument->fEpsilonVsDcc->Eval(dccR);
-//}
+Double_t JDOptimization::dNdOmegaSigma1OffEpsilonVsThetaPhi(Double_t* x, Double_t* par)
+{
+	Double_t dccR = TMath::Sqrt(TMath::Power(par[0],2)+TMath::Power(x[0],2)-2*par[0]*x[0]*TMath::Cos(x[1]+(TMath::Pi()/2)));
+
+	TF2* ffdNdOmegaSigma1OffThetaVsThetaPhi = jdDarkMatter->GetTF2dNdOmegaSigma1OffThetaVSThetaPhi();
+	ffdNdOmegaSigma1OffThetaVsThetaPhi->SetParameter(0,2*par[0]);
+
+	TF1* ffEpsilonVsDcc = jdInstrument->GetTF1EpsilonVsDcc();
+
+	return ffdNdOmegaSigma1OffThetaVsThetaPhi->Eval(x[0],x[1])*ffEpsilonVsDcc->Eval(dccR);
+}
+
 
 //----------------------------------------------------
 //
@@ -1335,12 +1390,17 @@ Double_t JDOptimization::dNdOmegaSigma1SmearedOffVsThetaPhi(Double_t* x, Double_
 //  par[0] = wobble [deg]
 //
 // dccR [deg] 			distance to fov center
-//Double_t JDOptimization::dNdOmegaOffEpsilonVsThetaPhi(Double_t* x, Double_t* par)
-//{
-//	Double_t dccR = TMath::Sqrt(TMath::Power(par[0],2)+TMath::Power(x[0],2)-2*par[0]*x[0]*TMath::Cos(x[1]+(TMath::Pi()/2)));
-//	jdDarkMatter->fdNdOmegaOffVsThetaPhi->SetParameter(0,2*par[0]);
-//	return jdDarkMatter->fdNdOmegaOffVsThetaPhi->Eval(x[0],x[1])*jdInstrument->fEpsilonVsDcc->Eval(dccR);
-//}
+Double_t JDOptimization::dNdOmegaOffEpsilonVsThetaPhi(Double_t* x, Double_t* par)
+{
+	Double_t dccR = TMath::Sqrt(TMath::Power(par[0],2)+TMath::Power(x[0],2)-2*par[0]*x[0]*TMath::Cos(x[1]+(TMath::Pi()/2)));
+
+	TF2* ffdNdOmegaOffVsThetaPhi = jdDarkMatter->GetTF2dNdOmegaOffVsThetaPhi();
+	ffdNdOmegaOffVsThetaPhi->SetParameter(0,2*par[0]);
+
+	TF1* ffEpsilonVsDcc = jdInstrument->GetTF1EpsilonVsDcc();
+
+	return ffdNdOmegaOffVsThetaPhi->Eval(x[0],x[1])*ffEpsilonVsDcc->Eval(dccR);
+}
 
 //----------------------------------------------------
 //	dN/dOmegaOffTheta * Epsilon
@@ -1375,6 +1435,11 @@ void JDOptimization::SetdNdOmegaSmeared()
 	{
 		pointSpreadFunction->SetParameter(0,0);
 		pointSpreadFunction->SetParameter(1,0.11);  // 68% containment at 0.11º for 100 GeV - see Arxiv1705.01790
+	}
+	else if(instrument=="MyInstrument")
+	{
+		pointSpreadFunction->SetParameter(0,0);
+		pointSpreadFunction->SetParameter(1,GetMyInstrument68Containment());  // 68% containment at 0.11º for 100 GeV - see Arxiv1705.01790
 	}
 	else
 	{
