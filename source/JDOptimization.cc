@@ -126,11 +126,11 @@ JDOptimization::	JDOptimization()
 //  distCameraCenter = (Double_t) distance to the center of the camera
 //	wobble			= (Double_t) wobble distance
 JDOptimization::JDOptimization(TString author, TString source, TString candidate, TString mySourcePath, TString myInstrumentPath, TString instrumentName, Double_t distCameraCenter, Double_t wobble):
-//fQ0FactorVsTheta(NULL), fQ1FactorVsTheta(NULL), fQ2FactorVsTheta(NULL), fQ3FactorVsTheta(NULL),
+fQ0FactorVsTheta(NULL), fQ1FactorVsTheta(NULL), fQ2FactorVsTheta(NULL), fQ3FactorVsTheta(NULL),
 //fQ12FactorVsTheta(NULL), fQ13FactorVsTheta(NULL), fQ23FactorVsTheta(NULL), fQ123FactorVsTheta(NULL),
-//fQ0FactorVsThetaWobble(NULL),fQ1FactorVsThetaWobble(NULL),fQ2FactorVsThetaWobble(NULL), fQ3FactorVsThetaWobble(NULL),
-//fQ12FactorVsThetaWobble(NULL), fQ13FactorVsThetaWobble(NULL), fQ23FactorVsThetaWobble(NULL),
-//fQ123FactorVsThetaWobble(NULL),bIsJFactorOnLessOff(1),
+fQ0FactorVsThetaWobble(NULL),fQ1FactorVsThetaWobble(NULL),fQ2FactorVsThetaWobble(NULL), fQ3FactorVsThetaWobble(NULL),
+fQ12FactorVsThetaWobble(NULL), fQ13FactorVsThetaWobble(NULL), fQ23FactorVsThetaWobble(NULL),
+fQ123FactorVsThetaWobble(NULL),bIsJFactorOnLessOff(1),
 dDeg2Rad(TMath::Pi()/180.), dBinResolution(binResolution),
 bIsdNdOmegaSmeared(0), bIsdNdOmegaSigma1Smeared(0)
 {
@@ -141,30 +141,29 @@ bIsdNdOmegaSmeared(0), bIsdNdOmegaSigma1Smeared(0)
 		cout << endl;
 
 
-		if (instrumentName == "IDEAL")
+		if ((instrumentName == "IDEAL")
+				and
+				(author == "Bonnivard" or author == "Geringer" ))
 		{
 			jdDarkMatter= new JDDarkMatter(author, source, candidate, mySourcePath);
 			jdInstrument= new JDInstrument(distCameraCenter, wobble, instrumentName);
 		}
 
-		else if (instrumentName == "MAGICPointLike")
+		else if ((instrumentName == "MAGICPointLike" or instrumentName == "Sensitivity" or instrumentName == "CTANorth50To80GeV")
+				and
+				(author == "Bonnivard" or author == "Geringer" ))
 		{
 			jdDarkMatter= new JDDarkMatter(author, source, candidate, mySourcePath);
 			jdInstrument= new JDInstrument(instrumentName, wobble, myInstrumentPath);
 		}
-
-		else if (instrumentName == "Sensitivity")
+		// This is a test for CTA Paper
+		else if ((instrumentName == "MyInstrument")
+				and
+				(author == "MyJFactor"))
 		{
 			jdDarkMatter= new JDDarkMatter(author, source, candidate, mySourcePath);
 			jdInstrument= new JDInstrument(instrumentName, wobble, myInstrumentPath);
 		}
-
-		else if (instrumentName == "CTANorth50To80GeV")
-		{
-			jdDarkMatter= new JDDarkMatter(author, source, candidate, mySourcePath);
-			jdInstrument= new JDInstrument(instrumentName, wobble, myInstrumentPath);
-		}
-
 		else
 		{
 			cout << "   "<< endl;
@@ -1416,6 +1415,11 @@ void JDOptimization::SetdNdOmegaSmeared()
 	{
 		pointSpreadFunction->SetParameter(0,0);
 		pointSpreadFunction->SetParameter(1,0.11);  // 68% containment at 0.11º for 100 GeV - see Arxiv1705.01790
+	}
+	else if(instrument=="MyInstrument")
+	{
+		pointSpreadFunction->SetParameter(0,0);
+		pointSpreadFunction->SetParameter(1,GetMyInstrument68Containment());  // 68% containment at 0.11º for 100 GeV - see Arxiv1705.01790
 	}
 	else
 	{

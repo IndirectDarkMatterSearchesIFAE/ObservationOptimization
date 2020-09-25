@@ -435,6 +435,34 @@ Bool_t JDInstrument::SetCameraAcceptanceFromInstrument(Bool_t verbose)
 		if(contador>0) return 1;
 	}
 
+	else if(GetInstrumentName()=="MyInstrument")
+	{
+		ifstream file (GetInstrumentPath()+"/"+GetInstrumentName()+".txt");
+
+		cout << "   "<< endl;
+		cout << "   Reading camera acceptance from: "<< endl;
+		cout << "   MyInstrument   "<< endl;
+		cout << "   "<< endl;
+		SetIsMyInstrument(1);
+
+		while(file 	>> distanceCenterCamera >> rateVsDistanceCC)
+			{
+				if (contador==0){
+					rateVsDistanceCC0=rateVsDistanceCC;
+				}
+
+				if(verbose)cout << distanceCenterCamera  << " " <<  rateVsDistanceCC << endl;
+
+				gCameraAcceptance->SetPoint(contador,distanceCenterCamera,(rateVsDistanceCC/rateVsDistanceCC0));
+
+				contador++;
+			}
+		SetDistCenterCameraMax(distanceCenterCamera);
+		file.close();
+		SetIsCameraAcceptance(1);
+		if(contador>0) return 1;
+	}
+
 	return 0;
 }
 

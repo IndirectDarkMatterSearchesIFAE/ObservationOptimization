@@ -122,6 +122,7 @@ protected:
 	void SetIsIdeal(Bool_t isIdeal)									{bIsIdeal=isIdeal;}
 	void SetIsMagic(Bool_t isMagic)									{bIsMagic=isMagic;}
 	void SetIsCTA(Bool_t isCTA)										{bIsCTA=isCTA;}
+	void SetIsMyInstrument(Bool_t isMyInstrument)					{bIsMyInstrument=isMyInstrument;}
 	void SetIsCameraAcceptance(Bool_t isCameraAcceptance)			{bIsCameraAcceptance=isCameraAcceptance;}
 	void SetWobbleDist(Double_t wobbleDist)							{dWobbleDist=wobbleDist;}
 
@@ -191,6 +192,7 @@ private:
 	Bool_t bIsIdeal;
 	Bool_t bIsMagic;
 	Bool_t bIsCTA;
+	Bool_t bIsMyInstrument;
 	Bool_t bIsCameraAcceptance;
 	Bool_t bIsSphericalCoordinates;
 

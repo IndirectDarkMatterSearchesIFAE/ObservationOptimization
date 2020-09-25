@@ -55,7 +55,9 @@ public:
 	Bool_t GetIsSphericalCoordinates() 			{return jdDarkMatter->GetIsSphericalCoordinates();}
 //
 	Double_t GetBinResolution()					{return dBinResolution;}
-//
+	Double_t GetMyInstrument68Containment()		{return dMyInstrument68Containment;}
+
+
 	TF1* GetTF1QFactorVsTheta(Int_t type=0, Double_t thetaNorm=0.4)
 	{
 		if(type==0)
@@ -388,6 +390,12 @@ TF2* GetTF2QFactorVsThetaWobble(Int_t type=0)
 
 	/**************************************************/
 
+	//	//***** JDOptimization Getters
+	void SetMyInstrument68Containment(Double_t myInstrument68Containment){dMyInstrument68Containment = myInstrument68Containment;}
+
+
+	/**************************************************/
+
 //	//***** JDDarkMatter Getters
 	void GetWarning()						{return jdDarkMatter->GetWarning();}
 //
@@ -486,7 +494,8 @@ protected:
 	void SetdNdOmegaSigma1Smeared();
 	void SetIsdNdOmegaSmeared(Bool_t isdNdOmegaSmeared)					{bIsdNdOmegaSmeared = isdNdOmegaSmeared;}
 	void SetIsdNdOmegaSigma1Smeared(Bool_t isdNdOmegaSigma1Smeared)		{bIsdNdOmegaSigma1Smeared = isdNdOmegaSigma1Smeared;}
-//
+
+
 //
 	Double_t Q0FactorVsTheta(Double_t* x, Double_t* par);
 	Double_t Q1FactorVsTheta(Double_t* x, Double_t* par);
@@ -648,7 +657,8 @@ private:
 //
 	Double_t dDeg2Rad;
 	Double_t dBinResolution;
-//
+	Double_t dMyInstrument68Containment;
+
 	Bool_t bIsJFactorOnLessOff;
 	Bool_t bIsdNdOmegaSmeared;
 	Bool_t bIsdNdOmegaSigma1Smeared;

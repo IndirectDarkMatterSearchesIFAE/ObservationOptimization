@@ -173,7 +173,7 @@ JDDarkMatter::JDDarkMatter(TString author, TString source, TString candidate, TS
 {
 	cout << endl;
 	cout << endl;
-	cout << "   Constructor JDDarkMatter..." << endl;
+	cout << "   Constructor JDDarkMatter ..." << endl;
 	cout << endl;
 	cout << endl;
 
@@ -370,6 +370,22 @@ Bool_t JDDarkMatter::SetJFactorFromReferences(Bool_t verbose)
 		ReadJFactorGeringer();
 		return 1;
 	}
+	else if (GetAuthor() == "MyJFactor")
+	{
+		cout << "   "<< endl;
+		cout << "   USER DEFINED JFACTOR: "<< endl;
+		cout << "   Reading a JFactor in... "<< endl;
+		cout << "   " << GetSourcePath()  << endl;
+		cout << "   Name of the file... "<< endl;
+		cout << "   " << GetSourceName()  << endl;
+		cout << "   "<< endl;
+
+		SetIsJFactorFromUser(1);
+
+		ReadJFactorFromUser();
+		return 1;
+	}
+
 
 	return 0;
 }
@@ -590,6 +606,63 @@ void JDDarkMatter::ReadJFactorGeringer(Bool_t verbose)
 		SetIsJFactor(1);
 		SetIsJFactorSigma1(1);
 }
+
+//-----------------------------------------------
+//	This function reads the JFactor data from the user...
+//
+//
+void JDDarkMatter::ReadJFactorFromUser(Bool_t verbose)
+{
+
+	Int_t contador = 0;
+
+	gJFactor = new TGraph();
+	gJFactorSigma1 = new TGraph();
+
+	Double_t dJ, dJSigma1, dJ_p1, dJ_m2, dJ_p2;
+	Double_t theta; // [deg]
+
+	if (verbose==1)
+		{
+			cout << " " << endl;
+			cout << "    GetSourcePath() = " << GetSourcePath() << endl;
+			cout << " " << endl;
+		}
+
+
+	while(contador==0)
+	{
+		gJFactor->SetPoint(contador,0.,0.);
+		gJFactorSigma1->SetPoint(contador,0.,0.);
+		contador ++;
+	}
+
+	ifstream file (GetSourcePath()+"/"+GetSourceName()+".txt");
+			while(file >> theta >> dJ >> dJSigma1 >> dJ_p1 >> dJ_m2 >> dJ_p2)
+			{
+				gJFactor->SetPoint(contador,theta,(dJ*(TMath::Power(SolarMass2GeV,1.)/TMath::Power(kpc2cm,2.))));
+				gJFactorSigma1->SetPoint(contador,theta,(dJSigma1*(TMath::Power(SolarMass2GeV,1.)/TMath::Power(kpc2cm,2.))));
+
+				// only for Tests
+				if (verbose==1) cout << theta << " " << dJ*(TMath::Power(SolarMass2GeV,1.)/TMath::Power(kpc2cm,2.)) << endl;
+				if (verbose==1) cout << theta << " " << dJSigma1*(TMath::Power(SolarMass2GeV,1.)/TMath::Power(kpc2cm,2.)) << endl;
+
+				if(contador==1) SetJFactorMin(dJ*(TMath::Power(SolarMass2GeV,1.)/TMath::Power(kpc2cm,2.)));
+				if(contador==1) SetJFactorSigma1Min(dJSigma1*(TMath::Power(SolarMass2GeV,1.)/TMath::Power(kpc2cm,2.)));
+
+				if(contador==1) SetThetaMin(theta);
+				contador ++;
+			}
+
+			SetNumPointsJFactorGraph(contador);
+			SetJFactorMax(dJ*(TMath::Power(SolarMass2GeV,1.)/TMath::Power(kpc2cm,2.)));
+			SetThetaMax(theta);
+			file.close();
+			SetIsJFactor(1);
+			SetIsJFactorSigma1(1);
+
+}
+
 
 //-----------------------------------------------
 // It evaluates the TGraph JFactor [~GeV, ~cm] vs Theta [deg]
