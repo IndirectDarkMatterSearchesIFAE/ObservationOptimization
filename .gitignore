@@ -1,3 +1,11 @@
+### Manual list of things I want to ignore
+.DS_Store
+.cproject
+.project
+.settings/
+plots/
+
+
 # Prerequisites
 *.d
 *~
