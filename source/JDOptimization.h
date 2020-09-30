@@ -55,8 +55,8 @@ public:
 	Bool_t GetIsSphericalCoordinates() 			{return jdDarkMatter->GetIsSphericalCoordinates();}
 //
 	Double_t GetBinResolution()					{return dBinResolution;}
-
 	Double_t GetMyInstrument68Containment()		{return dMyInstrument68Containment;}
+
 
 	TF1* GetTF1QFactorVsTheta(Int_t type=0, Double_t thetaNorm=0.4)
 	{
@@ -233,7 +233,6 @@ void GetOptimalThetaAndWobble(Double_t &thetaOpt, Double_t &thetaOptRangMin, Dou
 	}
 	else
 	{
-
 		cout << "   **************************************************" << endl;
 		cout << "   ***                                            ***" << endl;
 		cout << "   ***  WARNING:                                  ***" << endl;
@@ -394,6 +393,9 @@ TF2* GetTF2QFactorVsThetaWobble(Int_t type=0)
 	//	//***** JDOptimization Getters
 	void SetMyInstrument68Containment(Double_t myInstrument68Containment){dMyInstrument68Containment = myInstrument68Containment;}
 
+
+	/**************************************************/
+
 //	//***** JDDarkMatter Getters
 	void GetWarning()						{return jdDarkMatter->GetWarning();}
 //
@@ -493,6 +495,7 @@ protected:
 	void SetIsdNdOmegaSmeared(Bool_t isdNdOmegaSmeared)					{bIsdNdOmegaSmeared = isdNdOmegaSmeared;}
 	void SetIsdNdOmegaSigma1Smeared(Bool_t isdNdOmegaSigma1Smeared)		{bIsdNdOmegaSigma1Smeared = isdNdOmegaSigma1Smeared;}
 
+
 //
 	Double_t Q0FactorVsTheta(Double_t* x, Double_t* par);
 	Double_t Q1FactorVsTheta(Double_t* x, Double_t* par);
@@ -524,28 +527,24 @@ protected:
 //	// ...VsTheta
 //	Double_t dNdOmegaEpsilonVsTheta(Double_t* x, Double_t* par);
 	Double_t dNdOmegaSmearedVsTheta(Double_t* x, Double_t* par);
-
 	Double_t dNdOmegaSigma1SmearedVsTheta(Double_t* x, Double_t* par);
-
 //
 //	// ...VsThetaPhi
 //	Double_t dNdOmegaSmearedVsThetaPhi(Double_t* x, Double_t* par);
 	Double_t dNdOmegaEpsilonVsThetaPhi(Double_t* x, Double_t* par);
 	Double_t dNdOmegaSmearedEpsilonVsThetaPhi(Double_t* x, Double_t* par);
-//	Double_t dNdOmegaSigma1SmearedEpsilonVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t dNdOmegaSigma1SmearedEpsilonVsThetaPhi(Double_t* x, Double_t* par);
 	Double_t dNdOmegaSmearedEpsilonOffVsThetaPhi(Double_t* x, Double_t* par);
 	Double_t dNdOmegaSigma1SmearedEpsilonOffVsThetaPhi(Double_t* x, Double_t* par);
 	Double_t dNdOmegaSmearedOffVsThetaPhi(Double_t* x, Double_t* par);
-//	Double_t dNdOmegaSigma1EpsilonVsThetaPhi(Double_t* x, Double_t* par);
-//	Double_t dNdOmegaSigma1OffEpsilonVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t dNdOmegaSigma1EpsilonVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t dNdOmegaSigma1OffEpsilonVsThetaPhi(Double_t* x, Double_t* par);
 	Double_t dNdOmegaSigma1SmearedOffVsThetaPhi(Double_t* x, Double_t* par);
-
 	Double_t dNdOmegaOffEpsilonVsThetaPhi(Double_t* x, Double_t* par);
-
 //
 //	// ...ThetaVsThetaPhi
 	Double_t dNdOmegaSmearedThetaVsThetaPhi(Double_t* x, Double_t* par);
-//	Double_t dNdOmegaSmearedOffThetaVsThetaPhi(Double_t* x, Double_t* par);
+	Double_t dNdOmegaSmearedOffThetaVsThetaPhi(Double_t* x, Double_t* par);
 	Double_t dNdOmegaEpsilonThetaVsThetaPhi(Double_t* x, Double_t* par);
 	Double_t dNdOmegaSmearedEpsilonThetaVsThetaPhi(Double_t* x, Double_t* par);
 	Double_t dNdOmegaSigma1SmearedEpsilonThetaVsThetaPhi(Double_t* x, Double_t* par);
@@ -632,15 +631,15 @@ private:
 	TF2* fdNdOmegaSigma1SmearedEpsilonVsThetaPhi;
 	TF2* fdNdOmegaSmearedEpsilonOffVsThetaPhi;
 	TF2* fdNdOmegaSigma1SmearedEpsilonOffVsThetaPhi;
-//	TF2* fdNdOmegaOffEpsilonVsThetaPhi;
-//	TF2* fdNdOmegaSigma1EpsilonVsThetaPhi;
-//	TF2* fdNdOmegaSigma1OffEpsilonVsThetaPhi;
+	TF2* fdNdOmegaOffEpsilonVsThetaPhi;
+	TF2* fdNdOmegaSigma1EpsilonVsThetaPhi;
+	TF2* fdNdOmegaSigma1OffEpsilonVsThetaPhi;
 	TF2* fdNdOmegaSigma1SmearedOffVsThetaPhi;
 //	//TF2* fdNdOmegaSigma1SmearedOffVsThetaPhi;
 //
 //	// ...ThetaVsThetaPhi
 	TF2* fdNdOmegaSmearedThetaVsThetaPhi;
-//	TF2* fdNdOmegaSmearedOffThetaVsThetaPhi;
+	TF2* fdNdOmegaSmearedOffThetaVsThetaPhi;
 	TF2* fdNdOmegaEpsilonThetaVsThetaPhi;
 	TF2* fdNdOmegaSmearedEpsilonThetaVsThetaPhi;
 	TF2* fdNdOmegaSigma1SmearedEpsilonThetaVsThetaPhi;
@@ -651,7 +650,6 @@ private:
 	TF2* fdNdOmegaSigma1OffEpsilonThetaVsThetaPhi;
 	TF2* fdNdOmegaSigma1SmearedThetaVsThetaPhi;
 	TF2* fdNdOmegaSigma1SmearedOffThetaVsThetaPhi;
-
 //
 //
 	TGraph* gdNdOmegaSmeared;
